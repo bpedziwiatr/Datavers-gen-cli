@@ -22,7 +22,7 @@ namespace DataverseGen.Core.Metadata
         public static MappingRelationship1N Parse(OneToManyRelationshipMetadata rel, MappingField[] properties)
         {
             string propertyName =
-                properties.First(p => p.Attribute.LogicalName.ToLower() == rel.ReferencedAttribute.ToLower()).DisplayName;
+                properties.First(p => string.Equals(p.Attribute.LogicalName, rel.ReferencedAttribute, StringComparison.CurrentCultureIgnoreCase)).DisplayName;
 
             MappingRelationship1N result = new MappingRelationship1N
             {
@@ -35,20 +35,18 @@ namespace DataverseGen.Core.Metadata
                     IntersectingEntity = ""
                 },
                 ForeignKey = propertyName,
-                DisplayName = Naming.GetProperVariableName(rel.SchemaName),
-                SchemaName = Naming.GetProperVariableName(rel.SchemaName),
+                DisplayName = MetadataNamingExtensions.GetProperVariableName(rel.SchemaName),
+                SchemaName = MetadataNamingExtensions.GetProperVariableName(rel.SchemaName),
                 LogicalName = rel.ReferencingAttribute,
-                PrivateName = Naming.GetEntityPropertyPrivateName(rel.SchemaName),
-                HybridName = Naming.GetPluralName(Naming.GetProperVariableName(rel.SchemaName)),
+                PrivateName = rel.SchemaName.GetEntityPropertyPrivateName(),
+                HybridName = MetadataNamingExtensions.GetProperVariableName(rel.SchemaName).GetPluralName(),
                 EntityRole = "null",
-                Type = Naming.GetProperVariableName(rel.ReferencingEntity),
+                Type = MetadataNamingExtensions.GetProperVariableName(rel.ReferencingEntity),
             };
 
-            if (rel.ReferencedEntity == rel.ReferencingEntity)
-            {
-                result.DisplayName = "Referenced" + result.DisplayName;
-                result.EntityRole = "Microsoft.Xrm.Sdk.EntityRole.Referenced";
-            }
+            if (rel.ReferencedEntity != rel.ReferencingEntity) return result;
+            result.DisplayName = "Referenced" + result.DisplayName;
+            result.EntityRole = "Microsoft.Xrm.Sdk.EntityRole.Referenced";
 
             return result;
         }

@@ -21,7 +21,7 @@ namespace DataverseGen.Core.Metadata
         public string AttributeTypeName { get; private set; }
         public string DeprecatedVersion { get; set; }
         public string Description { get; set; }
-        public string DescriptionXmlSafe => Naming.XmlEscape(Description);
+        public string DescriptionXmlSafe => Description.XmlEscape();
 
         public string DisplayName { get; set; }
         public MappingEntity Entity { get; set; }
@@ -217,9 +217,9 @@ namespace DataverseGen.Core.Metadata
             result.IsPrimaryKey = attribute.IsPrimaryId == true;
 
             result.LogicalName = attribute.LogicalName;
-            result.DisplayName = Naming.GetProperVariableName(attribute);
-            result.PrivatePropertyName = Naming.GetEntityPropertyPrivateName(attribute.SchemaName);
-            result.HybridName = Naming.GetProperHybridFieldName(result.DisplayName, result.Attribute);
+            result.DisplayName = attribute.GetProperVariableName();
+            result.PrivatePropertyName = attribute.SchemaName.GetEntityPropertyPrivateName();
+            result.HybridName = result.GetProperHybridFieldName();
 
             if (attribute.Description?.UserLocalizedLabel != null)
                 result.Description = attribute.Description.UserLocalizedLabel.Label;
@@ -329,22 +329,18 @@ namespace DataverseGen.Core.Metadata
 
                         break;
                     }
-                case MoneyAttributeMetadata _:
+                case MoneyAttributeMetadata moneyAttributeMetadata:
                     {
-                        if (attribute is MoneyAttributeMetadata attr)
-                        {
-                            result.Min = attr.MinValue != null ? (decimal)attr.MinValue.Value : -1;
-                            result.Max = attr.MaxValue != null ? (decimal)attr.MaxValue.Value : -1;
-                        }
+                        result.Min = moneyAttributeMetadata.MinValue != null ? (decimal)moneyAttributeMetadata.MinValue.Value : -1;
+                        result.Max = moneyAttributeMetadata.MaxValue != null ? (decimal)moneyAttributeMetadata.MaxValue.Value : -1;
+
                         break;
                     }
-                case DoubleAttributeMetadata _:
+                case DoubleAttributeMetadata doubleAttributeMetadata:
                     {
-                        if (attribute is DoubleAttributeMetadata attr)
-                        {
-                            result.Min = attr.MinValue != null ? (decimal)attr.MinValue.Value : -1;
-                            result.Max = attr.MaxValue != null ? (decimal)attr.MaxValue.Value : -1;
-                        }
+                        result.Min = doubleAttributeMetadata.MinValue != null ? (decimal)doubleAttributeMetadata.MinValue.Value : -1;
+                        result.Max = doubleAttributeMetadata.MaxValue != null ? (decimal)doubleAttributeMetadata.MaxValue.Value : -1;
+
                         break;
                     }
             }

@@ -45,7 +45,7 @@
     <Compile Include="Class1.cs" />
     <Compile Include="Config\ConfigModel.cs" />
     <Compile Include="DataConverter\DataverseConnector.cs" />
-    <Compile Include="Extensions\Helper.cs" />
+    <Compile Include="Extensions\MetadataNamingExtensions.cs" />
     <Compile Include="Metadata\Context.cs" />
     <Compile Include="Metadata\CrmAttribute.cs" />
     <Compile Include="Metadata\MappingEntity.cs" />
@@ -54,8 +54,6 @@
     <Compile Include="Metadata\MappingRelationship1N.cs" />
     <Compile Include="Metadata\MappingRelationshipMN.cs" />
     <Compile Include="Metadata\MappingRelationshipN1.cs" />
-    <Compile Include="Metadata\Settings.cs" />
-    <Compile Include="Metadata\TestModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="T4\Generator.cs" />
     <Compile Include="T4\TextTemplatingEngineHost.cs" />

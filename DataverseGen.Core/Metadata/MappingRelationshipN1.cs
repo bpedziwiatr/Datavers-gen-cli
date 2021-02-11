@@ -1,7 +1,7 @@
-﻿using System;
-using System.Linq;
-using DataverseGen.Core.Extensions;
+﻿using DataverseGen.Core.Extensions;
 using Microsoft.Xrm.Sdk.Metadata;
+using System;
+using System.Linq;
 
 namespace DataverseGen.Core.Metadata
 {
@@ -11,19 +11,19 @@ namespace DataverseGen.Core.Metadata
         public CrmRelationshipAttribute Attribute { get; set; }
 
         public string DisplayName { get; set; }
-        public string SchemaName { get; set; }
-        public string LogicalName { get; set; }
-        public string HybridName { get; set; }
-        public string ForeignKey  { get; set; }
-        public string PrivateName { get; set; }
         public string EntityRole { get; set; }
-        public string Type { get; set; }
-        public MappingEntity ToEntity { get; set; }
+        public string ForeignKey { get; set; }
+        public string HybridName { get; set; }
+        public string LogicalName { get; set; }
+        public string PrivateName { get; set; }
         public MappingField Property { get; set; }
-
+        public string SchemaName { get; set; }
+        public MappingEntity ToEntity { get; set; }
+        public string Type { get; set; }
         public static MappingRelationshipN1 Parse(OneToManyRelationshipMetadata rel, MappingField[] properties)
         {
-            MappingField property = properties.First(p => p.Attribute.LogicalName.ToLower() == rel.ReferencingAttribute.ToLower());
+            MappingField property = properties.First(
+                p => string.Equals(p.Attribute.LogicalName, rel.ReferencingAttribute, StringComparison.CurrentCultureIgnoreCase));
 
             string propertyName = property.DisplayName;
 
@@ -38,22 +38,20 @@ namespace DataverseGen.Core.Metadata
                     IntersectingEntity = ""
                 },
 
-                DisplayName = Naming.GetProperVariableName(rel.SchemaName),
-                SchemaName = Naming.GetProperVariableName(rel.SchemaName),
+                DisplayName = MetadataNamingExtensions.GetProperVariableName(rel.SchemaName),
+                SchemaName = MetadataNamingExtensions.GetProperVariableName(rel.SchemaName),
                 LogicalName = rel.ReferencingAttribute,
-                HybridName = Naming.GetProperVariableName(rel.SchemaName) + "_N1",
-                PrivateName = "_n1"+ Naming.GetEntityPropertyPrivateName(rel.SchemaName),
+                HybridName = MetadataNamingExtensions.GetProperVariableName(rel.SchemaName) + "_N1",
+                PrivateName = "_n1" + rel.SchemaName.GetEntityPropertyPrivateName(),
                 ForeignKey = propertyName,
-                Type = Naming.GetProperVariableName(rel.ReferencedEntity),
+                Type = MetadataNamingExtensions.GetProperVariableName(rel.ReferencedEntity),
                 Property = property,
                 EntityRole = "null"
             };
 
-            if (rel.ReferencedEntity == rel.ReferencingEntity)
-            {
-                result.EntityRole = "Microsoft.Xrm.Sdk.EntityRole.Referencing";
-                result.DisplayName = "Referencing" + result.DisplayName;
-            }
+            if (rel.ReferencedEntity != rel.ReferencingEntity) return result;
+            result.EntityRole = "Microsoft.Xrm.Sdk.EntityRole.Referencing";
+            result.DisplayName = "Referencing" + result.DisplayName;
 
             return result;
         }

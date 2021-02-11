@@ -21,13 +21,7 @@ namespace DataverseGen.Core.Metadata
         public MappingRelationship1N[] RelationshipsOneToMany { get; set; }
         public MappingRelationshipN1[] RelationshipsManyToOne { get; set; }
 
-        public string LogicalName
-        {
-            get
-            {
-                return Attribute.LogicalName;
-            }
-        }
+        public string LogicalName => Attribute.LogicalName;
 
         public string DisplayName { get; set; }
         public string HybridName { get; set; }
@@ -36,9 +30,9 @@ namespace DataverseGen.Core.Metadata
         public string PrimaryKeyProperty { get; set; }
         public string PrimaryNameAttribute { get; set; }
         public string Description { get; set; }
-        public string DescriptionXmlSafe => Naming.XmlEscape(Description);
+        public string DescriptionXmlSafe => Description.XmlEscape();
 
-        public string Plural => Naming.GetPluralName(DisplayName);
+        public string Plural => DisplayName.GetPluralName();
 
         public MappingEntity()
         {
@@ -57,8 +51,8 @@ namespace DataverseGen.Core.Metadata
             entity.Attribute.PrimaryKey = entityMetadata.PrimaryIdAttribute;
 
        
-            entity.DisplayName = Naming.GetProperEntityName(entityMetadata.SchemaName);
-            entity.HybridName = Naming.GetProperHybridName(entityMetadata.SchemaName, entityMetadata.LogicalName);
+            entity.DisplayName = entityMetadata.GetProperEntityName();
+            entity.HybridName = entityMetadata.GetProperHybridName();
             entity.StateName = entity.HybridName + "State";
 
             if (entityMetadata.Description?.UserLocalizedLabel != null)
@@ -122,12 +116,12 @@ namespace DataverseGen.Core.Metadata
                 }
             });
 
-            List<MappingRelationshipMN> relationshipsManyToMany = entityMetadata.ManyToManyRelationships.Select(r => MappingRelationshipMN.Parse(r, entity.LogicalName)).ToList();
-            List<MappingRelationshipMN> selfReferenced = relationshipsManyToMany.Where(r => r.IsSelfReferenced).ToList();
-            foreach (MappingRelationshipMN referenced in selfReferenced)
+            List<MappingRelationshipMn> relationshipsManyToMany = entityMetadata.ManyToManyRelationships.Select(r => MappingRelationshipMn.Parse(r, entity.LogicalName)).ToList();
+            List<MappingRelationshipMn> selfReferenced = relationshipsManyToMany.Where(r => r.IsSelfReferenced).ToList();
+            foreach (MappingRelationshipMn referenced in selfReferenced)
             {
-                MappingRelationshipMN referencing = (MappingRelationshipMN)referenced.Clone();
-                referencing.DisplayName = "Referencing" + Naming.GetProperVariableName(referenced.SchemaName);
+                MappingRelationshipMn referencing = (MappingRelationshipMn)referenced.Clone();
+                referencing.DisplayName = "Referencing" + MetadataNamingExtensions.GetProperVariableName(referenced.SchemaName);
                 referencing.EntityRole = "Microsoft.Xrm.Sdk.EntityRole.Referencing";
                 relationshipsManyToMany.Add(referencing);
             }
@@ -261,6 +255,6 @@ namespace DataverseGen.Core.Metadata
             if (fields.All(f => f.DisplayName != image.DisplayName))
                 fields.Add(image);
         }
-        public MappingRelationshipMN[] RelationshipsManyToMany { get; set; }
+        public MappingRelationshipMn[] RelationshipsManyToMany { get; set; }
     }
 }

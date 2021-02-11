@@ -1,28 +1,27 @@
-﻿using System;
-using DataverseGen.Core.Extensions;
+﻿using DataverseGen.Core.Extensions;
 using Microsoft.Xrm.Sdk.Metadata;
+using System;
 
 namespace DataverseGen.Core.Metadata
 {
     [Serializable]
-    public class MappingRelationshipMN : ICloneable
+    public class MappingRelationshipMn : ICloneable
     {
         public CrmRelationshipAttribute Attribute { get; set; }
 
         public string DisplayName { get; set; }
-        public string SchemaName { get; set; }
-        public string HybridName { get; set; }
-        public string ForeignKey { get; set; }
-        public string PrivateName { get; set; }
         public string EntityRole { get; set; }
-        public string Type {get; set; }
+        public string ForeignKey { get; set; }
+        public string HybridName { get; set; }
         public bool IsSelfReferenced { get; set; }
+        public string PrivateName { get; set; }
+        public string SchemaName { get; set; }
         public MappingEntity ToEntity { get; set; }
-
-        public static MappingRelationshipMN Parse(ManyToManyRelationshipMetadata rel, string ThisEntityLogicalName)
+        public string Type { get; set; }
+        public static MappingRelationshipMn Parse(ManyToManyRelationshipMetadata rel, string thisEntityLogicalName)
         {
-            MappingRelationshipMN result = new MappingRelationshipMN();
-            if (rel.Entity1LogicalName == ThisEntityLogicalName)
+            MappingRelationshipMn result = new MappingRelationshipMn();
+            if (rel.Entity1LogicalName == thisEntityLogicalName)
             {
                 result.Attribute = new CrmRelationshipAttribute
                 {
@@ -46,31 +45,31 @@ namespace DataverseGen.Core.Metadata
             }
 
             result.EntityRole = "null";
-            result.SchemaName = Naming.GetProperVariableName(rel.SchemaName);
-            result.DisplayName = Naming.GetProperVariableName(rel.SchemaName);
-            if (rel.Entity1LogicalName == rel.Entity2LogicalName && rel.Entity1LogicalName == ThisEntityLogicalName)
+            result.SchemaName = MetadataNamingExtensions.GetProperVariableName(rel.SchemaName);
+            result.DisplayName = MetadataNamingExtensions.GetProperVariableName(rel.SchemaName);
+            if (rel.Entity1LogicalName == rel.Entity2LogicalName && rel.Entity1LogicalName == thisEntityLogicalName)
             {
                 result.DisplayName = "Referenced" + result.DisplayName;
                 result.EntityRole = "Microsoft.Xrm.Sdk.EntityRole.Referenced";
                 result.IsSelfReferenced = true;
             }
-            if (result.DisplayName == ThisEntityLogicalName)
+            if (result.DisplayName == thisEntityLogicalName)
             {
                 result.DisplayName += "1";   // this is what CrmSvcUtil does
             }
 
-            result.HybridName = Naming.GetProperVariableName(rel.SchemaName) + "_NN";  
-            result.PrivateName = "_nn" + Naming.GetEntityPropertyPrivateName(rel.SchemaName);
-            result.ForeignKey =  Naming.GetProperVariableName(result.Attribute.ToKey);
-            result.Type = Naming.GetProperVariableName(result.Attribute.ToEntity);
+            result.HybridName = MetadataNamingExtensions.GetProperVariableName(rel.SchemaName) + "_NN";
+            result.PrivateName = "_nn" + rel.SchemaName.GetEntityPropertyPrivateName();
+            result.ForeignKey = MetadataNamingExtensions.GetProperVariableName(result.Attribute.ToKey);
+            result.Type = MetadataNamingExtensions.GetProperVariableName(result.Attribute.ToEntity);
 
             return result;
         }
 
         public object Clone()
         {
-            MappingRelationshipMN newPerson = (MappingRelationshipMN)this.MemberwiseClone();
-            newPerson.Attribute = (CrmRelationshipAttribute)this.Attribute.Clone();
+            MappingRelationshipMn newPerson = (MappingRelationshipMn)MemberwiseClone();
+            newPerson.Attribute = (CrmRelationshipAttribute)Attribute.Clone();
             return newPerson;
         }
     }

@@ -27,7 +27,7 @@ namespace DataverseGen.Core.Metadata
 
         public object Clone()
         {
-            return this.MemberwiseClone();
+            return MemberwiseClone();
         }
     }
 

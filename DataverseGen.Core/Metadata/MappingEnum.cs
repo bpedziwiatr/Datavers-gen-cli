@@ -30,7 +30,7 @@ namespace DataverseGen.Core.Metadata
         {
             MappingEnum enm = new MappingEnum
             {
-                DisplayName = Naming.GetProperVariableName(Naming.GetProperVariableName(pickList.SchemaName)),
+                DisplayName = MetadataNamingExtensions.GetProperVariableName(MetadataNamingExtensions.GetProperVariableName(pickList.SchemaName)),
                 Items =
                     pickList.OptionSet.Options
                     .Where(p=>p.Label.UserLocalizedLabel != null)
@@ -42,7 +42,7 @@ namespace DataverseGen.Core.Metadata
                                 DisplayName = o.Label.UserLocalizedLabel.Label,
                                 Value = o.Value ?? 1
                             },
-                            Name = Naming.GetProperVariableName(o.Label.UserLocalizedLabel.Label)
+                            Name = MetadataNamingExtensions.GetProperVariableName(o.Label.UserLocalizedLabel.Label)
                         }
                     ).ToArray()
             };
@@ -56,7 +56,7 @@ namespace DataverseGen.Core.Metadata
         {
             MappingEnum enm = new MappingEnum
             {
-                DisplayName = Naming.GetProperVariableName(Naming.GetProperVariableName(twoOption.SchemaName)),
+                DisplayName = MetadataNamingExtensions.GetProperVariableName(MetadataNamingExtensions.GetProperVariableName(twoOption.SchemaName)),
                 Items = new MapperEnumItem[2]
             };
             enm.Items[0] = MapBoolOption(twoOption.OptionSet.TrueOption);
@@ -88,7 +88,7 @@ namespace DataverseGen.Core.Metadata
                     DisplayName = option.Label.UserLocalizedLabel.Label,
                     Value = (int)option.Value
                 },
-                Name = Naming.GetProperVariableName(option.Label.UserLocalizedLabel.Label)
+                Name = MetadataNamingExtensions.GetProperVariableName(option.Label.UserLocalizedLabel.Label)
             };
             return results;
         }
