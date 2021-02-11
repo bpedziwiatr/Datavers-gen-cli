@@ -1,0 +1,392 @@
+﻿<#@ template debug="false" hostspecific="true" language="C#" #>
+<#@ output extension=".cs" #>
+<#@ assembly name="DataverseGen.Core.dll" #>
+<#@ import namespace="DataverseGen.Core.Metadata" #>
+<#@ parameter type="DataverseGen.Core.Metadata.Context" name="Context"#>
+<#@include file="MultipleOutputHelper.ttinclude" #>
+<# var manager = Manager.Create(Host, GenerationEnvironment); #>
+<# manager.StartHeader(); #>
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.Serialization;
+using Microsoft.Xrm.Sdk;
+using Microsoft.Xrm.Sdk.Client;
+using System.ComponentModel;
+
+namespace <#= Context.Namespace #>
+{
+<# manager.EndBlock(); #>
+<# foreach (var entity in Context.Entities) { 
+		manager.StartNewFile(String.Format("{0}.cs", entity.HybridName)); 
+#>
+<#	if (entity.States != null) { #>
+	[DataContract]
+	public enum <#=entity.StateName#>
+	{
+<# foreach (var itm in entity.States.Items) { #>
+		
+		[EnumMember]
+		<#=itm.Name#> = <#=itm.Value#>,
+<#}#>
+	}
+<#}#>
+
+	/// <summary>
+	/// <#=entity.DescriptionXmlSafe.Replace("\n","").Replace("\r", " \r\n\t/// ") #>
+	/// </summary>
+	[DataContract]
+	[EntityLogicalName("<#=entity.LogicalName#>")]
+	public partial class <#=entity.HybridName#> : Entity, INotifyPropertyChanging, INotifyPropertyChanged
+	{
+	   
+		
+		/// <summary>
+		/// Default Constructor.
+		/// </summary>
+		public <#=entity.HybridName#>() : 
+				base(EntityLogicalName)
+		{
+		}
+		
+		public const string EntityLogicalName = "<#=entity.LogicalName#>";
+		
+		public const int EntityTypeCode = <#=entity.TypeCode#>;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		private void OnPropertyChanged(string propertyName)
+		{
+			if ((PropertyChanged != null))
+			{
+				PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		private void OnPropertyChanging(string propertyName)
+		{
+			if ((PropertyChanging != null))
+			{
+				PropertyChanging(this, new PropertyChangingEventArgs(propertyName));
+			}
+		}
+		
+		[AttributeLogicalName("<#=entity.PrimaryKey.LogicalName#>")]
+		public override Guid Id
+		{
+			get
+			{
+				return base.Id;
+			}
+			set
+			{
+<# if(entity.PrimaryKey.IsValidForCreate) { #>
+				<#=entity.PrimaryKey.DisplayName#> = value;
+<# } else { #>
+				base.Id = value;
+<# } #>
+			}
+		}
+<#	foreach(var attribute in entity.Fields)	{#>
+<# if(attribute.Attribute.IsEntityReferenceHelper != true) { #>
+<# if(attribute.Description != "") { #>
+		/// <summary>
+		/// <#=attribute.DescriptionXmlSafe.Replace("\n","").Replace("\r", " \r\n\t\t/// ") #>
+		/// </summary>
+<# } #>
+		[AttributeLogicalName("<#=attribute.Attribute.LogicalName#>")]
+<# if(attribute.IsDeprecated) { #>
+		[System.Obsolete]
+<# } #>
+		public <#=attribute.TargetTypeForCrmSvcUtil#> <#=attribute.DisplayName#>
+		{
+<# if(attribute.IsActivityParty) { #>
+			get
+			{
+				EntityCollection collection = GetAttributeValue<EntityCollection>("<#=attribute.Attribute.LogicalName#>");
+				if (((collection != null) 
+							&& (collection.Entities != null)))
+				{
+					return Enumerable.Cast<ActivityParty>(collection.Entities);
+				}
+				else
+				{
+					return null;
+				}
+			}
+<# if(attribute.IsValidForUpdate == true || attribute.IsValidForCreate == true) { #>
+			set
+			{
+				OnPropertyChanging("<#=attribute.DisplayName#>");
+				if ((value == null))
+				{
+					SetAttributeValue("<#=attribute.Attribute.LogicalName#>", value);
+				}
+				else
+				{
+					SetAttributeValue("<#=attribute.Attribute.LogicalName#>", new EntityCollection(new List<Entity>(value)));
+				}
+				OnPropertyChanged("<#=attribute.DisplayName#>");
+			}
+<# } #>
+<# } else if(attribute.IsStateCode) { #>
+			get
+			{
+				OptionSetValue optionSet = GetAttributeValue<OptionSetValue>("<#=attribute.Attribute.LogicalName#>");
+				if ((optionSet != null))
+				{
+					return ((<#=entity.StateName#>)(Enum.ToObject(typeof(<#=entity.StateName#>), optionSet.Value)));
+				}
+				else
+				{
+					return null;
+				}
+			}
+<# if(attribute.IsValidForUpdate == true || attribute.IsValidForCreate == true) { #>
+			set
+			{
+				OnPropertyChanging("<#=attribute.DisplayName#>");
+				if ((value == null))
+				{
+					SetAttributeValue("<#=attribute.Attribute.LogicalName#>", null);
+				}
+				else
+				{
+					SetAttributeValue("<#=attribute.Attribute.LogicalName#>", new OptionSetValue(((int)(value))));
+				}
+				OnPropertyChanged("<#=attribute.DisplayName#>");
+			}
+<# } #>
+<# } else { #>
+			get
+			{
+				return GetAttributeValue<<#=attribute.TargetTypeForCrmSvcUtil#>>("<#=attribute.Attribute.LogicalName#>");
+			}
+<# // if(attribute.IsValidForUpdate == true || attribute.IsValidForCreate == true || attribute == entity.PrimaryKey) { #>
+<# if(attribute.IsValidForUpdate == true || attribute.IsValidForCreate == true) { #>
+			set
+			{
+				OnPropertyChanging("<#=attribute.DisplayName#>");
+				SetAttributeValue("<#=attribute.Attribute.LogicalName#>", value);
+<# if(attribute == entity.PrimaryKey) { #>
+				if (value.HasValue)
+				{
+					base.Id = value.Value;
+				}
+				else
+				{
+					base.Id = System.Guid.Empty;
+				}
+<#}#>
+				OnPropertyChanged("<#=attribute.DisplayName#>");
+			}
+<#}#>
+<#}#>
+		}
+<#}#>
+<#}#>
+<# //BEGIN// 1:N Realationships  #>
+<#	foreach(var attribute in entity.RelationshipsOneToMany)	{#>
+		
+		/// <summary>
+		/// 1:N <#=attribute.SchemaName#>
+		/// </summary>
+<# if(attribute.SchemaName == "calendar_calendar_rules" || attribute.SchemaName == "service_calendar_rules") { #>
+		[AttributeLogicalName("calendarrules")]
+		public IEnumerable<CalendarRule> CalendarRules
+		{
+			get
+			{
+				EntityCollection collection = GetAttributeValue<EntityCollection>("calendarrules");
+				if (((collection != null) 
+							&& (collection.Entities != null)))
+				{
+					return Enumerable.Cast<CalendarRule>(collection.Entities);
+				}
+				else
+				{
+					return null;
+				}
+			}
+			set
+			{
+				OnPropertyChanging("CalendarRules");
+				if ((value == null))
+				{
+					SetAttributeValue("calendarrules", value);
+				}
+				else
+				{
+					SetAttributeValue("calendarrules", new EntityCollection(new List<Entity>(value)));
+				}
+				OnPropertyChanged("CalendarRules");
+			}
+		}
+<# } else { #>
+		[RelationshipSchemaName("<#=attribute.SchemaName#>"<#=attribute.EntityRole=="null" ? "" :", " + attribute.EntityRole#>)]
+		public IEnumerable<<#=attribute.ToEntity.HybridName#>> <#=attribute.DisplayName#>
+		{
+			get
+			{
+				return GetRelatedEntities<<#=attribute.ToEntity.HybridName#>>("<#=attribute.SchemaName#>", <#=attribute.EntityRole#>);
+			}
+			set
+			{
+				OnPropertyChanging("<#=attribute.DisplayName#>");
+				SetRelatedEntities<<#=attribute.ToEntity.HybridName#>>("<#=attribute.SchemaName#>", <#=attribute.EntityRole#>, value);
+				OnPropertyChanged("<#=attribute.DisplayName#>");
+			}
+		}
+<# } #>
+<#}#>
+<# 
+//END// 1:N Realationships
+
+//BEGIN// N:1 Realationships 
+	foreach(var attribute in entity.RelationshipsManyToOne)	{
+#>
+		/// <summary>
+		/// N:1 <#=attribute.SchemaName#>
+		/// </summary>
+		[AttributeLogicalName("<#=attribute.LogicalName#>")]
+		[RelationshipSchemaName("<#=attribute.SchemaName#>"<#=attribute.EntityRole=="null" ? "" :", " + attribute.EntityRole#>)]
+		public <#=attribute.ToEntity.HybridName#> <#=attribute.DisplayName#>
+		{
+			get
+			{
+				return GetRelatedEntity<<#=attribute.ToEntity.HybridName#>>("<#=attribute.SchemaName#>", <#=attribute.EntityRole#>);
+			}
+<# if(attribute.Property.IsValidForCreate || attribute.Property.IsValidForUpdate) { #>
+			set
+			{
+				OnPropertyChanging("<#=attribute.DisplayName#>");
+				SetRelatedEntity<<#=attribute.ToEntity.HybridName#>>("<#=attribute.SchemaName#>", <#=attribute.EntityRole#>, value);
+				OnPropertyChanged("<#=attribute.DisplayName#>");
+			}
+<# } #>
+		}
+<#} //END// N:1 Realationships 
+
+//BEGIN// N:N Realationships 
+	foreach(var attribute in entity.RelationshipsManyToMany)	{
+#>		
+		/// <summary>
+		/// N:N <#=attribute.SchemaName#>
+		/// </summary>
+		[RelationshipSchemaName("<#=attribute.SchemaName#>"<#=attribute.EntityRole=="null" ? "" :", " + attribute.EntityRole#>)]
+		public IEnumerable<<#=attribute.ToEntity.HybridName#>> <#=attribute.DisplayName#>
+		{
+			get
+			{
+				return GetRelatedEntities<<#=attribute.ToEntity.HybridName#>>("<#=attribute.SchemaName#>", <#=attribute.EntityRole#>);
+			}
+			set
+			{
+				OnPropertyChanging("<#=attribute.DisplayName#>");
+				SetRelatedEntities<<#=attribute.ToEntity.HybridName#>>("<#=attribute.SchemaName#>", <#=attribute.EntityRole#>, value);
+				OnPropertyChanged("<#=attribute.DisplayName#>");
+			}
+		}
+<#} //END// N:N Realationships  #>
+}
+<# manager.StartNewFile(String.Format("{0}.Fields.cs", entity.HybridName)); #>
+	public partial class <#=entity.HybridName#> : Entity, INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		public class Fields
+		{
+			public const string SchemaName = "<#=entity.Attribute.LogicalName#>";
+
+			#region Fields.<#=entity.Attribute.LogicalName#>
+
+<#foreach(var f in entity.Fields){#>
+			public const string <#=f.DisplayName#> = "<#=f.Attribute.LogicalName#>";
+<#}#>		
+			#endregion Fields."<#=entity.Attribute.LogicalName#>
+<# //BEGIN// 1:N Realationships  #>
+
+			#region 1:N Realationships
+		<#	foreach(var attribute in entity.RelationshipsOneToMany)	{#>			
+<# if(attribute.SchemaName == "calendar_calendar_rules" || attribute.SchemaName == "service_calendar_rules") { #>		
+			public const string  Relationship_1N_calendarrules ="calendarrules";
+<# } else { #>
+			public const string Relationship_1N_<#=attribute.SchemaName#> ="<#=attribute.SchemaName#>";		
+<# } #>
+<#}#>
+			#endregion  1:N Realationships
+
+<# //END// 1:N Realationships#>
+<#//BEGIN// N:1 Realationships #>
+			#region N:1 Realationships
+	
+	<#foreach(var attribute in entity.RelationshipsManyToOne)	{ #>
+		public const string Relationship_N1_<#=attribute.SchemaName#> ="<#=attribute.SchemaName#>";
+	<# } #>		
+			#endregion N:1 Realationships
+<# //END// N:1 Realationships #>
+
+<#//BEGIN// N:N Realationships#>
+			#region N:N Realationships
+	<#foreach(var attribute in entity.RelationshipsManyToMany)	{#>
+		public const string Relationship_NN_<#=attribute.SchemaName#> ="<#=attribute.SchemaName#>";
+		<#}#>
+
+			#endregion N:N Realationships
+<# //END// N:N Realationships  #>
+
+		}
+	}
+<# manager.StartNewFile(String.Format("{0}.Enums.cs", entity.HybridName)); #>
+	public partial class <#=entity.HybridName#> : Entity, INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		 public class Enums
+		{
+<#foreach(var enm in entity.Enums){#>
+			public enum <#=enm.DisplayName#> 
+			{
+<#foreach(var item in enm.Items){#>
+				<#= item.Name #> = <#= item.Value #>,
+<#}#>
+			}		
+<#}#>
+		}
+	}
+<#
+manager.EndBlock();
+}#>
+<# manager.StartFooter(); #>
+}
+
+<# manager.EndBlock(); #>
+
+<# manager.StartNewFile("XrmServiceContext.cs"); #>
+	/// <summary>
+	/// Represents a source of entities bound to a CRM service. It tracks and manages changes made to the retrieved entities.
+	/// </summary>
+	public partial class XrmServiceContext : OrganizationServiceContext
+	{
+		/// <summary>
+		/// Constructor.
+		/// </summary>
+		public XrmServiceContext(IOrganizationService service) : 
+				base(service)
+		{
+		}
+
+<# foreach (var entity in Context.Entities){ #>
+	/// <summary>
+	/// Gets a binding to the set of all <see cref="<#=entity.HybridName#>"/> entities.
+	/// </summary>
+	public IQueryable<<#=entity.HybridName#>> <#=entity.HybridName#>Set
+	{
+		get
+		{
+			return CreateQuery<<#=entity.HybridName#>>();
+		}
+	}
+<#}#>
+	}
+
+
+<# manager.Process(true); #>

@@ -1,0 +1,60 @@
+{
+  "General": {
+    "OutputFile": "$(TargetDir)DataverseGen.Cli-merged.exe",
+    "TargetPlatform": null,
+    "KeyFile": null,
+    "AlternativeILMergePath": null,
+    "InputAssemblies": [
+      "DataverseGen.Core.dll",
+      "EnvDTE.dll",
+      "Microsoft.Xrm.Sdk.dll",
+      "Microsoft.Crm.Sdk.Proxy.dll",
+      "Microsoft.Xrm.Tooling.Connector.dll",
+      "Microsoft.CodeAnalysis.CSharp.dll",
+      "Microsoft.CodeAnalysis.dll",
+      "Microsoft.Diagnostics.Tracing.EventSource.dll",
+      "Microsoft.IdentityModel.Clients.ActiveDirectory.dll",
+      "Microsoft.IdentityModel.Clients.ActiveDirectory.Platform.dll",
+      "Microsoft.VisualStudio.RemoteControl.dll",
+      "Microsoft.VisualStudio.Telemetry.dll",
+      "Microsoft.VisualStudio.TextTemplating.15.0.dll",
+      "Microsoft.VisualStudio.TextTemplating.Interfaces.10.0.dll",
+      "Microsoft.VisualStudio.TextTemplating.Interfaces.11.0.dll",
+      "Microsoft.VisualStudio.Utilities.Internal.dll",
+      "System.Collections.Immutable.dll",
+      "System.Memory.dll",
+      "System.Numerics.Vectors.dll",
+      "System.Reflection.Metadata.dll",
+      "System.Runtime.CompilerServices.Unsafe.dll"
+
+
+
+
+
+
+
+    ]
+  },
+  "Advanced": {
+    "AllowDuplicateType": null,
+    "AllowMultipleAssemblyLevelAttributes": false,
+    "AllowWildCards": false,
+    "AllowZeroPeKind": false,
+    "AttributeFile": null,
+    "Closed": false,
+    "CopyAttributes": false,
+    "DebugInfo": true,
+    "DelaySign": false,
+    "ExcludeFile": "",
+    "FileAlignment": 512,
+    "Internalize": false,
+    "Log": true,
+    "LogFile": "$(TargetDir)ilmerge.log",
+    "PublicKeyTokens": true,
+    "SearchDirectories": [],
+    "TargetKind": null,
+    "UnionMerge": false,
+    "Version": null,
+    "XmlDocumentation": false
+  }
+}

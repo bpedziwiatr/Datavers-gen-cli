@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30804.86
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataverseGen.Cli", "DataverseGen.Cli\DataverseGen.Cli.csproj", "{4EF3B7BA-D7B7-4DA0-A7BD-AF6D995B894D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataverseGen.Core", "DataverseGen.Core\DataverseGen.Core.csproj", "{9C57355D-7EE0-4438-A87F-50B5C121BFBA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4EF3B7BA-D7B7-4DA0-A7BD-AF6D995B894D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4EF3B7BA-D7B7-4DA0-A7BD-AF6D995B894D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4EF3B7BA-D7B7-4DA0-A7BD-AF6D995B894D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4EF3B7BA-D7B7-4DA0-A7BD-AF6D995B894D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9C57355D-7EE0-4438-A87F-50B5C121BFBA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C57355D-7EE0-4438-A87F-50B5C121BFBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C57355D-7EE0-4438-A87F-50B5C121BFBA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C57355D-7EE0-4438-A87F-50B5C121BFBA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BF7EFFEE-5D20-4507-88D8-6E9399F44DCF}
+	EndGlobalSection
+EndGlobal
