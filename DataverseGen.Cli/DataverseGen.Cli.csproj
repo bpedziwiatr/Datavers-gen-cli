@@ -49,7 +49,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>1704E2EC6C2FAE121749644E3A37A67B2D8FEC44</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>3FE293A649F8F33FE6AC548CB43859918F5F1D10</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
     <ManifestKeyFile>DataverseGen.Cli_TemporaryKey.pfx</ManifestKeyFile>
