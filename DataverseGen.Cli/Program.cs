@@ -7,22 +7,18 @@ using DataverseGen.Core.T4;
 using System;
 using System.IO;
 using System.Runtime.Serialization.Json;
-using System.Web.UI.WebControls;
 
 namespace DataverseGen.Cli
 {
     internal class Program
     {
         private const string title = @"
- _____                                                 ______                                                  ______ _       _____ 
+ _____                                                 ______                                                  ______ _       _____
 (____ \       _                                       / _____)                             _                  / _____) |     (_____)
- _   \ \ ____| |_  ____ _   _ ____  ____ ___  ____   | /  ___  ____ ____   ____  ____ ____| |_  ___   ____   | /     | |        _   
-| |   | / _  |  _)/ _  | | | / _  )/ ___)___)/ _  )  | | (___)/ _  )  _ \ / _  )/ ___) _  |  _)/ _ \ / ___)  | |     | |       | |  
-| |__/ ( ( | | |_( ( | |\ V ( (/ /| |  |___ ( (/ /   | \____/( (/ /| | | ( (/ /| |  ( ( | | |_| |_| | |      | \_____| |_____ _| |_ 
+ _   \ \ ____| |_  ____ _   _ ____  ____ ___  ____   | /  ___  ____ ____   ____  ____ ____| |_  ___   ____   | /     | |        _
+| |   | / _  |  _)/ _  | | | / _  )/ ___)___)/ _  )  | | (___)/ _  )  _ \ / _  )/ ___) _  |  _)/ _ \ / ___)  | |     | |       | |
+| |__/ ( ( | | |_( ( | |\ V ( (/ /| |  |___ ( (/ /   | \____/( (/ /| | | ( (/ /| |  ( ( | | |_| |_| | |      | \_____| |_____ _| |_
 |_____/ \_||_|\___)_||_| \_/ \____)_|  (___/ \____)   \_____/ \____)_| |_|\____)_|   \_||_|\___)___/|_|       \______)_______|_____)
-                                                                                                                                    
-
-
 
 ";
 
@@ -59,12 +55,11 @@ namespace DataverseGen.Cli
                 //        }
                 //    });
 
-
                 Console.WriteLine(title);
                 ConfigModel config = GetConfig();
 
                 DataverseConnector connector = new DataverseConnector(config.ConnectionString, config.Entities);
-                var data = connector.GetMappedEntities();
+                MappingEntity[] data = connector.GetMappedEntities();
                 Console.WriteLine("Finish Load data");
                 // Generator gen = new Generator("Ttfile.tt","out\\",null);
 
@@ -86,7 +81,7 @@ namespace DataverseGen.Cli
                 throw;
             }
             Console.WriteLine("Bye Bye, see you next time");
-            //     Console.ReadKey();
+            Console.ReadKey();
         }
     }
 }
