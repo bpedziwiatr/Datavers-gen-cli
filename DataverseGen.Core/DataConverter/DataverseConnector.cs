@@ -25,19 +25,23 @@ namespace DataverseGen.Core.DataConverter
         {
             Stopwatch stopper= Stopwatch.StartNew();
             CrmServiceClient connection = new CrmServiceClient(_connectionString);
-
+            if (string.IsNullOrWhiteSpace(connection.LastCrmError))
+            {
+                throw new Exception($"Connectiuon did not connect with {_connectionString}");
+            }
             RetrieveAllEntitiesRequest request = new RetrieveAllEntitiesRequest()
             {
                 EntityFilters = EntityFilters.Default,
                 RetrieveAsIfPublished = true,
             };
+            Console.WriteLine("Retriving All Entities");
             RetrieveAllEntitiesResponse response = (RetrieveAllEntitiesResponse)connection.Execute(request);
             EntityMetadata[] allEntities = response.EntityMetadata;
-
+            Console.WriteLine("All Entities  Retrived");
             var entities = allEntities;
-
+            Console.WriteLine("Retriving Selected Entities");
             var selectedEntities = SelectedEntitiesMEtaData(allEntities, connection).ToList();
-
+            Console.WriteLine("All Selected Entities Retrived");
             var mappedEntities = selectedEntities.Select(e => MappingEntity.Parse(e)).OrderBy(e => e.DisplayName).ToList();
             ExcludeRelationshipsNotIncluded(mappedEntities);
             foreach (var ent in mappedEntities)

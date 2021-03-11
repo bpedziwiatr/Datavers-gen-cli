@@ -131,6 +131,8 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-
+  <ItemGroup>
+    <Folder Include="CliParser\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

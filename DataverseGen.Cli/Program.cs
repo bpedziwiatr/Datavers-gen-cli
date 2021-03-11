@@ -1,4 +1,6 @@
-﻿using DataverseGen.Core.Config;
+﻿//using CommandLine;
+//using DataverseGen.Cli.CliParser;
+using DataverseGen.Core.Config;
 using DataverseGen.Core.DataConverter;
 using DataverseGen.Core.Metadata;
 using DataverseGen.Core.T4;
@@ -42,6 +44,21 @@ namespace DataverseGen.Cli
         {
             try
             {
+                //Parser.Default.ParseArguments<Options>(args)
+                //    .WithParsed<Options>(o =>
+                //    {
+                //        if (o.Verbose)
+                //        {
+                //            Console.WriteLine($"Verbose output enabled. Current Arguments: -v {o.Verbose}");
+                //            Console.WriteLine("Quick Start Example! App is in Verbose mode!");
+                //        }
+                //        else
+                //        {
+                //            Console.WriteLine($"Current Arguments: -v {o.Verbose}");
+                //            Console.WriteLine("Quick Start Example!");
+                //        }
+                //    });
+
 
                 Console.WriteLine(title);
                 ConfigModel config = GetConfig();
@@ -64,6 +81,8 @@ namespace DataverseGen.Cli
             catch (Exception e)
             {
                 Console.WriteLine(e);
+                Console.WriteLine("#StackTrace:");
+                Console.WriteLine(e.StackTrace);
                 throw;
             }
             Console.WriteLine("Bye Bye, see you next time");
