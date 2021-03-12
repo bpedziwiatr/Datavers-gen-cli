@@ -78,6 +78,7 @@ namespace DataverseGen.Cli
                 Console.WriteLine(e);
                 Console.WriteLine("#StackTrace:");
                 Console.WriteLine(e.StackTrace);
+                Console.ReadKey();
                 throw;
             }
             Console.WriteLine("Bye Bye, see you next time");
