@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using EnvDTE;
 
 namespace DataverseGen.Core.DataConverter
 {
@@ -25,10 +26,16 @@ namespace DataverseGen.Core.DataConverter
         {
             Stopwatch stopper = Stopwatch.StartNew();
             CrmServiceClient connection = new CrmServiceClient(_connectionString);
-            if (string.IsNullOrWhiteSpace(connection.LastCrmError))
+            if (!connection.IsReady)
             {
-                throw new Exception($"Connection did not connect with {_connectionString}");
+                Console.WriteLine("Waiting for connection...");
+                System.Threading.Thread.Sleep(1000);
             }
+
+            //if (string.IsNullOrWhiteSpace(connection.LastCrmError))
+            //{
+            //    throw new Exception($"Connection did not connect with {_connectionString}. LastCrmError: {connection.LastCrmError}");
+            //}
             RetrieveAllEntitiesRequest request = new RetrieveAllEntitiesRequest()
             {
                 EntityFilters = EntityFilters.Default,
