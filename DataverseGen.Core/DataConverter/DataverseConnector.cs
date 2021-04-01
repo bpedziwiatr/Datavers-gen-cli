@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using EnvDTE;
 
 namespace DataverseGen.Core.DataConverter
 {
@@ -23,52 +24,58 @@ namespace DataverseGen.Core.DataConverter
 
         public MappingEntity[] GetMappedEntities()
         {
-            Stopwatch stopper= Stopwatch.StartNew();
+            Stopwatch stopper = Stopwatch.StartNew();
             CrmServiceClient connection = new CrmServiceClient(_connectionString);
-            if (string.IsNullOrWhiteSpace(connection.LastCrmError))
+            if (!connection.IsReady)
             {
-                throw new Exception($"Connectiuon did not connect with {_connectionString}");
+                Console.WriteLine("Waiting for connection...");
+                System.Threading.Thread.Sleep(1000);
             }
+
+            //if (string.IsNullOrWhiteSpace(connection.LastCrmError))
+            //{
+            //    throw new Exception($"Connection did not connect with {_connectionString}. LastCrmError: {connection.LastCrmError}");
+            //}
             RetrieveAllEntitiesRequest request = new RetrieveAllEntitiesRequest()
             {
                 EntityFilters = EntityFilters.Default,
                 RetrieveAsIfPublished = true,
             };
-            Console.WriteLine("Retriving All Entities");
+            Console.WriteLine("Retrieving All Entities");
             RetrieveAllEntitiesResponse response = (RetrieveAllEntitiesResponse)connection.Execute(request);
             EntityMetadata[] allEntities = response.EntityMetadata;
-            Console.WriteLine("All Entities  Retrived");
-            var entities = allEntities;
-            Console.WriteLine("Retriving Selected Entities");
-            var selectedEntities = SelectedEntitiesMEtaData(allEntities, connection).ToList();
-            Console.WriteLine("All Selected Entities Retrived");
-            var mappedEntities = selectedEntities.Select(e => MappingEntity.Parse(e)).OrderBy(e => e.DisplayName).ToList();
+            Console.WriteLine("All Entities  Retrieved");
+            EntityMetadata[] entities = allEntities;
+            Console.WriteLine("Retrieving Selected Entities");
+            List<EntityMetadata> selectedEntities = SelectedEntitiesMetaData(allEntities, connection).ToList();
+            Console.WriteLine("All Selected Entities Retrieved");
+            List<MappingEntity> mappedEntities = selectedEntities.Select(MappingEntity.Parse).OrderBy(e => e.DisplayName).ToList();
             ExcludeRelationshipsNotIncluded(mappedEntities);
-            foreach (var ent in mappedEntities)
+            foreach (MappingEntity ent in mappedEntities)
             {
-                foreach (var rel in ent.RelationshipsOneToMany)
+                foreach (MappingRelationship1N rel in ent.RelationshipsOneToMany)
                 {
-                    rel.ToEntity = mappedEntities.Where(e => e.LogicalName.Equals(rel.Attribute.ToEntity)).FirstOrDefault();
+                    rel.ToEntity = mappedEntities.Find(e => e.LogicalName.Equals(rel.Attribute.ToEntity));
                 }
-                foreach (var rel in ent.RelationshipsManyToOne)
+                foreach (MappingRelationshipN1 rel in ent.RelationshipsManyToOne)
                 {
-                    rel.ToEntity = mappedEntities.Where(e => e.LogicalName.Equals(rel.Attribute.ToEntity)).FirstOrDefault();
+                    rel.ToEntity = mappedEntities.Find(e => e.LogicalName.Equals(rel.Attribute.ToEntity));
                 }
-                foreach (var rel in ent.RelationshipsManyToMany)
+                foreach (MappingRelationshipMn rel in ent.RelationshipsManyToMany)
                 {
-                    rel.ToEntity = mappedEntities.Where(e => e.LogicalName.Equals(rel.Attribute.ToEntity)).FirstOrDefault();
+                    rel.ToEntity = mappedEntities.Find(e => e.LogicalName.Equals(rel.Attribute.ToEntity));
                 }
             }
 
-            var result = mappedEntities.ToArray();
+            MappingEntity[] result = mappedEntities.ToArray();
             stopper.Stop();
             Console.WriteLine($"Read data from crm took: {stopper.Elapsed:g}");
             return result;
         }
 
-        private static void ExcludeRelationshipsNotIncluded(List<MappingEntity> mappedEntities)
+        private static void ExcludeRelationshipsNotIncluded(IReadOnlyCollection<MappingEntity> mappedEntities)
         {
-            foreach (var ent in mappedEntities)
+            foreach (MappingEntity ent in mappedEntities)
             {
                 ent.RelationshipsOneToMany = ent.RelationshipsOneToMany.ToList().Where(r => mappedEntities.Select(m => m.LogicalName).Contains(r.Type)).ToArray();
                 ent.RelationshipsManyToOne = ent.RelationshipsManyToOne.ToList().Where(r => mappedEntities.Select(m => m.LogicalName).Contains(r.Type)).ToArray();
@@ -76,24 +83,24 @@ namespace DataverseGen.Core.DataConverter
             }
         }
 
-        private  IEnumerable<EntityMetadata> SelectedEntitiesMEtaData(EntityMetadata[] allEntities, IOrganizationService service)
+        private IEnumerable<EntityMetadata> SelectedEntitiesMetaData(EntityMetadata[] allEntities, IOrganizationService service)
         {
-            var selected = allEntities.Where(p => _selectedEntities.Any(pp=>pp == p.LogicalName)).ToList();
+            List<EntityMetadata> selected = allEntities.Where(p => _selectedEntities.Any(pp => pp == p.LogicalName)).ToList();
             if (selected.Any(r => r.IsActivity == true || r.IsActivityParty == true))
             {
                 if (!selected.Any(r => r.LogicalName.Equals("activityparty")))
                     selected.Add(allEntities.Single(r => r.LogicalName.Equals("activityparty")));
             }
-            var results = new List<EntityMetadata>();
-            foreach (var entity in selected)
+            List<EntityMetadata> results = new List<EntityMetadata>();
+            foreach (EntityMetadata entity in selected)
             {
-                var req = new RetrieveEntityRequest
+                RetrieveEntityRequest req = new RetrieveEntityRequest
                 {
                     EntityFilters = EntityFilters.All,
                     LogicalName = entity.LogicalName,
                     RetrieveAsIfPublished = true
                 };
-                var res = (RetrieveEntityResponse)service.Execute(req);
+                RetrieveEntityResponse res = (RetrieveEntityResponse)service.Execute(req);
                 yield return res.EntityMetadata;
             }
         }
