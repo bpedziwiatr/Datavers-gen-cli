@@ -32,10 +32,10 @@ namespace DataverseGen.Core.DataConverter
                 System.Threading.Thread.Sleep(1000);
             }
 
-            //if (string.IsNullOrWhiteSpace(connection.LastCrmError))
-            //{
-            //    throw new Exception($"Connection did not connect with {_connectionString}. LastCrmError: {connection.LastCrmError}");
-            //}
+            if (!string.IsNullOrWhiteSpace(connection.LastCrmError))
+            {
+                throw new Exception($"Connection did not connect with {_connectionString}. LastCrmError: {connection.LastCrmError}");
+            }
             RetrieveAllEntitiesRequest request = new RetrieveAllEntitiesRequest()
             {
                 EntityFilters = EntityFilters.Default,
