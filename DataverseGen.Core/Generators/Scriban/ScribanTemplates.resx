@@ -121,4 +121,16 @@
   <data name="dataversegen_single" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Teamplates\Single\dataversegen-single.sbncs;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="Main.entity" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Teamplates\Multiple\Main\entity.sbncs;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="Main.enums" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Teamplates\Multiple\Main\enums.sbncs;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="Main.fields" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Teamplates\Multiple\Main\fields.sbncs;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="Main.xrmservicecontext" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Teamplates\Multiple\Main\xrmservicecontext.sbncs;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
 </root>

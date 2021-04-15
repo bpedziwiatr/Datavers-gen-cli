@@ -1,0 +1,36 @@
+namespace {{ namespace }}
+{
+    public partial class {{entity.hybrid_name}}
+    {
+        public class Fields
+        {
+            public const string SchemaName = "{{entity.attribute.logical_name}}";
+
+            #region Fields.{{entity.attribute.logical_name}}	
+            {{for field in entity.fields}}			
+            public const string {{field.display_name}} = "{{field.attribute.logical_ame}}";
+
+            {{end}}
+            #endregion Fields.{{entity.attribute.logical_name}}
+            #region 1:N Realationships
+            {{for attribute in entity.relationships_one_to_many}}
+                {{if attribute.schema_name == "calendar_calendar_rules" || attribute.schema_name == "service_calendar_rules"}}
+            public const string  Relationship_1N_calendarrules ="calendarrules";
+                {{else}}
+            public const string Relationship_1N_{{attribute.schema_name}} ="{{attribute.schema_name}}";	
+                {{end}}
+            {{end}}
+            #endregion  1:N Realationships
+            #region N:1 Realationships
+            {{for attribute in entity.relationships_many_to_one}}
+            public const string Relationship_N1_{{attribute.schema_name}} ="{{attribute.schema_name}}";	
+            {{end}}
+            #endregion N:1 Realationships
+            #region N:N Realationships
+            {{for attribute in entity.relationships_many_to_many}}
+            public const string Relationship_NN_{{attribute.schema_name}} ="{{attribute.schema_name}}";	
+            {{end}}
+            #endregion N:N Realationships
+        }
+    }
+}
