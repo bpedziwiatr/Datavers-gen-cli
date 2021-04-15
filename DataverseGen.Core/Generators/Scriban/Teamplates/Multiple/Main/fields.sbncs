@@ -1,3 +1,4 @@
+{{info.welcome_xml}}
 namespace {{ namespace }}
 {
     public partial class {{entity.hybrid_name}}

@@ -1,3 +1,4 @@
+{{info.welcome_xml}}
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Client;
 using System.Linq;
@@ -7,7 +8,8 @@ namespace {{ namespace }}
     /// <summary>
 	/// Represents a source of entities bound to a CRM service. It tracks and manages changes made to the retrieved entities.
 	/// </summary>
-	public partial class XrmServiceContext : OrganizationServiceContext
+    {{info.generated_code_attribute}}
+	public  class XrmServiceContext : OrganizationServiceContext
 	{
 		/// <summary>
 		/// Constructor.

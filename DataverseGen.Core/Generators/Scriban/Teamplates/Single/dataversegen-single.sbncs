@@ -1,3 +1,4 @@
+{{info.welcome_xml}}
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +12,7 @@ namespace {{ namespace }}
 {{for entity in entities}}
 	{{if entity.states}}
 	[DataContract]
+	{{info.generated_code_attribute}}
 	public enum {{entity.state_name}}
 	{
 		{{for stateitem in entity.states.items}}
@@ -25,6 +27,7 @@ namespace {{ namespace }}
 	/// </summary>
 	[DataContract]
 	[EntityLogicalName("{{entity.logical_name }}")]
+	{{info.generated_code_attribute}}
 	public partial class {{entity.hybrid_name}} : Entity, INotifyPropertyChanging, INotifyPropertyChanged
 	{
 		/// <summary>
@@ -247,6 +250,7 @@ namespace {{ namespace }}
 		{{end}}
 		#endregion
 		#region enums
+		{{info.generated_code_attribute}}
 	 	public class Enums
 		{
 		{{for enm in entity.enums}}
@@ -260,7 +264,7 @@ namespace {{ namespace }}
 		}
 		#endregion
 		#region Fields
-		
+			{{info.generated_code_attribute}}
 			public class Fields
 			{
 				public const string SchemaName = "{{entity.attribute.logical_name}}";
@@ -299,6 +303,7 @@ namespace {{ namespace }}
 	/// <summary>
 	/// Represents a source of entities bound to a CRM service. It tracks and manages changes made to the retrieved entities.
 	/// </summary>
+	{{info.generated_code_attribute}}
 	public partial class XrmServiceContext : OrganizationServiceContext
 	{
 		/// <summary>

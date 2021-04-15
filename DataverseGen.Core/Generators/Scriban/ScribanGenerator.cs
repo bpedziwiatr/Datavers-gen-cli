@@ -47,13 +47,13 @@ namespace DataverseGen.Core.Generators.Scriban
 
             foreach (MappingEntity entity in _context.Entities)
             {
-                string entityContent = RemoveEmptyLines(templates.EntityTemplate.Render(new { _context.Namespace, Entity = entity }));
+                string entityContent = RemoveEmptyLines(templates.EntityTemplate.Render(new { _context.Namespace,_context.Info, Entity = entity }));
                 File.WriteAllText($"{dir}/{entity.HybridName}.cs", entityContent, Encoding.UTF8);
 
-                string fieldsContent = RemoveEmptyLines(templates.FieldsTemplate.Render(new { _context.Namespace, Entity = entity }));
+                string fieldsContent = RemoveEmptyLines(templates.FieldsTemplate.Render(new { _context.Namespace,_context.Info, Entity = entity }));
                 File.WriteAllText($"{dir}/{entity.HybridName}.Fields.cs", fieldsContent, Encoding.UTF8);
 
-                string enumsContent = RemoveEmptyLines(templates.EnumsTemplate.Render(new { _context.Namespace, Entity = entity }));
+                string enumsContent = RemoveEmptyLines(templates.EnumsTemplate.Render(new { _context.Namespace,_context.Info, Entity = entity }));
                 File.WriteAllText($"{dir}/{entity.HybridName}.Enums.cs", enumsContent, Encoding.UTF8);
             }
 

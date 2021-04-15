@@ -1,8 +1,8 @@
+{{info.welcome_xml}}
 namespace {{ namespace }}
 {
     public partial class {{entity.hybrid_name}}
     {
-        #region enums
         public class Enums
         {
         {{for enm in entity.enums}}
@@ -13,7 +13,6 @@ namespace {{ namespace }}
                 {{end}}
             }
         {{end}}
-        #endregion
         }
     }
 }

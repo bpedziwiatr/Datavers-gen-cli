@@ -45,6 +45,7 @@
     <Compile Include="Config\ConfigModel.cs" />
     <Compile Include="DataConverter\DataverseConnector.cs" />
     <Compile Include="Extensions\MetadataNamingExtensions.cs" />
+    <Compile Include="Metadata\GeneratorInfo.cs" />
     <Compile Include="Generators\Scriban\MultipleFileTemplate.cs" />
     <Compile Include="Generators\Scriban\ScribanGenerator.cs" />
     <Compile Include="Generators\Scriban\ScribanTemplates.Designer.cs">

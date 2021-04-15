@@ -94,7 +94,7 @@ namespace DataverseGen.Cli
                 Console.ReadKey();
                 throw;
             }
-            Console.WriteLine("Bye Bye, see you next time");
+            Console.WriteLine("Bye Bye, see you next time Press any Key to exit");
             Console.ReadKey();
         }
     }

@@ -1,12 +1,15 @@
+{{info.welcome_xml}}
 using System;
 using System.Runtime.Serialization;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Client;
 using System.ComponentModel;
+using System.Collections.Generic;
 namespace {{ namespace }}
 {
     {{if entity.states}}
 	[DataContract]
+    {{info.generated_code_attribute}}
 	public enum {{entity.state_name}}
 	{
 		{{for stateitem in entity.states.items}}
@@ -21,6 +24,7 @@ namespace {{ namespace }}
 	/// </summary>
 	[DataContract]
 	[EntityLogicalName("{{entity.logical_name }}")]
+    {{info.generated_code_attribute}}
 	public partial class {{entity.hybrid_name}} : Entity, INotifyPropertyChanging, INotifyPropertyChanged
 	{
 		/// <summary>
@@ -62,13 +66,13 @@ namespace {{ namespace }}
 		{{for attribute in entity.fields}}
 			{{if attribute.attribute.is_entity_reference_helper == false}}
 				{{if attribute.description != ""}}
-				/// <summary>
-				/// {{attribute.description_xml_safe}}
-				/// </summary>
+        /// <summary>
+        /// {{attribute.description_xml_safe}}
+        /// </summary>
 				{{end}}
-				[AttributeLogicalName("{{attribute.attribute.logical_name}}")]
+        [AttributeLogicalName("{{attribute.attribute.logical_name}}")]
 				{{if attribute.is_deprecated == true}}
-				[System.Obsolete]
+        [System.Obsolete]
 				{{end}}
         public {{attribute.target_type_for_crm_svc_util}} {{attribute.display_name}}
         {					
@@ -151,9 +155,9 @@ namespace {{ namespace }}
 		{{end}} 
 		#region 1:N
 			{{for attribute in entity.relationships_one_to_many}}
-			/// <summary>
-			/// 1:N {{attribute.schema_name}}
-			/// </summary>
+        /// <summary>
+        /// 1:N {{attribute.schema_name}}
+        /// </summary>
 				{{if attribute.schema_name == "calendar_calendar_rules" || attribute.schema_name == "service_calendar_rules"}}
         [AttributeLogicalName("calendarrules")]
         public IEnumerable<CalendarRule> CalendarRules
