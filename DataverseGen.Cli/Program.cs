@@ -6,7 +6,11 @@ using DataverseGen.Core.Metadata;
 using DataverseGen.Core.T4;
 using System;
 using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.Serialization.Json;
+using System.Xml;
+using System.Xml.Serialization;
+using DataverseGen.Core.Generators.Scriban;
 
 namespace DataverseGen.Cli
 {
@@ -69,7 +73,12 @@ namespace DataverseGen.Cli
                     Namespace = config.Namespace,
                     Entities = data
                 };
+
                 Console.WriteLine("Start generator");
+
+                //ScribanGenerator scribanGenerator =  new ScribanGenerator("dataversetemplate.tt", config.OutDirectory, context);
+                //scribanGenerator.GenerateTemplate();
+
                 Generator gen2 = new Generator("dataversetemplate.tt", config.OutDirectory, context);
                 gen2.GenerateTemplate();
             }
@@ -84,5 +93,6 @@ namespace DataverseGen.Cli
             Console.WriteLine("Bye Bye, see you next time");
             Console.ReadKey();
         }
+       
     }
 }
