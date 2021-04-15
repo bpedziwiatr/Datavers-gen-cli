@@ -40,7 +40,7 @@ namespace DataverseGen.Core.Generators.T4
 
             host.FileExtension = ".cs";
             Stopwatch stopper = Stopwatch.StartNew();
-            string dir = AppDomain.CurrentDomain.BaseDirectory + _outPath;
+            string dir = $"{AppDomain.CurrentDomain.BaseDirectory}{_outPath}//";
             string outputFileName = string.Concat(
                 dir,
                 Path.GetFileNameWithoutExtension(templateFileName),
