@@ -8,12 +8,22 @@ namespace DataverseGen.Core.Config
     public class ConfigModel
     {
         [DataMember]
+        public string ConnectionString { get; set; }
+
+        [DataMember]
         public string Entities { get; set; }
         [DataMember]
-        public string ConnectionString { get; set; }
+        public bool IsSingleOutputScriban { get; set; }
+
         [DataMember]
         public string Namespace { get; set; }
+
         [DataMember]
         public string OutDirectory { get; set; }
+
+        [DataMember]
+        public string TemplateEngine { get; set; }
+        [DataMember]
+        public string TemplateName { get; set; }
     }
 }

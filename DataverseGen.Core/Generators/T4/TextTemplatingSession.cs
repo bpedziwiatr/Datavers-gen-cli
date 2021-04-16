@@ -1,9 +1,9 @@
-﻿using Microsoft.VisualStudio.TextTemplating;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using Microsoft.VisualStudio.TextTemplating;
 
-namespace DataverseGen.Core.T4
+namespace DataverseGen.Core.Generators.T4
 {
     [Serializable]
     public class TextTemplatingSession : Dictionary<string, object>, ITextTemplatingSession

@@ -2,6 +2,8 @@
   "Entities": "account;contact",
   "ConnectionString": "AuthType=Office365;Username=@.onmicrosoft.com;Password=;Url=",
   "Namespace": "sad.CRM.Test",
-  "OutDirectory": "out-crm\\"
-
+  "OutDirectory": "out-crm",
+  "TemplateName": "Main", // for T4 use dataversetemplate.tt
+  "TemplateEngine": "scriban",
+  "IsSingleOutputScriban": false
 }

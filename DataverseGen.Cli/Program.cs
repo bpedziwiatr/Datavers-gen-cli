@@ -2,8 +2,9 @@
 //using DataverseGen.Cli.CliParser;
 using DataverseGen.Core.Config;
 using DataverseGen.Core.DataConverter;
+using DataverseGen.Core.Generators.Scriban;
+using DataverseGen.Core.Generators.T4;
 using DataverseGen.Core.Metadata;
-using DataverseGen.Core.T4;
 using System;
 using System.IO;
 using System.Runtime.Serialization.Json;
@@ -61,17 +62,29 @@ namespace DataverseGen.Cli
                 DataverseConnector connector = new DataverseConnector(config.ConnectionString, config.Entities);
                 MappingEntity[] data = connector.GetMappedEntities();
                 Console.WriteLine("Finish Load data");
-                // Generator gen = new Generator("Ttfile.tt","out\\",null);
-
-                //  gen.GenerateTemplate();
                 Context context = new Context
                 {
                     Namespace = config.Namespace,
                     Entities = data
                 };
+
                 Console.WriteLine("Start generator");
-                Generator gen2 = new Generator("dataversetemplate.tt", config.OutDirectory, context);
-                gen2.GenerateTemplate();
+                switch (config.TemplateEngine)
+                {
+                    case "scriban":
+                        ScribanGenerator scribanGenerator = new ScribanGenerator(config.TemplateName, config.OutDirectory, context, config.IsSingleOutputScriban);
+                        scribanGenerator.GenerateTemplate();
+                        break;
+
+                    case "t4":
+                        Generator gen2 = new Generator(config.TemplateName, config.OutDirectory, context);
+                        gen2.GenerateTemplate();
+                        break;
+
+                    default:
+                        Console.WriteLine($"Unsuported generator {config.TemplateEngine}");
+                        break;
+                }
             }
             catch (Exception e)
             {

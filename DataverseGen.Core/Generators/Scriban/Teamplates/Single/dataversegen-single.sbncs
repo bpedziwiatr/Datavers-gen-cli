@@ -1,0 +1,318 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.Serialization;
+using Microsoft.Xrm.Sdk;
+using Microsoft.Xrm.Sdk.Client;
+using System.ComponentModel;
+
+namespace {{ namespace }}
+{
+{{for entity in entities}}
+	{{if entity.states}}
+	[DataContract]
+	public enum {{entity.state_name}}
+	{
+		{{for stateitem in entity.states.items}}
+		[EnumMember]
+		{{stateitem.name}} = {{stateitem.value}},
+		{{end}}
+	}
+	{{end}}
+
+	/// <summary>
+	/// {{entity.description_xml_safe }} //entity.DescriptionXmlSafe.Replace("\n","").Replace("\r", " \r\n\t/// ")
+	/// </summary>
+	[DataContract]
+	[EntityLogicalName("{{entity.logical_name }}")]
+	public partial class {{entity.hybrid_name}} : Entity, INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		/// <summary>
+		/// Default Constructor.
+		/// </summary>
+		public {{entity.hybrid_name }}() : base(EntityLogicalName)
+		{
+		}
+		
+		public const string EntityLogicalName = "{{entity.logical_name}}";
+		
+		public const int EntityTypeCode = {{entity.type_code}};
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		private void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+		
+		private void OnPropertyChanging(string propertyName)
+        {
+            PropertyChanging?.Invoke(this, new PropertyChangingEventArgs(propertyName));
+        }
+		
+		[AttributeLogicalName("{{entity.primary_key.logical_name}}")]
+		public override Guid Id
+		{
+			get => base.Id;
+			set =>  
+                    {{if entity.primary_key.is_valid_for_create == true}}
+                        {{entity.primary_key.display_name}} = value;                 
+                    {{else}}
+                        base.Id = value;
+                    {{end}}
+		}
+		{{for attribute in entity.fields}}
+			{{if attribute.attribute.is_entity_reference_helper == false}}
+				{{if attribute.description != ""}}
+				/// <summary>
+				/// {{attribute.description_xml_safe}}
+				/// </summary>
+				{{end}}
+				[AttributeLogicalName("{{attribute.attribute.logical_name}}")]
+				{{if attribute.is_deprecated == true}}
+				[System.Obsolete]
+				{{end}}
+				public {{attribute.target_type_for_crm_svc_util}} {{attribute.display_name}}
+				{					
+					{{if attribute.is_activity_party == true}}
+					get
+					{
+						EntityCollection collection = GetAttributeValue<EntityCollection>("{{attribute.attribute.logical_name}}");
+						if (((collection != null) 
+									&& (collection.Entities != null)))
+						{
+							return Enumerable.Cast<ActivityParty>(collection.Entities);
+						}
+						else
+						{
+							return null;
+						}
+					}
+						{{if attribute.is_valid_for_update ==true || attribute.is_valid_for_create ==true}}
+					set
+					{
+						OnPropertyChanging("{{attribute.display_name}}");
+						if ((value == null))
+						{
+							SetAttributeValue("{{attribute.attribute.logical_name}}", value);
+						}
+						else
+						{
+							SetAttributeValue("{{attribute.attribute.logical_name}}", new EntityCollection(new List<Entity>(value)));
+						}
+						OnPropertyChanged("{{attribute.display_name}}");
+					}
+						{{end}}		
+					{{else if attribute.is_state_code}}
+					get
+					{
+						OptionSetValue optionSet = GetAttributeValue<OptionSetValue>("{{attribute.attribute.logical_name}}");
+						if ((optionSet != null))
+						{
+							return (({{entity.state_name}})(Enum.ToObject(typeof({{entity.state_name}}), optionSet.Value)));
+						}
+						else
+						{
+							return null;
+						}
+					}
+					{{if attribute.is_valid_for_update ==true || attribute.is_valid_for_create ==true}}		
+					set
+					{
+						OnPropertyChanging("{{attribute.display_name}}");
+						if ((value == null))
+						{
+							SetAttributeValue("{{attribute.attribute.logical_name}}", null);
+						}
+						else
+						{
+							SetAttributeValue("{{attribute.attribute.logical_name}}", new OptionSetValue(((int)(value))));
+						}
+						OnPropertyChanged("{{attribute.display_name}}");
+					}
+							{{end}}
+					{{else}}
+					get =>  GetAttributeValue<{{attribute.target_type_for_crm_svc_util}}>("{{attribute.attribute.logical_name}}");
+					
+						{{if attribute.is_valid_for_update ==true || attribute.is_valid_for_create ==true}}
+					set
+					{
+						OnPropertyChanging("{{attribute.display_name}}");
+						SetAttributeValue("{{attribute.attribute.logical_name}}", value);
+							{{if attribute == entity.primary_key}}
+						base.Id = value ?? Guid.Empty;
+							{{end}}
+						OnPropertyChanged("{{attribute.display_name}}");
+					}
+						{{end}}
+					{{end}}
+				}
+			{{end}}
+			
+			
+		{{end}} 
+		#region 1:N
+			{{for attribute in entity.relationships_one_to_many}}
+			/// <summary>
+			/// 1:N {{attribute.schema_name}}
+			/// </summary>
+				{{if attribute.schema_name == "calendar_calendar_rules" || attribute.schema_name == "service_calendar_rules"}}
+			[AttributeLogicalName("calendarrules")]
+			public IEnumerable<CalendarRule> CalendarRules
+			{
+				get
+				{
+					EntityCollection collection = GetAttributeValue<EntityCollection>("calendarrules");
+					if (((collection != null) && (collection.Entities != null)))
+					{
+						return Enumerable.Cast<CalendarRule>(collection.Entities);
+					}
+					else
+					{
+						return null;
+					}
+				}
+				set
+				{
+					OnPropertyChanging("CalendarRules");
+					if ((value == null))
+					{
+						SetAttributeValue("calendarrules", value);
+					}
+					else
+					{
+						SetAttributeValue("calendarrules", new EntityCollection(new List<Entity>(value)));
+					}
+					OnPropertyChanged("CalendarRules");
+				}
+			}
+				{{else}}
+			[RelationshipSchemaName("{{attribute.schema_name}}"{{attribute.entity_role_schema}})]
+			public IEnumerable<{{attribute.to_entity.hybrid_name}}> {{attribute.display_name}}
+			{
+				get => GetRelatedEntities<{{attribute.to_entity.hybrid_name}}>("{{attribute.schema_name}}", {{attribute.entity_role}});
+				set
+				{
+					OnPropertyChanging("{{attribute.display_name}}");
+					SetRelatedEntities("{{attribute.schema_name}}", {{attribute.entity_role}}, value);
+					OnPropertyChanged("{{attribute.display_name}}");
+				}
+			}
+				{{end}}
+			{{end}}				
+		#endregion
+		
+		#region N:1
+		{{for attribute in entity.relationships_many_to_one}}
+			/// <summary>
+			/// N:1 {{attribute.schema_name}}
+			/// </summary>
+			[AttributeLogicalName("{{attribute.logical_name}}")]
+			[RelationshipSchemaName("{{attribute.schema_name}}"{{attribute.entity_role_schema}})]
+			{{if attribute.is_valid_for_update ==true || attribute.is_valid_for_create ==true}}
+			public {{attribute.to_entity.hybrid_name}} {{attribute.display_name}}
+			{
+				get => GetRelatedEntity< {{attribute.to_entity.hybrid_name}}>("{{attribute.schema_name}}",{{attribute.entity_role}});				
+				set
+					{
+						OnPropertyChanging("{{attribute.display_name}}");
+						SetRelatedEntity("{{attribute.schema_name}}", {{attribute.entity_role}}, value);
+						OnPropertyChanged("{{attribute.display_name}}");
+					}
+				
+			}
+			{{else}}
+			public {{attribute.to_entity.hybrid_name}} {{attribute.display_name}} => GetRelatedEntity< {{attribute.to_entity.hybrid_name}}>("{{attribute.schema_name}}",{{attribute.entity_role}});				
+			{{end}}
+		{{end}}
+		#endregion 
+		#region N:N
+		{{for attribute in entity.relationships_many_to_many}}
+			/// <summary>
+			/// N:N {{attribute.schema_name}}
+			/// </summary>
+			[RelationshipSchemaName("{{attribute.schema_name}}"{{attribute.entity_role_schema}})]
+			public IEnumerable<{{attribute.to_entity.hybrid_name}}> {{attribute.display_name}}
+			{
+				get => GetRelatedEntity<{{attribute.to_entity.hybrid_name}}>("{{attribute.schema_name}}",{{attribute.entity_role}});
+				set
+					{
+						OnPropertyChanging("{{attribute.display_name}}");
+						SetRelatedEntities<{{attribute.to_entity.hybrid_name}}>("{{attribute.schema_name}}", {{attribute.entity_role}}, value);
+						OnPropertyChanged("{{attribute.display_name}}");
+					}
+			}
+		{{end}}
+		#endregion
+		#region enums
+	 	public class Enums
+		{
+		{{for enm in entity.enums}}
+			public enum {{enm.display_name}}
+			{
+				{{for item in enm.items}}
+				{{item.name}} = {{item.value}},
+				{{end}}
+			}
+		{{end}}
+		}
+		#endregion
+		#region Fields
+		
+			public class Fields
+			{
+				public const string SchemaName = "{{entity.attribute.logical_name}}";
+	
+				#region Fields.{{entity.attribute.logical_name}}	
+				{{for field in entity.fields}}			
+				public const string {{field.display_name}} = "{{field.attribute.logical_ame}}";
+			
+				{{end}}
+				#endregion Fields.{{entity.attribute.logical_name}}
+				#region 1:N Realationships
+				{{for attribute in entity.relationships_one_to_many}}
+					{{if attribute.schema_name == "calendar_calendar_rules" || attribute.schema_name == "service_calendar_rules"}}
+				public const string  Relationship_1N_calendarrules ="calendarrules";
+					{{else}}
+				public const string Relationship_1N_{{attribute.schema_name}} ="{{attribute.schema_name}}";	
+					{{end}}
+				{{end}}
+				#endregion  1:N Realationships
+				#region N:1 Realationships
+				{{for attribute in entity.relationships_many_to_one}}
+				public const string Relationship_N1_{{attribute.schema_name}} ="{{attribute.schema_name}}";	
+				{{end}}
+				#endregion N:1 Realationships
+				#region N:N Realationships
+				{{for attribute in entity.relationships_many_to_many}}
+				public const string Relationship_NN_{{attribute.schema_name}} ="{{attribute.schema_name}}";	
+				{{end}}
+				#endregion N:N Realationships
+			}
+		#endregion
+	}
+{{end}}
+
+
+	/// <summary>
+	/// Represents a source of entities bound to a CRM service. It tracks and manages changes made to the retrieved entities.
+	/// </summary>
+	public partial class XrmServiceContext : OrganizationServiceContext
+	{
+		/// <summary>
+		/// Constructor.
+		/// </summary>
+		public XrmServiceContext(IOrganizationService service) : base(service)
+		{
+		}
+		{{for entity in entities}}
+		/// <summary>
+		/// Gets a binding to the set of all <see cref="{{entity.hybrid_name}}"/> entities.
+		/// </summary>
+		public IQueryable<{{entity.hybrid_name}}> {{entity.hybrid_name}}Set => CreateQuery<{{entity.hybrid_name}}>();
+		{{end}}
+
+    }
+}

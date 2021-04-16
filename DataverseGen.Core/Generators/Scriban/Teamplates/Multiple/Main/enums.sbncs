@@ -1,0 +1,19 @@
+namespace {{ namespace }}
+{
+    public partial class {{entity.hybrid_name}}
+    {
+        #region enums
+        public class Enums
+        {
+        {{for enm in entity.enums}}
+            public enum {{enm.display_name}}
+            {
+                {{for item in enm.items}}
+                {{item.name}} = {{item.value}},
+                {{end}}
+            }
+        {{end}}
+        #endregion
+        }
+    }
+}

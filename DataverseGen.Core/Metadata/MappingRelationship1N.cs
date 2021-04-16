@@ -19,6 +19,7 @@ namespace DataverseGen.Core.Metadata
         public string Type { get; set; }
         public MappingEntity ToEntity { get; set; }
 
+        public string EntityRoleSchema => EntityRole == "null" ? "" : ", " + EntityRole;
         public static MappingRelationship1N Parse(OneToManyRelationshipMetadata rel, MappingField[] properties)
         {
             string propertyName =

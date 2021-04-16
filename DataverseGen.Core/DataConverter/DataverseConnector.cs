@@ -69,7 +69,7 @@ namespace DataverseGen.Core.DataConverter
 
             MappingEntity[] result = mappedEntities.ToArray();
             stopper.Stop();
-            Console.WriteLine($"Read data from crm took: {stopper.Elapsed:g}");
+            Console.WriteLine($"Read data from cds in: {stopper.Elapsed:g}");
             return result;
         }
 
