@@ -9,7 +9,7 @@ namespace {{ namespace }}
 
             #region Fields.{{entity.attribute.logical_name}}	
             {{for field in entity.fields}}			
-            public const string {{field.display_name}} = "{{field.attribute.logical_ame}}";
+            public const string {{field.display_name}} = "{{field.attribute.logical_name}}";
 
             {{end}}
             #endregion Fields.{{entity.attribute.logical_name}}
