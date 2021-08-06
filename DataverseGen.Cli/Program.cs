@@ -55,8 +55,9 @@ namespace DataverseGen.Cli
                 //            Console.WriteLine("Quick Start Example!");
                 //        }
                 //    });
-
+                Console.SetWindowSize(140, 30);
                 Console.WriteLine(title);
+
                 ConfigModel config = GetConfig();
 
                 DataverseConnector connector = new DataverseConnector(config.ConnectionString, config.Entities);

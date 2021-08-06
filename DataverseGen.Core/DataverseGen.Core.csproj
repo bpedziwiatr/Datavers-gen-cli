@@ -76,6 +76,11 @@
     <PackageReference Include="EnvDTE">
       <Version>16.7.30508.193</Version>
     </PackageReference>
+    <PackageReference Include="GitVersion.MsBuild">
+      <Version>5.6.11</Version>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.CodeAnalysis">
       <Version>3.8.0</Version>
     </PackageReference>
@@ -98,6 +103,7 @@
     <None Include="Generators\Scriban\Teamplates\Multiple\Main\fields.sbncs" />
     <None Include="Generators\Scriban\Teamplates\Multiple\Main\xrmservicecontext.sbncs" />
     <None Include="Generators\Scriban\Teamplates\Single\dataversegen-single.sbncs" />
+    <None Include="GitVersion.yml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
