@@ -1,0 +1,43 @@
+{{info.welcome_xml}}
+
+type {{entity.logical_name}}
+{
+{{for attribute in entity.fields}}
+    {{attribute.attribute.logical_name}} = "{{attribute.attribute.logical_name}}"
+{{end}}     
+}
+
+{{for enm in entity.enums}}
+enum {{enm.display_name}}
+{
+    {{for item in enm.items}}
+    {{item.name}} = {{item.value}},
+    {{end}}
+}
+{{end}}
+
+
+type {{entity.logical_name}}_Relationships
+{
+//region 1:N Realationships
+{{for attribute in entity.relationships_one_to_many}}
+    {{if attribute.schema_name == "calendar_calendar_rules" || attribute.schema_name == "service_calendar_rules"}}
+    relationship_1N_calendarrules ="calendarrules";
+    {{else}}
+    relationship_1N_{{attribute.schema_name}} ="{{attribute.schema_name}}";	
+    {{end}}
+{{end}}
+//endregion  1:N Realationships
+//region N:1 Realationships
+{{for attribute in entity.relationships_many_to_one}}
+    relationship_N1_{{attribute.schema_name}} ="{{attribute.schema_name}}";	
+{{end}}
+//endregion N:1 Realationships
+//region N:N Realationships
+{{for attribute in entity.relationships_many_to_many}}
+    relationship_NN_{{attribute.schema_name}} ="{{attribute.schema_name}}";	
+{{end}}
+//endregion N:N Realationships
+}
+
+

@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
+using DataverseGen.Core.Generators.Scriban.Teamplates;
 
 namespace DataverseGen.Core.Generators.Scriban
 {
@@ -29,7 +30,8 @@ namespace DataverseGen.Core.Generators.Scriban
             Console.WriteLine("Welcome to Scriban template generator");
             Stopwatch stopper = Stopwatch.StartNew();
             if (_isSingleOutput)
-                SingleFile();
+                //SingleFile();
+                TypescriptOutput();
             else
             {
                 MultiOutputGenerator();
@@ -59,6 +61,23 @@ namespace DataverseGen.Core.Generators.Scriban
 
             string xrmContextContent = RemoveEmptyLines(templates.XrmContextTemplate.Render(_context));
             File.WriteAllText($"{dir}/XrmServiceContext.cs", xrmContextContent, Encoding.UTF8);
+        }
+
+        private void TypescriptOutput()
+        {
+            Template template = Template.Parse(System.Text.Encoding.UTF8.GetString(ScribanTemplates.Main_TS_entity
+                ));
+            string dir = $"{Directory.GetCurrentDirectory()}\\{_outPath}\\";
+            if (!Directory.Exists(dir))
+                Directory.CreateDirectory(dir);
+
+            foreach (MappingEntity entity in _context.Entities)
+            {
+                string entityContent = RemoveEmptyLines(template.Render(new { _context.Namespace,_context.Info, Entity = entity }));
+                File.WriteAllText($"{dir}/{entity.LogicalName}.ts", entityContent, Encoding.UTF8);
+
+            }
+
         }
 
         private string RemoveEmptyLines(string lines)

@@ -1,6 +1,7 @@
 ﻿using Scriban;
 using System;
 using System.IO;
+using DataverseGen.Core.Generators.Scriban.Teamplates;
 
 namespace DataverseGen.Core.Generators.Scriban
 {
