@@ -1,0 +1,18 @@
+{{info.welcome_xml}}
+namespace {{ namespace }}
+{
+    public partial class {{entity.hybrid_name}}
+    {
+        public class Enums
+        {
+        {{for enm in entity.enums}}
+            public enum {{enm.display_name}}
+            {
+                {{for item in enm.items}}
+                {{item.name}} = {{item.value}},
+                {{end}}
+            }
+        {{end}}
+        }
+    }
+}

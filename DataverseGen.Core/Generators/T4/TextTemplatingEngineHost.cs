@@ -1,12 +1,12 @@
-﻿using Microsoft.VisualStudio.TextTemplating;
-using System;
+﻿using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Microsoft.VisualStudio.TextTemplating;
 
-namespace DataverseGen.Core.T4
+namespace DataverseGen.Core.Generators.T4
 {
     [Serializable]
     public class TextTemplatingEngineHost : ITextTemplatingEngineHost, ITextTemplatingSessionHost
