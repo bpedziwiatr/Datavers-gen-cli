@@ -23,7 +23,7 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>1</ApplicationRevision>
+    <ApplicationRevision>2</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -49,7 +49,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>1704E2EC6C2FAE121749644E3A37A67B2D8FEC44</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>3FE293A649F8F33FE6AC548CB43859918F5F1D10</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
     <ManifestKeyFile>DataverseGen.Cli_TemporaryKey.pfx</ManifestKeyFile>
@@ -59,6 +59,12 @@
   </PropertyGroup>
   <PropertyGroup>
     <SignManifests>true</SignManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>application_icon.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>DataverseGen.Cli.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -83,6 +89,7 @@
     <None Include="example-config.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="GitVersion.yml" />
     <None Include="ILMergeConfig.json" />
     <None Include="MultipleOutputHelper.ttinclude">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -98,6 +105,7 @@
     <EmbeddedResource Include="dataversetemplate.tt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
+    <Content Include="application_icon.ico" />
     <Content Include="Ttfile.tt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -106,6 +114,11 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="GitVersion.MsBuild">
+      <Version>5.6.11</Version>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="ILMerge">
       <Version>3.0.41</Version>
     </PackageReference>

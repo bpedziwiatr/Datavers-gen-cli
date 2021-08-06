@@ -2,27 +2,24 @@
 //using DataverseGen.Cli.CliParser;
 using DataverseGen.Core.Config;
 using DataverseGen.Core.DataConverter;
+using DataverseGen.Core.Generators.Scriban;
+using DataverseGen.Core.Generators.T4;
 using DataverseGen.Core.Metadata;
-using DataverseGen.Core.T4;
 using System;
 using System.IO;
 using System.Runtime.Serialization.Json;
-using System.Web.UI.WebControls;
 
 namespace DataverseGen.Cli
 {
     internal class Program
     {
         private const string title = @"
- _____                                                 ______                                                  ______ _       _____ 
+ _____                                                 ______                                                  ______ _       _____
 (____ \       _                                       / _____)                             _                  / _____) |     (_____)
- _   \ \ ____| |_  ____ _   _ ____  ____ ___  ____   | /  ___  ____ ____   ____  ____ ____| |_  ___   ____   | /     | |        _   
-| |   | / _  |  _)/ _  | | | / _  )/ ___)___)/ _  )  | | (___)/ _  )  _ \ / _  )/ ___) _  |  _)/ _ \ / ___)  | |     | |       | |  
-| |__/ ( ( | | |_( ( | |\ V ( (/ /| |  |___ ( (/ /   | \____/( (/ /| | | ( (/ /| |  ( ( | | |_| |_| | |      | \_____| |_____ _| |_ 
+ _   \ \ ____| |_  ____ _   _ ____  ____ ___  ____   | /  ___  ____ ____   ____  ____ ____| |_  ___   ____   | /     | |        _
+| |   | / _  |  _)/ _  | | | / _  )/ ___)___)/ _  )  | | (___)/ _  )  _ \ / _  )/ ___) _  |  _)/ _ \ / ___)  | |     | |       | |
+| |__/ ( ( | | |_( ( | |\ V ( (/ /| |  |___ ( (/ /   | \____/( (/ /| | | ( (/ /| |  ( ( | | |_| |_| | |      | \_____| |_____ _| |_
 |_____/ \_||_|\___)_||_| \_/ \____)_|  (___/ \____)   \_____/ \____)_| |_|\____)_|   \_||_|\___)___/|_|       \______)_______|_____)
-                                                                                                                                    
-
-
 
 ";
 
@@ -58,35 +55,48 @@ namespace DataverseGen.Cli
                 //            Console.WriteLine("Quick Start Example!");
                 //        }
                 //    });
-
-
+                Console.SetWindowSize(140, 30);
                 Console.WriteLine(title);
+
                 ConfigModel config = GetConfig();
 
                 DataverseConnector connector = new DataverseConnector(config.ConnectionString, config.Entities);
-                var data = connector.GetMappedEntities();
+                MappingEntity[] data = connector.GetMappedEntities();
                 Console.WriteLine("Finish Load data");
-                // Generator gen = new Generator("Ttfile.tt","out\\",null);
-
-                //  gen.GenerateTemplate();
                 Context context = new Context
                 {
                     Namespace = config.Namespace,
                     Entities = data
                 };
+
                 Console.WriteLine("Start generator");
-                Generator gen2 = new Generator("dataversetemplate.tt", config.OutDirectory, context);
-                gen2.GenerateTemplate();
+                switch (config.TemplateEngine)
+                {
+                    case "scriban":
+                        ScribanGenerator scribanGenerator = new ScribanGenerator(config.TemplateName, config.OutDirectory, context, config.IsSingleOutputScriban);
+                        scribanGenerator.GenerateTemplate();
+                        break;
+
+                    case "t4":
+                        Generator gen2 = new Generator(config.TemplateName, config.OutDirectory, context);
+                        gen2.GenerateTemplate();
+                        break;
+
+                    default:
+                        Console.WriteLine($"Unsuported generator {config.TemplateEngine}");
+                        break;
+                }
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
                 Console.WriteLine("#StackTrace:");
                 Console.WriteLine(e.StackTrace);
+                Console.ReadKey();
                 throw;
             }
-            Console.WriteLine("Bye Bye, see you next time");
-            //     Console.ReadKey();
+            Console.WriteLine("Bye Bye, see you next time Press any Key to exit");
+            Console.ReadKey();
         }
     }
 }
