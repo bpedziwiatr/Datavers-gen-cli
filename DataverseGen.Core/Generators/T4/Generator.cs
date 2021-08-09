@@ -3,28 +3,24 @@ using System.CodeDom.Compiler;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using DataverseGen.Core.Config;
 using DataverseGen.Core.Metadata;
 using Microsoft.VisualStudio.TextTemplating;
 
 namespace DataverseGen.Core.Generators.T4
 {
-    public class Generator
+    public class Generator:BaseGenerator
     {
-        private readonly Context _context;
-        private readonly string _outPath;
-        private readonly string _t4TemplateFile;
 
-        public Generator(string t4TemplateFile, string outPath, Context context)
+        public Generator(string templateName, string outPath, Context context, TemplateEngineModel templateEngineModel)
+            : base(templateName, outPath, context, templateEngineModel)
         {
-            _t4TemplateFile = t4TemplateFile;
-            _outPath = outPath;
-            _context = context;
         }
 
-        public void GenerateTemplate()
+        public override void GenerateTemplate()
         {
-            Console.WriteLine("Welcome to T4 template generator");
-            string templateFileName = _t4TemplateFile;
+            Console.WriteLine(@"Welcome to T4 template generator");
+            string templateFileName = _templateName;
             TextTemplatingEngineHost host = new TextTemplatingEngineHost();
             Engine engine = new Engine();
             host.SetOutputEncoding(Encoding.UTF8, false);
@@ -53,7 +49,7 @@ namespace DataverseGen.Core.Generators.T4
             File.WriteAllText(outputFileName, output, host.FileEncoding);
             PrintErrors(host);
             stopper.Stop();
-            Console.WriteLine($"Generating T4 '{_t4TemplateFile}' elapsed in: {stopper.Elapsed:g}");
+            Console.WriteLine($@"Generating T4 '{_templateName}' elapsed in: {stopper.Elapsed:g}");
         }
 
         private static void PrintErrors(TextTemplatingEngineHost host)

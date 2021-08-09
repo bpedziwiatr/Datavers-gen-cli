@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace DataverseGen.Core.Generators.Scriban.Teamplates {
+namespace DataverseGen.Core.Generators.Scriban.Templates {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace DataverseGen.Core.Generators.Scriban.Teamplates {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("DataverseGen.Core.Generators.Scriban.Teamplates.ScribanTemplates", typeof(ScribanTemplates).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("DataverseGen.Core.Generators.Scriban.Templates.ScribanTemplates", typeof(ScribanTemplates).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -66,6 +66,16 @@ namespace DataverseGen.Core.Generators.Scriban.Teamplates {
         internal static byte[] dataversegen_single {
             get {
                 object obj = ResourceManager.GetObject("dataversegen_single", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] dataversegen_single_ts {
+            get {
+                object obj = ResourceManager.GetObject("dataversegen_single_ts", resourceCulture);
                 return ((byte[])(obj));
             }
         }
@@ -103,9 +113,29 @@ namespace DataverseGen.Core.Generators.Scriban.Teamplates {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static byte[] Main_TS_entity {
+        internal static byte[] Main_ts_entity {
             get {
-                object obj = ResourceManager.GetObject("Main_TS_entity", resourceCulture);
+                object obj = ResourceManager.GetObject("Main_ts_entity", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] Main_ts_entity_relationship {
+            get {
+                object obj = ResourceManager.GetObject("Main_ts_entity_relationship", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] Main_ts_enums {
+            get {
+                object obj = ResourceManager.GetObject("Main_ts_enums", resourceCulture);
                 return ((byte[])(obj));
             }
         }

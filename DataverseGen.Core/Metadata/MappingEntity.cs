@@ -1,8 +1,8 @@
-﻿using System;
+﻿using DataverseGen.Core.Extensions;
+using Microsoft.Xrm.Sdk.Metadata;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using DataverseGen.Core.Extensions;
-using Microsoft.Xrm.Sdk.Metadata;
 
 //using Microsoft.Xrm.Sdk.Metadata;
 //using CrmCodeGenerator.VSPackage.Helpers;
@@ -12,45 +12,43 @@ namespace DataverseGen.Core.Metadata
     [Serializable]
     public class MappingEntity
     {
-        public CrmEntityAttribute Attribute { get; set; }
-        public bool IsIntersect { get; set; }
-        public int? TypeCode { get; set; }
-        public MappingField[] Fields { get; set; }
-        public MappingEnum States { get; set; }
-        public MappingEnum[] Enums { get; set; }
-        public MappingRelationship1N[] RelationshipsOneToMany { get; set; }
-        public MappingRelationshipN1[] RelationshipsManyToOne { get; set; }
-
-        public string LogicalName => Attribute.LogicalName;
-
-        public string DisplayName { get; set; }
-        public string HybridName { get; set; }
-        public string StateName { get; set; }
-        public MappingField PrimaryKey { get; set; }
-        public string PrimaryKeyProperty { get; set; }
-        public string PrimaryNameAttribute { get; set; }
-        public string Description { get; set; }
-        public string DescriptionXmlSafe => Description.XmlEscape();
-
-        public string Plural => DisplayName.GetPluralName();
-
         public MappingEntity()
         {
             Description = "";
         }
 
+        public CrmEntityAttribute Attribute { get; set; }
+        public string Description { get; set; }
+        public string DescriptionXmlSafe => Description.XmlEscape();
+        public string DisplayName { get; set; }
+        public MappingEnum[] Enums { get; set; }
+        public MappingField[] Fields { get; set; }
+        public string HybridName { get; set; }
+        public bool IsIntersect { get; set; }
+        public string LogicalName => Attribute.LogicalName;
+        public string Plural => DisplayName.GetPluralName();
+        public MappingField PrimaryKey { get; set; }
+        public string PrimaryKeyProperty { get; set; }
+        public string PrimaryNameAttribute { get; set; }
+        public MappingRelationshipMn[] RelationshipsManyToMany { get; set; }
+        public MappingRelationshipN1[] RelationshipsManyToOne { get; set; }
+        public MappingRelationship1N[] RelationshipsOneToMany { get; set; }
+        public string StateName { get; set; }
+        public MappingEnum States { get; set; }
+        public int? TypeCode { get; set; }
+
         public static MappingEntity Parse(EntityMetadata entityMetadata)
         {
             MappingEntity entity = new MappingEntity
             {
-                Attribute = new CrmEntityAttribute(), TypeCode = entityMetadata.ObjectTypeCode
+                Attribute = new CrmEntityAttribute(),
+                TypeCode = entityMetadata.ObjectTypeCode
             };
 
             entity.Attribute.LogicalName = entityMetadata.LogicalName;
-            if (entityMetadata.IsIntersect != null) entity.IsIntersect = (bool) entityMetadata.IsIntersect;
+            if (entityMetadata.IsIntersect != null) entity.IsIntersect = (bool)entityMetadata.IsIntersect;
             entity.Attribute.PrimaryKey = entityMetadata.PrimaryIdAttribute;
 
-       
             entity.DisplayName = entityMetadata.GetProperEntityName();
             entity.HybridName = entityMetadata.GetProperHybridName();
             entity.StateName = entity.HybridName + "State";
@@ -99,7 +97,6 @@ namespace DataverseGen.Core.Metadata
                 }
             });
 
-
             entity.RelationshipsManyToOne = entityMetadata.ManyToOneRelationships.Select(r =>
                 MappingRelationshipN1.Parse(r, entity.Fields)).ToArray();
 
@@ -112,7 +109,7 @@ namespace DataverseGen.Core.Metadata
 
                 if (entity.Fields.Any(e => e.DisplayName == newName))
                 {
-                     r.DisplayName += "2";
+                    r.DisplayName += "2";
                 }
             });
 
@@ -142,56 +139,8 @@ namespace DataverseGen.Core.Metadata
             return entity;
         }
 
-        private static void AddLookupFields(ICollection<MappingField> fields)
-        {
-            MappingField[] fieldsIterator = fields.Where(e => e.Attribute.IsLookup).ToArray();
-            foreach (MappingField lookup in fieldsIterator)
-            {
-                MappingField nameField = new MappingField
-                {
-                    Attribute = new CrmPropertyAttribute
-                    {
-                        IsLookup = false,
-                        LogicalName = lookup.Attribute.LogicalName + "Name",
-                        IsEntityReferenceHelper = true
-                    },
-                    DisplayName = lookup.DisplayName + "Name",
-                    HybridName = lookup.HybridName + "Name",
-                    FieldType = AttributeTypeCode.EntityName,
-                    IsValidForUpdate = false,
-                    GetMethod = "",
-                    PrivatePropertyName = lookup.PrivatePropertyName + "Name"
-                };
-
-                if (fields.Count(f => f.DisplayName == nameField.DisplayName) == 0)
-                    fields.Add(nameField);
-
-                if (!string.IsNullOrEmpty(lookup.LookupSingleType))
-                    continue;
-
-                MappingField typeField = new MappingField
-                {
-                    Attribute = new CrmPropertyAttribute
-                    {
-                        IsLookup = false,
-                        LogicalName = lookup.Attribute.LogicalName + "Type",
-                        IsEntityReferenceHelper = true
-                    },
-                    DisplayName = lookup.DisplayName + "Type",
-                    HybridName = lookup.HybridName + "Type",
-                    FieldType = AttributeTypeCode.EntityName,
-                    IsValidForUpdate = false,
-                    GetMethod = "",
-                    PrivatePropertyName = lookup.PrivatePropertyName + "Type"
-                };
-
-                if (fields.Count(f => f.DisplayName == typeField.DisplayName) == 0)
-                    fields.Add(typeField);
-            }
-        }
         private static void AddEntityImageCrm2013(ICollection<MappingField> fields)
         {
-
             if (!fields.Any(f => f.DisplayName.Equals("EntityImageId")))
                 return;
 
@@ -250,11 +199,59 @@ namespace DataverseGen.Core.Metadata
             };
             SafeAddField(fields, imageUrl);
         }
+
+        private static void AddLookupFields(ICollection<MappingField> fields)
+        {
+            MappingField[] fieldsIterator = fields.Where(e => e.Attribute.IsLookup).ToArray();
+            foreach (MappingField lookup in fieldsIterator)
+            {
+                MappingField nameField = new MappingField
+                {
+                    Attribute = new CrmPropertyAttribute
+                    {
+                        IsLookup = false,
+                        LogicalName = lookup.Attribute.LogicalName + "Name",
+                        IsEntityReferenceHelper = true
+                    },
+                    DisplayName = lookup.DisplayName + "Name",
+                    HybridName = lookup.HybridName + "Name",
+                    FieldType = AttributeTypeCode.EntityName,
+                    IsValidForUpdate = false,
+                    GetMethod = "",
+                    PrivatePropertyName = lookup.PrivatePropertyName + "Name"
+                };
+
+                if (fields.Count(f => f.DisplayName == nameField.DisplayName) == 0)
+                    fields.Add(nameField);
+
+                if (!string.IsNullOrEmpty(lookup.LookupSingleType))
+                    continue;
+
+                MappingField typeField = new MappingField
+                {
+                    Attribute = new CrmPropertyAttribute
+                    {
+                        IsLookup = false,
+                        LogicalName = lookup.Attribute.LogicalName + "Type",
+                        IsEntityReferenceHelper = true
+                    },
+                    DisplayName = lookup.DisplayName + "Type",
+                    HybridName = lookup.HybridName + "Type",
+                    FieldType = AttributeTypeCode.EntityName,
+                    IsValidForUpdate = false,
+                    GetMethod = "",
+                    PrivatePropertyName = lookup.PrivatePropertyName + "Type"
+                };
+
+                if (fields.Count(f => f.DisplayName == typeField.DisplayName) == 0)
+                    fields.Add(typeField);
+            }
+        }
+
         private static void SafeAddField(ICollection<MappingField> fields, MappingField image)
         {
             if (fields.All(f => f.DisplayName != image.DisplayName))
                 fields.Add(image);
         }
-        public MappingRelationshipMn[] RelationshipsManyToMany { get; set; }
     }
 }

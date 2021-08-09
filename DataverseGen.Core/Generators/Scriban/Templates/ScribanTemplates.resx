@@ -121,6 +121,9 @@
   <data name="dataversegen_single" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Single\dataversegen-single.sbncs;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="dataversegen_single_ts" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Single\dataversegen-single-ts.sbncs;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="Main_entity" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Multiple\Main\entity.sbncs;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
@@ -130,8 +133,14 @@
   <data name="Main_fields" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Multiple\Main\fields.sbncs;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="Main_TS_entity" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>Multiple\TS-Main\entity-ts.sbncs;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="Main_ts_entity" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Multiple\TS-Main\entity.sbncs;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="Main_ts_entity_relationship" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Multiple\TS-Main\entity-relationship.sbncs;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="Main_ts_enums" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Multiple\TS-Main\enums.sbncs;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="Main_xrmservicecontext" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Multiple\Main\xrmservicecontext.sbncs;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>

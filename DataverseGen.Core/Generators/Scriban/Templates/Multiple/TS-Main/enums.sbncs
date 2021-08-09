@@ -1,0 +1,10 @@
+{{info.welcome_xml}}
+
+{{for enm in entity.enums}}
+enum {{enm.display_name}}_{{entity.hybrid_name }}
+{
+    {{for item in enm.items}}
+    {{item.name}} = {{item.value}},
+    {{end}}
+}
+{{end}}

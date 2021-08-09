@@ -28,7 +28,7 @@ namespace DataverseGen.Core.DataConverter
             CrmServiceClient connection = new CrmServiceClient(_connectionString);
             if (!connection.IsReady)
             {
-                Console.WriteLine("Waiting for connection...");
+                Console.WriteLine(@"Waiting for connection...");
                 System.Threading.Thread.Sleep(1000);
             }
 
@@ -41,14 +41,14 @@ namespace DataverseGen.Core.DataConverter
                 EntityFilters = EntityFilters.Default,
                 RetrieveAsIfPublished = true,
             };
-            Console.WriteLine("Retrieving All Entities");
+            Console.WriteLine(@"Retrieving All Entities");
             RetrieveAllEntitiesResponse response = (RetrieveAllEntitiesResponse)connection.Execute(request);
             EntityMetadata[] allEntities = response.EntityMetadata;
-            Console.WriteLine("All Entities  Retrieved");
+            Console.WriteLine(@"All Entities  Retrieved");
             EntityMetadata[] entities = allEntities;
-            Console.WriteLine("Retrieving Selected Entities");
+            Console.WriteLine(@"Retrieving Selected Entities");
             List<EntityMetadata> selectedEntities = SelectedEntitiesMetaData(allEntities, connection).ToList();
-            Console.WriteLine("All Selected Entities Retrieved");
+            Console.WriteLine(@"All Selected Entities Retrieved");
             List<MappingEntity> mappedEntities = selectedEntities.Select(MappingEntity.Parse).OrderBy(e => e.DisplayName).ToList();
             ExcludeRelationshipsNotIncluded(mappedEntities);
             foreach (MappingEntity ent in mappedEntities)
@@ -69,7 +69,7 @@ namespace DataverseGen.Core.DataConverter
 
             MappingEntity[] result = mappedEntities.ToArray();
             stopper.Stop();
-            Console.WriteLine($"Read data from cds in: {stopper.Elapsed:g}");
+            Console.WriteLine($@"Read data from cds in: {stopper.Elapsed:g}");
             return result;
         }
 
