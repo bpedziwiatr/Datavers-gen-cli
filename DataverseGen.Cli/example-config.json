@@ -3,7 +3,10 @@
   "ConnectionString": "AuthType=Office365;Username=@.onmicrosoft.com;Password=;Url=",
   "Namespace": "sad.CRM.Test",
   "OutDirectory": "out-crm",
-  "TemplateName": "Main", // for T4 use dataversetemplate.tt
-  "TemplateEngine": "scriban",
-  "IsSingleOutputScriban": false
+  "TemplateName": "Main",
+  "TemplateEngine": {
+    "IsSingleOutput": true,
+    "Name": "scriban",
+    "Type": "ts"
+  }
 }

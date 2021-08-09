@@ -3,7 +3,6 @@
 using DataverseGen.Core.Config;
 using DataverseGen.Core.DataConverter;
 using DataverseGen.Core.Generators.Scriban;
-using DataverseGen.Core.Generators.T4;
 using DataverseGen.Core.Metadata;
 using System;
 using System.IO;
@@ -73,25 +72,11 @@ namespace DataverseGen.Cli
                 switch (config.TemplateEngine.Name)
                 {
                     case "scriban":
-                        ScribanGenerator scribanGenerator = new ScribanGenerator(
-                            config.TemplateName,
-                            config.OutDirectory,
-                            context,
-                            config.TemplateEngine);
-                        scribanGenerator.GenerateTemplate();
+                        ScribanRun(config, context);
                         break;
-
-                    case "t4":
-                        new Generator(
-                                config.TemplateName,
-                                config.OutDirectory,
-                                context,
-                                config.TemplateEngine)
-                           .GenerateTemplate();
-                        break;
-
                     default:
-                        Console.WriteLine($@"Unsupported generator {config.TemplateEngine}");
+                        Console.WriteLine($@"Unsupported generator {config.TemplateEngine}, run scriban");
+                        ScribanRun(config, context);
                         break;
                 }
             }
@@ -107,6 +92,16 @@ namespace DataverseGen.Cli
                 Console.WriteLine(@"Bye Bye, see you next time Press any Key to exit");
                 Console.ReadKey();
             }
+        }
+
+        private static void ScribanRun(ConfigModel config, Context context)
+        {
+            ScribanGenerator scribanGenerator = new ScribanGenerator(
+                config.TemplateName,
+                config.OutDirectory,
+                context,
+                config.TemplateEngine);
+            scribanGenerator.GenerateTemplate();
         }
     }
 }

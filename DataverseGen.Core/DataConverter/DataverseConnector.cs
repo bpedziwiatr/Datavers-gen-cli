@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using EnvDTE;
 
 namespace DataverseGen.Core.DataConverter
 {
@@ -45,7 +44,6 @@ namespace DataverseGen.Core.DataConverter
             RetrieveAllEntitiesResponse response = (RetrieveAllEntitiesResponse)connection.Execute(request);
             EntityMetadata[] allEntities = response.EntityMetadata;
             Console.WriteLine(@"All Entities  Retrieved");
-            EntityMetadata[] entities = allEntities;
             Console.WriteLine(@"Retrieving Selected Entities");
             List<EntityMetadata> selectedEntities = SelectedEntitiesMetaData(allEntities, connection).ToList();
             Console.WriteLine(@"All Selected Entities Retrieved");
