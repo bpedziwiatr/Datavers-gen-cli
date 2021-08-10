@@ -125,7 +125,7 @@ namespace DataverseGen.Core.Generators.Scriban
                 , options
                 , lexerOptions);
             string content = RemoveEmptyLines(template.Render(_context));
-            File.WriteAllText($"{_fullOutputPath}databerse.metadata.ts", content, Encoding.UTF8);
+            File.WriteAllText($"{_fullOutputPath}dataverse.metadata.ts", content, Encoding.UTF8);
         }
 
         private void TypescriptOutput()
