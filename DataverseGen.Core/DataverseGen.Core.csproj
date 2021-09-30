@@ -45,14 +45,17 @@
     <Compile Include="Config\ConfigModel.cs" />
     <Compile Include="DataConverter\DataverseConnector.cs" />
     <Compile Include="Extensions\MetadataNamingExtensions.cs" />
-    <Compile Include="Metadata\GeneratorInfo.cs" />
-    <Compile Include="Generators\Scriban\MultipleFileTemplate.cs" />
-    <Compile Include="Generators\Scriban\ScribanGenerator.cs" />
-    <Compile Include="Generators\Scriban\ScribanTemplates.Designer.cs">
+    <Compile Include="Generators\BaseGenerator.cs" />
+    <Compile Include="Generators\Scriban\Templates\TemplateFileManager\MultipleFileTemplateBase.cs" />
+    <Compile Include="Generators\Scriban\Templates\TemplateFileManager\MultipleFileTemplateTypescript.cs" />
+    <Compile Include="Generators\Scriban\Templates\ScribanTemplates.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>ScribanTemplates.resx</DependentUpon>
     </Compile>
+    <Compile Include="Metadata\GeneratorInfo.cs" />
+    <Compile Include="Generators\Scriban\Templates\TemplateFileManager\MultipleFileTemplateCsharp.cs" />
+    <Compile Include="Generators\Scriban\ScribanGenerator.cs" />
     <Compile Include="Metadata\Context.cs" />
     <Compile Include="Metadata\CrmAttribute.cs" />
     <Compile Include="Metadata\MappingEntity.cs" />
@@ -62,48 +65,38 @@
     <Compile Include="Metadata\MappingRelationshipMN.cs" />
     <Compile Include="Metadata\MappingRelationshipN1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Generators\T4\Generator.cs" />
-    <Compile Include="Generators\T4\TextTemplatingEngineHost.cs" />
-    <Compile Include="Generators\T4\TextTemplatingSession.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Generators\Scriban\ScribanTemplates.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>ScribanTemplates.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="EnvDTE">
-      <Version>16.7.30508.193</Version>
-    </PackageReference>
     <PackageReference Include="GitVersion.MsBuild">
       <Version>5.6.11</Version>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.CodeAnalysis">
-      <Version>3.8.0</Version>
-    </PackageReference>
     <PackageReference Include="Microsoft.CrmSdk.XrmTooling.CoreAssembly">
       <Version>9.1.0.68</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.VisualStudio.TextTemplating.15.0">
-      <Version>16.7.30329.63</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.VisualStudio.TextTemplating.Interfaces.10.0">
-      <Version>10.0.30319</Version>
     </PackageReference>
     <PackageReference Include="Scriban">
       <Version>3.6.0</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Generators\Scriban\Teamplates\Multiple\Main\entity.sbncs" />
-    <None Include="Generators\Scriban\Teamplates\Multiple\Main\enums.sbncs" />
-    <None Include="Generators\Scriban\Teamplates\Multiple\Main\fields.sbncs" />
-    <None Include="Generators\Scriban\Teamplates\Multiple\Main\xrmservicecontext.sbncs" />
-    <None Include="Generators\Scriban\Teamplates\Single\dataversegen-single.sbncs" />
+    <None Include="Generators\Scriban\Templates\Multiple\Main\entity.sbncs" />
+    <None Include="Generators\Scriban\Templates\Multiple\Main\enums.sbncs" />
+    <None Include="Generators\Scriban\Templates\Multiple\Main\fields.sbncs" />
+    <None Include="Generators\Scriban\Templates\Multiple\Main\xrmservicecontext.sbncs" />
+    <None Include="Generators\Scriban\Templates\Multiple\TS-Main\entity-relationship.sbncs" />
+    <None Include="Generators\Scriban\Templates\Multiple\TS-Main\enums.sbncs" />
+    <None Include="Generators\Scriban\Templates\Multiple\TS-Main\entity.sbncs" />
+    <None Include="Generators\Scriban\Templates\Single\dataversegen-single-ts.sbncs" />
+    <None Include="Generators\Scriban\Templates\Single\dataversegen-single.sbncs" />
     <None Include="GitVersion.yml" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Generators\Scriban\Templates\ScribanTemplates.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ScribanTemplates.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

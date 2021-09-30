@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace DataverseGen.Core.Generators.Scriban {
+namespace DataverseGen.Core.Generators.Scriban.Templates {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace DataverseGen.Core.Generators.Scriban {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("DataverseGen.Core.Generators.Scriban.ScribanTemplates", typeof(ScribanTemplates).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("DataverseGen.Core.Generators.Scriban.Templates.ScribanTemplates", typeof(ScribanTemplates).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -73,9 +73,19 @@ namespace DataverseGen.Core.Generators.Scriban {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
+        internal static byte[] dataversegen_single_ts {
+            get {
+                object obj = ResourceManager.GetObject("dataversegen_single_ts", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
         internal static byte[] Main_entity {
             get {
-                object obj = ResourceManager.GetObject("Main.entity", resourceCulture);
+                object obj = ResourceManager.GetObject("Main_entity", resourceCulture);
                 return ((byte[])(obj));
             }
         }
@@ -85,7 +95,7 @@ namespace DataverseGen.Core.Generators.Scriban {
         /// </summary>
         internal static byte[] Main_enums {
             get {
-                object obj = ResourceManager.GetObject("Main.enums", resourceCulture);
+                object obj = ResourceManager.GetObject("Main_enums", resourceCulture);
                 return ((byte[])(obj));
             }
         }
@@ -95,7 +105,37 @@ namespace DataverseGen.Core.Generators.Scriban {
         /// </summary>
         internal static byte[] Main_fields {
             get {
-                object obj = ResourceManager.GetObject("Main.fields", resourceCulture);
+                object obj = ResourceManager.GetObject("Main_fields", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] Main_ts_entity {
+            get {
+                object obj = ResourceManager.GetObject("Main_ts_entity", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] Main_ts_entity_relationship {
+            get {
+                object obj = ResourceManager.GetObject("Main_ts_entity_relationship", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] Main_ts_enums {
+            get {
+                object obj = ResourceManager.GetObject("Main_ts_enums", resourceCulture);
                 return ((byte[])(obj));
             }
         }
@@ -105,7 +145,7 @@ namespace DataverseGen.Core.Generators.Scriban {
         /// </summary>
         internal static byte[] Main_xrmservicecontext {
             get {
-                object obj = ResourceManager.GetObject("Main.xrmservicecontext", resourceCulture);
+                object obj = ResourceManager.GetObject("Main_xrmservicecontext", resourceCulture);
                 return ((byte[])(obj));
             }
         }

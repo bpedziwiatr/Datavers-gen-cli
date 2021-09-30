@@ -136,7 +136,7 @@ namespace DataverseGen.Core.Extensions
         {
             if (!entityMetadata.LogicalName.Contains("_")) 
                 return Clean(Capitalize(entityMetadata.SchemaName, true));
-            Console.WriteLine($"{entityMetadata.SchemaName} {entityMetadata.LogicalName}");
+            Console.WriteLine($@"{entityMetadata.SchemaName} {entityMetadata.LogicalName}");
             return entityMetadata.SchemaName;
 
         }

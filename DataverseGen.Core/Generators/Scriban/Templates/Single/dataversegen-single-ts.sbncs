@@ -1,0 +1,76 @@
+{{info.welcome_xml}}
+{{for entity in entities}}
+
+    {{  isFirstRow = true }}
+
+type {{entity.hybrid_name}}_attributes =
+    {{for attribute in entity.fields}}
+        {{if isFirstRow == true }}
+    "{{attribute.attribute.logical_name}}"
+        {{isFirstRow = false}}
+        {{else}}
+    | "{{attribute.attribute.logical_name}}"
+        {{end}}
+    {{end}}     
+
+    {{for enm in entity.enums}}
+enum {{enm.display_name}}_{{entity.hybrid_name }}
+{
+        {{for item in enm.items}}
+    {{item.name}} = {{item.value}},
+        {{end}}
+}
+    {{end}}
+
+
+    {{  isFirstRow1N = true }}
+    {{  isFirstRowN1 = true }}
+    {{  isFirstRowNN = true }}
+
+    {{if entity.relationships_one_to_many.size >0 }}
+type {{entity.logical_name}}_1n_relationships =
+        {{for attribute in entity.relationships_one_to_many}}
+            {{if attribute.schema_name == "calendar_calendar_rules" || attribute.schema_name == "service_calendar_rules"}}
+
+                {{if isFirstRow1N == true }}
+    "calendarrules"
+                    {{isFirstRow1N = false}}
+                {{else}}
+    | "calendarrules"
+                {{end}}
+            {{else}}
+                {{if isFirstRow1N == true }}
+    "{{attribute.schema_name}}"
+                    {{isFirstRow1N = false}}
+                {{else}}
+    | "{{attribute.schema_name}}"
+                {{end}}
+            {{end}}
+        {{end}}
+    {{end}}
+
+    {{if entity.relationships_many_to_one.size >0 }}
+type {{entity.logical_name}}_n1_relationships =
+        {{for attribute in entity.relationships_many_to_one}}
+            {{if isFirstRowN1 == true }}
+    "{{attribute.schema_name}}"
+                {{isFirstRowN1 = false}}
+            {{else}}
+    | "{{attribute.schema_name}}"
+            {{end}}    
+        {{end}}
+    {{end}}
+
+    {{if entity.relationships_many_to_many.size >0 }}
+type {{entity.logical_name}}nn_relationships =
+        {{for attribute in entity.relationships_many_to_many}}
+            {{if isFirstRowNN == true }}
+    "{{attribute.schema_name}}"
+                {{isFirstRowNN = false}}
+            {{else}}
+    | "{{attribute.schema_name}}"
+            {{end}}
+        {{end}}
+    {{end}}
+
+{{end}}

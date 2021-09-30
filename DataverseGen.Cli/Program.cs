@@ -3,7 +3,6 @@
 using DataverseGen.Core.Config;
 using DataverseGen.Core.DataConverter;
 using DataverseGen.Core.Generators.Scriban;
-using DataverseGen.Core.Generators.T4;
 using DataverseGen.Core.Metadata;
 using System;
 using System.IO;
@@ -13,7 +12,7 @@ namespace DataverseGen.Cli
 {
     internal class Program
     {
-        private const string title = @"
+        private const string Title = @"
  _____                                                 ______                                                  ______ _       _____
 (____ \       _                                       / _____)                             _                  / _____) |     (_____)
  _   \ \ ____| |_  ____ _   _ ____  ____ ___  ____   | /  ___  ____ ____   ____  ____ ____| |_  ___   ____   | /     | |        _
@@ -56,47 +55,53 @@ namespace DataverseGen.Cli
                 //        }
                 //    });
                 Console.SetWindowSize(140, 30);
-                Console.WriteLine(title);
+                Console.WriteLine(Title);
 
                 ConfigModel config = GetConfig();
 
                 DataverseConnector connector = new DataverseConnector(config.ConnectionString, config.Entities);
                 MappingEntity[] data = connector.GetMappedEntities();
-                Console.WriteLine("Finish Load data");
+                Console.WriteLine(@"Finish Load data");
                 Context context = new Context
                 {
                     Namespace = config.Namespace,
                     Entities = data
                 };
 
-                Console.WriteLine("Start generator");
-                switch (config.TemplateEngine)
+                Console.WriteLine(@"Start generator");
+                switch (config.TemplateEngine.Name)
                 {
                     case "scriban":
-                        ScribanGenerator scribanGenerator = new ScribanGenerator(config.TemplateName, config.OutDirectory, context, config.IsSingleOutputScriban);
-                        scribanGenerator.GenerateTemplate();
+                        ScribanRun(config, context);
                         break;
-
-                    case "t4":
-                        Generator gen2 = new Generator(config.TemplateName, config.OutDirectory, context);
-                        gen2.GenerateTemplate();
-                        break;
-
                     default:
-                        Console.WriteLine($"Unsuported generator {config.TemplateEngine}");
+                        Console.WriteLine($@"Unsupported generator {config.TemplateEngine}, run scriban");
+                        ScribanRun(config, context);
                         break;
                 }
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                Console.WriteLine("#StackTrace:");
+                Console.WriteLine(@"#StackTrace:");
                 Console.WriteLine(e.StackTrace);
-                Console.ReadKey();
                 throw;
             }
-            Console.WriteLine("Bye Bye, see you next time Press any Key to exit");
-            Console.ReadKey();
+            finally
+            {
+                Console.WriteLine(@"Bye Bye, see you next time Press any Key to exit");
+                Console.ReadKey();
+            }
+        }
+
+        private static void ScribanRun(ConfigModel config, Context context)
+        {
+            ScribanGenerator scribanGenerator = new ScribanGenerator(
+                config.TemplateName,
+                config.OutDirectory,
+                context,
+                config.TemplateEngine);
+            scribanGenerator.GenerateTemplate();
         }
     }
 }
