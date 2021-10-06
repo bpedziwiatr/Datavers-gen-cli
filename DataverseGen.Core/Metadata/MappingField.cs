@@ -290,7 +290,19 @@ namespace DataverseGen.Core.Metadata
                 case AttributeTypeCode.Virtual:
                 case AttributeTypeCode.EntityName:
                 case AttributeTypeCode.String:
-                    return field.AttributeTypeName == "MultiSelectPicklistType" ? "OptionSetValueCollection" : "string";
+                {
+
+                    switch (field.AttributeTypeName)
+                        {
+
+                            case "FileType":
+                                return "Guid";
+                            case "MultiSelectPicklistType":
+                                return "OptionSetValueCollection";
+                            default:
+                                return "string";
+                        }
+                    }
 
                 case AttributeTypeCode.PartyList:
                     return "IEnumerable<ActivityParty>";

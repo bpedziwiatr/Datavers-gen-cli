@@ -228,7 +228,7 @@ namespace {{ namespace }}
         [RelationshipSchemaName("{{attribute.schema_name}}"{{attribute.entity_role_schema}})]
         public IEnumerable<{{attribute.to_entity.hybrid_name}}> {{attribute.display_name}}
         {
-            get => GetRelatedEntity<{{attribute.to_entity.hybrid_name}}>("{{attribute.schema_name}}",{{attribute.entity_role}});
+            get => GetRelatedEntities<{{attribute.to_entity.hybrid_name}}>("{{attribute.schema_name}}",{{attribute.entity_role}});
             set
                 {
                     OnPropertyChanging("{{attribute.display_name}}");
