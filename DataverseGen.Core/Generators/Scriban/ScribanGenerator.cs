@@ -143,11 +143,11 @@ namespace DataverseGen.Core.Generators.Scriban
             }
         }
 
-        private void WriteEntityTemplateToFile(Template template, MappingEntity entity, string outputFileSufixWithExtension)
+        private void WriteEntityTemplateToFile(Template template, MappingEntity entity, string outputFileSuffixWithExtension)
         {
             string entityContent =
                 RemoveEmptyLines(template.Render(new { _context.Namespace, _context.Info, Entity = entity }));
-            File.WriteAllText($"{_fullOutputPath}/{entity.HybridName.ToLower()}.{outputFileSufixWithExtension}", entityContent, Encoding.UTF8);
+            File.WriteAllText($"{_fullOutputPath}/{entity.HybridName.ToLower()}.{outputFileSuffixWithExtension}", entityContent, Encoding.UTF8);
         }
     }
 }
