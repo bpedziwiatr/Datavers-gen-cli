@@ -147,7 +147,7 @@ namespace DataverseGen.Core.Generators.Scriban
         {
             string entityContent =
                 RemoveEmptyLines(template.Render(new { _context.Namespace, _context.Info, Entity = entity }));
-            File.WriteAllText($"{_fullOutputPath}/{entity.HybridName}.{outputFileSufixWithExtension}", entityContent, Encoding.UTF8);
+            File.WriteAllText($"{_fullOutputPath}/{entity.HybridName.ToLower()}.{outputFileSufixWithExtension}", entityContent, Encoding.UTF8);
         }
     }
 }
