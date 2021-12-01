@@ -296,7 +296,7 @@ namespace DataverseGen.Core.Metadata
                         {
 
                             case "FileType":
-                                return "Guid";
+                                return "File";
                             case "MultiSelectPicklistType":
                                 return "OptionSetValueCollection";
                             default:
