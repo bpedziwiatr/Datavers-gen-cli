@@ -5,6 +5,7 @@ using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Client;
 using System.ComponentModel;
 using System.Collections.Generic;
+using System.Linq
 namespace {{ namespace }}
 {
     {{if entity.states}}

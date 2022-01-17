@@ -1,6 +1,6 @@
-﻿using DataverseGen.Core.Extensions;
+﻿using System;
+using DataverseGen.Core.Extensions;
 using Microsoft.Xrm.Sdk.Metadata;
-using System;
 
 namespace DataverseGen.Core.Metadata
 {
@@ -15,13 +15,14 @@ namespace DataverseGen.Core.Metadata
             Description = "";
         }
 
+        public string DescriptionXmlSafe => Description.XmlEscape();
+
         public CrmPropertyAttribute Attribute { get; set; }
-        public AttributeMetadata AttributeMetadata { get; set; }
+        //public AttributeMetadata AttributeMetadata { get; set; }
         public string AttributeOf { get; set; }
         public string AttributeTypeName { get; private set; }
         public string DeprecatedVersion { get; set; }
         public string Description { get; set; }
-        public string DescriptionXmlSafe => Description.XmlEscape();
 
         public string DisplayName { get; set; }
         public MappingEntity Entity { get; set; }
@@ -45,6 +46,7 @@ namespace DataverseGen.Core.Metadata
         public decimal? Max { get; set; }
         public int? MaxLength { get; set; }
         public decimal? Min { get; set; }
+
         public string PrivatePropertyName { get; set; }
         //public string SetMethodCall
         //{
@@ -227,19 +229,33 @@ namespace DataverseGen.Core.Metadata
             if (attribute.DisplayName?.UserLocalizedLabel != null)
                 result.Label = attribute.DisplayName.UserLocalizedLabel.Label;
 
-            result.IsRequired = attribute.RequiredLevel != null && attribute.RequiredLevel.Value == AttributeRequiredLevel.ApplicationRequired;
+            result.IsRequired = attribute.RequiredLevel != null &&
+                                attribute.RequiredLevel.Value == AttributeRequiredLevel.ApplicationRequired;
 
             result.Attribute =
                 new CrmPropertyAttribute
                 {
                     LogicalName = attribute.LogicalName,
-                    IsLookup = attribute.AttributeType == AttributeTypeCode.Lookup || attribute.AttributeType == AttributeTypeCode.Customer
+                    IsLookup = attribute.AttributeType == AttributeTypeCode.Lookup ||
+                               attribute.AttributeType == AttributeTypeCode.Customer
                 };
             result.TargetTypeForCrmSvcUtil = GetTargetType(result);
             result.FieldTypeString = result.TargetTypeForCrmSvcUtil;
 
             return result;
         }
+
+        public MappingField CreateCopyForNameAttribute(MappingField field)
+        {
+             
+            
+            MappingField fieldCopy = DeepCloneExtensions.CreateDeepCopy(field);
+            fieldCopy.TargetTypeForCrmSvcUtil = "string";
+            fieldCopy.DisplayName = $"{fieldCopy.DisplayName}Name";
+            fieldCopy.Attribute.LogicalName = $"{fieldCopy.Attribute.LogicalName}_name";
+            return fieldCopy;
+        }
+       
 
         private static string GetTargetType(MappingField field)
         {
@@ -291,18 +307,16 @@ namespace DataverseGen.Core.Metadata
                 case AttributeTypeCode.EntityName:
                 case AttributeTypeCode.String:
                 {
-
                     switch (field.AttributeTypeName)
-                        {
-
-                            case "FileType":
-                                return "File";
-                            case "MultiSelectPicklistType":
-                                return "OptionSetValueCollection";
-                            default:
-                                return "string";
-                        }
+                    {
+                        case "FileType":
+                            return "Guid?";
+                        case "MultiSelectPicklistType":
+                            return "OptionSetValueCollection";
+                        default:
+                            return "string";
                     }
+                }
 
                 case AttributeTypeCode.PartyList:
                     return "IEnumerable<ActivityParty>";
@@ -328,34 +342,44 @@ namespace DataverseGen.Core.Metadata
                     break;
 
                 case IntegerAttributeMetadata integerAttributeMetadata:
-                    {
-                        result.Min = integerAttributeMetadata.MinValue ?? -1;
-                        result.Max = integerAttributeMetadata.MaxValue ?? -1;
+                {
+                    result.Min = integerAttributeMetadata.MinValue ?? -1;
+                    result.Max = integerAttributeMetadata.MaxValue ?? -1;
 
-                        break;
-                    }
+                    break;
+                }
                 case DecimalAttributeMetadata decimalAttributeMetadata:
-                    {
-                        result.Min = decimalAttributeMetadata.MinValue ?? -1;
-                        result.Max = decimalAttributeMetadata.MaxValue ?? -1;
+                {
+                    result.Min = decimalAttributeMetadata.MinValue ?? -1;
+                    result.Max = decimalAttributeMetadata.MaxValue ?? -1;
 
-                        break;
-                    }
+                    break;
+                }
                 case MoneyAttributeMetadata moneyAttributeMetadata:
-                    {
-                        result.Min = moneyAttributeMetadata.MinValue != null ? (decimal)moneyAttributeMetadata.MinValue.Value : -1;
-                        result.Max = moneyAttributeMetadata.MaxValue != null ? (decimal)moneyAttributeMetadata.MaxValue.Value : -1;
+                {
+                    result.Min = moneyAttributeMetadata.MinValue != null
+                        ? (decimal)moneyAttributeMetadata.MinValue.Value
+                        : -1;
+                    result.Max = moneyAttributeMetadata.MaxValue != null
+                        ? (decimal)moneyAttributeMetadata.MaxValue.Value
+                        : -1;
 
-                        break;
-                    }
+                    break;
+                }
                 case DoubleAttributeMetadata doubleAttributeMetadata:
-                    {
-                        result.Min = doubleAttributeMetadata.MinValue != null ? (decimal)doubleAttributeMetadata.MinValue.Value : -1;
-                        result.Max = doubleAttributeMetadata.MaxValue != null ? (decimal)doubleAttributeMetadata.MaxValue.Value : -1;
+                {
+                    result.Min = doubleAttributeMetadata.MinValue != null
+                        ? (decimal)doubleAttributeMetadata.MinValue.Value
+                        : -1;
+                    result.Max = doubleAttributeMetadata.MaxValue != null
+                        ? (decimal)doubleAttributeMetadata.MaxValue.Value
+                        : -1;
 
-                        break;
-                    }
+                    break;
+                }
             }
         }
+
+       
     }
 }

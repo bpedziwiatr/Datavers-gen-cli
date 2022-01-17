@@ -1,8 +1,8 @@
-﻿using DataverseGen.Core.Extensions;
-using Microsoft.Xrm.Sdk.Metadata;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using DataverseGen.Core.Extensions;
+using Microsoft.Xrm.Sdk.Metadata;
 
 //using Microsoft.Xrm.Sdk.Metadata;
 //using CrmCodeGenerator.VSPackage.Helpers;
@@ -17,16 +17,17 @@ namespace DataverseGen.Core.Metadata
             Description = "";
         }
 
+        public string DescriptionXmlSafe => Description.XmlEscape();
+        public string LogicalName => Attribute.LogicalName;
+        public string Plural => DisplayName.GetPluralName();
+
         public CrmEntityAttribute Attribute { get; set; }
         public string Description { get; set; }
-        public string DescriptionXmlSafe => Description.XmlEscape();
         public string DisplayName { get; set; }
         public MappingEnum[] Enums { get; set; }
         public MappingField[] Fields { get; set; }
         public string HybridName { get; set; }
         public bool IsIntersect { get; set; }
-        public string LogicalName => Attribute.LogicalName;
-        public string Plural => DisplayName.GetPluralName();
         public MappingField PrimaryKey { get; set; }
         public string PrimaryKeyProperty { get; set; }
         public string PrimaryNameAttribute { get; set; }
@@ -56,25 +57,26 @@ namespace DataverseGen.Core.Metadata
             if (entityMetadata.Description?.UserLocalizedLabel != null)
                 entity.Description = entityMetadata.Description.UserLocalizedLabel.Label;
 
-            List<MappingField> fields = entityMetadata.Attributes
-                .Where(a => a.AttributeOf == null)
-                .Select(a => MappingField.Parse(a, entity)).ToList();
+            List<MappingField> fields = MapFieldsFromEntityMetadata(entityMetadata, entity).ToList();
 
             fields.ForEach(f =>
-                    {
-                        if (f.DisplayName == entity.DisplayName)
-                            f.DisplayName += "1";
-                    }
-                );
+                {
+                    if (f.DisplayName == entity.DisplayName)
+                        f.DisplayName += "1";
+                }
+            );
 
             AddEntityImageCrm2013(fields);
             AddLookupFields(fields);
 
             entity.Fields = fields.ToArray();
-            entity.States = entityMetadata.Attributes.Where(a => a is StateAttributeMetadata).Select(a => MappingEnum.Parse(a as EnumAttributeMetadata)).FirstOrDefault();
+            entity.States = entityMetadata.Attributes.Where(a => a is StateAttributeMetadata)
+                .Select(a => MappingEnum.Parse(a as EnumAttributeMetadata)).FirstOrDefault();
 
             entity.Enums = entityMetadata.Attributes
-                .Where(a => a is PicklistAttributeMetadata || a is StateAttributeMetadata || a is StatusAttributeMetadata || a is BooleanAttributeMetadata || a is MultiSelectPicklistAttributeMetadata)
+                .Where(a => a is PicklistAttributeMetadata || a is StateAttributeMetadata ||
+                            a is StatusAttributeMetadata || a is BooleanAttributeMetadata ||
+                            a is MultiSelectPicklistAttributeMetadata)
                 .Select(a => MappingEnum.Parse(a)).ToArray();
 
             entity.PrimaryKey = entity.Fields.First(f => f.Attribute.LogicalName == entity.Attribute.PrimaryKey);
@@ -113,15 +115,19 @@ namespace DataverseGen.Core.Metadata
                 }
             });
 
-            List<MappingRelationshipMn> relationshipsManyToMany = entityMetadata.ManyToManyRelationships.Select(r => MappingRelationshipMn.Parse(r, entity.LogicalName)).ToList();
-            List<MappingRelationshipMn> selfReferenced = relationshipsManyToMany.Where(r => r.IsSelfReferenced).ToList();
+            List<MappingRelationshipMn> relationshipsManyToMany = entityMetadata.ManyToManyRelationships
+                .Select(r => MappingRelationshipMn.Parse(r, entity.LogicalName)).ToList();
+            List<MappingRelationshipMn> selfReferenced =
+                relationshipsManyToMany.Where(r => r.IsSelfReferenced).ToList();
             foreach (MappingRelationshipMn referenced in selfReferenced)
             {
                 MappingRelationshipMn referencing = (MappingRelationshipMn)referenced.Clone();
-                referencing.DisplayName = "Referencing" + MetadataNamingExtensions.GetProperVariableName(referenced.SchemaName);
+                referencing.DisplayName =
+                    "Referencing" + MetadataNamingExtensions.GetProperVariableName(referenced.SchemaName);
                 referencing.EntityRole = "Microsoft.Xrm.Sdk.EntityRole.Referencing";
                 relationshipsManyToMany.Add(referencing);
             }
+
             relationshipsManyToMany.ForEach(r =>
             {
                 string newName = r.DisplayName;
@@ -156,7 +162,8 @@ namespace DataverseGen.Core.Metadata
                 HybridName = "EntityImage",
                 TargetTypeForCrmSvcUtil = "byte[]",
                 IsValidForUpdate = true,
-                Description = "",  // TODO there is an Description for this entityimage, Need to figure out how to read it from the server
+                Description =
+                    "", // TODO there is an Description for this entityimage, Need to figure out how to read it from the server
                 GetMethod = ""
             };
             SafeAddField(fields, image);
@@ -175,7 +182,7 @@ namespace DataverseGen.Core.Metadata
                 FieldType = AttributeTypeCode.BigInt,
                 IsValidForUpdate = false,
                 IsValidForCreate = false,
-                Description = " ",  // CrmSvcUtil provides an empty description for this EntityImage_TimeStamp
+                Description = " ", // CrmSvcUtil provides an empty description for this EntityImage_TimeStamp
                 GetMethod = ""
             };
             SafeAddField(fields, imageTimestamp);
@@ -194,7 +201,7 @@ namespace DataverseGen.Core.Metadata
                 FieldType = AttributeTypeCode.String,
                 IsValidForUpdate = false,
                 IsValidForCreate = false,
-                Description = " ",   // CrmSvcUtil provides an empty description for this EntityImage_URL
+                Description = " ", // CrmSvcUtil provides an empty description for this EntityImage_URL
                 GetMethod = ""
             };
             SafeAddField(fields, imageUrl);
@@ -245,6 +252,20 @@ namespace DataverseGen.Core.Metadata
 
                 if (fields.Count(f => f.DisplayName == typeField.DisplayName) == 0)
                     fields.Add(typeField);
+            }
+        }
+
+        private static IEnumerable<MappingField> MapFieldsFromEntityMetadata(EntityMetadata entityMetadata,
+            MappingEntity entity)
+        {
+            foreach (AttributeMetadata attribute in entityMetadata.Attributes.Where(a => a.AttributeOf == null))
+            {
+                MappingField result = MappingField.Parse(attribute, entity);
+                yield return result;
+                if (attribute.AttributeTypeName == "FileType" || attribute.AttributeType == AttributeTypeCode.Lookup)
+                {
+                    yield return result.CreateCopyForNameAttribute(result);
+                }
             }
         }
 
