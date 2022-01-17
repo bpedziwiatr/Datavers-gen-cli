@@ -245,7 +245,7 @@ namespace DataverseGen.Core.Metadata
             return result;
         }
 
-        public MappingField CreateCopyForNameAttribute(MappingField field)
+        public MappingField CreateFileNameField(MappingField field)
         {
              
             
@@ -255,7 +255,16 @@ namespace DataverseGen.Core.Metadata
             fieldCopy.Attribute.LogicalName = $"{fieldCopy.Attribute.LogicalName}_name";
             return fieldCopy;
         }
-       
+        public MappingField CreateLookupNameField(MappingField field)
+        {
+             
+            
+            MappingField fieldCopy = DeepCloneExtensions.CreateDeepCopy(field);
+            fieldCopy.TargetTypeForCrmSvcUtil = "string";
+            fieldCopy.DisplayName = $"{fieldCopy.DisplayName}Name";
+            fieldCopy.Attribute.LogicalName = $"{fieldCopy.Attribute.LogicalName}name";
+            return fieldCopy;
+        }
 
         private static string GetTargetType(MappingField field)
         {

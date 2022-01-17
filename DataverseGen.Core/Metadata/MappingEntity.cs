@@ -264,7 +264,12 @@ namespace DataverseGen.Core.Metadata
                 yield return result;
                 if (attribute.AttributeTypeName == "FileType" || attribute.AttributeType == AttributeTypeCode.Lookup)
                 {
-                    yield return result.CreateCopyForNameAttribute(result);
+                    yield return result.CreateFileNameField(result);
+                }
+                
+                if (attribute.AttributeType == AttributeTypeCode.Lookup)
+                {
+                    yield return result.CreateLookupNameField(result);
                 }
             }
         }
