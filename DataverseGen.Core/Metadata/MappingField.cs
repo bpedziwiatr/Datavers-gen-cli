@@ -18,6 +18,7 @@ namespace DataverseGen.Core.Metadata
         public string DescriptionXmlSafe => Description.XmlEscape();
 
         public CrmPropertyAttribute Attribute { get; set; }
+
         //public AttributeMetadata AttributeMetadata { get; set; }
         public string AttributeOf { get; set; }
         public string AttributeTypeName { get; private set; }
@@ -48,126 +49,6 @@ namespace DataverseGen.Core.Metadata
         public decimal? Min { get; set; }
 
         public string PrivatePropertyName { get; set; }
-        //public string SetMethodCall
-        //{
-        //    get
-        //    {
-        //        var methodName = "";
-
-        //        switch (FieldType)
-        //        {
-        //            case AttributeTypeCode.Picklist:
-        //                methodName = "SetPicklist"; break;
-        //            case AttributeTypeCode.BigInt:
-        //            case AttributeTypeCode.Integer:
-        //                methodName = "SetValue<int?>"; break;
-        //            case AttributeTypeCode.Boolean:
-        //                methodName = "SetValue<bool?>"; break;
-        //            case AttributeTypeCode.DateTime:
-        //                methodName = "SetValue<DateTime?>"; break;
-        //            case AttributeTypeCode.Decimal:
-        //                methodName = "SetValue<decimal?>"; break;
-        //            case AttributeTypeCode.Money:
-        //                methodName = "SetMoney"; break;
-        //            case AttributeTypeCode.Memo:
-        //            case AttributeTypeCode.String:
-        //                methodName = "SetValue<string>"; break;
-        //            case AttributeTypeCode.Double:
-        //                methodName = "SetValue<double?>"; break;
-        //            case AttributeTypeCode.Uniqueidentifier:
-        //                methodName = "SetValue<Guid?>"; break;
-        //            case AttributeTypeCode.Lookup:
-        //                methodName = "SetLookup"; break;
-        //            //methodName = "SetLookup"; break;
-        //            case AttributeTypeCode.Virtual:
-        //                if (AttributeTypeName == "MultiSelectPicklistType")
-        //                {
-        //                    return "SetValue<OptionSetValueCollection>";
-        //                }
-        //                methodName = "SetValue<string>"; break;
-        //            case AttributeTypeCode.Customer:
-        //                methodName = "SetCustomer"; break;
-        //            case AttributeTypeCode.Status:
-        //                methodName = ""; break;
-        //            case AttributeTypeCode.EntityName:
-        //                methodName = "SetEntityNameReference"; break;
-        //            default:
-        //                return "";
-        //        }
-
-        //        if (methodName == "" || !IsValidForUpdate)
-        //            return "";
-
-        //        switch (FieldType)
-        //        {
-        //            case AttributeTypeCode.Picklist:
-        //                return $"{methodName}(\"{this.Attribute.LogicalName}\", (int?)value);";
-        //            case AttributeTypeCode.Lookup:
-        //            case AttributeTypeCode.Customer:
-        //                return string.IsNullOrEmpty(LookupSingleType)
-        //                    ? $"{methodName}(\"{Attribute.LogicalName}\", {this.DisplayName}Type, value);"
-        //                    : $"{methodName}(\"{Attribute.LogicalName}\", \"{this.LookupSingleType}\", value);";
-        //        }
-
-        //        return $"{methodName}(\"{this.Attribute.LogicalName}\", value);";
-        //    }
-        //}
-
-        //public string StateName { get; set; }
-        //public string TargetType
-        //{
-        //    get
-        //    {
-        //        if (IsPrimaryKey)
-        //            return "Guid";
-
-        //        switch (FieldType)
-        //        {
-        //            case AttributeTypeCode.Picklist:
-        //                return $"Enums.{EnumData.DisplayName}?";
-
-        //            case AttributeTypeCode.BigInt:
-        //            case AttributeTypeCode.Integer:
-        //                return "int?";
-
-        //            case AttributeTypeCode.Boolean:
-        //                return "bool?";
-
-        //            case AttributeTypeCode.DateTime:
-        //                return "DateTime?";
-
-        //            case AttributeTypeCode.Decimal:
-        //            case AttributeTypeCode.Money:
-        //                return "decimal?";
-
-        //            case AttributeTypeCode.Double:
-        //                return "double?";
-
-        //            case AttributeTypeCode.Uniqueidentifier:
-        //            case AttributeTypeCode.Lookup:
-        //            case AttributeTypeCode.Owner:
-        //            case AttributeTypeCode.Customer:
-        //                return "Guid?";
-
-        //            case AttributeTypeCode.State:
-        //            case AttributeTypeCode.Status:
-        //                return "int";
-
-        //            case AttributeTypeCode.Memo:
-        //            case AttributeTypeCode.Virtual:
-        //            case AttributeTypeCode.EntityName:
-        //            case AttributeTypeCode.String:
-        //                if (AttributeTypeName == "MultiSelectPicklistType")
-        //                {
-        //                    return "OptionSetValueCollection";
-        //                }
-        //                return "string";
-
-        //            default:
-        //                return "object";
-        //        }
-        //    }
-        //}
 
         public string TargetTypeForCrmSvcUtil { get; set; }
         private bool IsPrimaryKey { get; set; }
@@ -247,18 +128,15 @@ namespace DataverseGen.Core.Metadata
 
         public MappingField CreateFileNameField(MappingField field)
         {
-             
-            
             MappingField fieldCopy = DeepCloneExtensions.CreateDeepCopy(field);
             fieldCopy.TargetTypeForCrmSvcUtil = "string";
             fieldCopy.DisplayName = $"{fieldCopy.DisplayName}Name";
             fieldCopy.Attribute.LogicalName = $"{fieldCopy.Attribute.LogicalName}_name";
             return fieldCopy;
         }
+
         public MappingField CreateLookupNameField(MappingField field)
         {
-             
-            
             MappingField fieldCopy = DeepCloneExtensions.CreateDeepCopy(field);
             fieldCopy.TargetTypeForCrmSvcUtil = "string";
             fieldCopy.DisplayName = $"{fieldCopy.DisplayName}Name";
@@ -388,7 +266,5 @@ namespace DataverseGen.Core.Metadata
                 }
             }
         }
-
-       
     }
 }
