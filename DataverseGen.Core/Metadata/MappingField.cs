@@ -19,7 +19,6 @@ namespace DataverseGen.Core.Metadata
 
         public CrmPropertyAttribute Attribute { get; set; }
 
-        //public AttributeMetadata AttributeMetadata { get; set; }
         public string AttributeOf { get; set; }
         public string AttributeTypeName { get; private set; }
         public string DeprecatedVersion { get; set; }
@@ -132,15 +131,6 @@ namespace DataverseGen.Core.Metadata
             fieldCopy.TargetTypeForCrmSvcUtil = "string";
             fieldCopy.DisplayName = $"{fieldCopy.DisplayName}Name";
             fieldCopy.Attribute.LogicalName = $"{fieldCopy.Attribute.LogicalName}_name";
-            return fieldCopy;
-        }
-
-        public MappingField CreateLookupNameField(MappingField field)
-        {
-            MappingField fieldCopy = DeepCloneExtensions.CreateDeepCopy(field);
-            fieldCopy.TargetTypeForCrmSvcUtil = "string";
-            fieldCopy.DisplayName = $"{fieldCopy.DisplayName}Name";
-            fieldCopy.Attribute.LogicalName = $"{fieldCopy.Attribute.LogicalName}name";
             return fieldCopy;
         }
 

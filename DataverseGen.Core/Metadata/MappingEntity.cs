@@ -4,9 +4,6 @@ using System.Linq;
 using DataverseGen.Core.Extensions;
 using Microsoft.Xrm.Sdk.Metadata;
 
-//using Microsoft.Xrm.Sdk.Metadata;
-//using CrmCodeGenerator.VSPackage.Helpers;
-
 namespace DataverseGen.Core.Metadata
 {
     [Serializable]
@@ -265,11 +262,6 @@ namespace DataverseGen.Core.Metadata
                 if (attribute.AttributeTypeName == "FileType" || attribute.AttributeType == AttributeTypeCode.Lookup)
                 {
                     yield return result.CreateFileNameField(result);
-                }
-                
-                if (attribute.AttributeType == AttributeTypeCode.Lookup)
-                {
-                    yield return result.CreateLookupNameField(result);
                 }
             }
         }
