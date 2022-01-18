@@ -44,6 +44,7 @@
   <ItemGroup>
     <Compile Include="Config\ConfigModel.cs" />
     <Compile Include="DataConverter\DataverseConnector.cs" />
+    <Compile Include="Extensions\DeepCloneExtensions.cs" />
     <Compile Include="Extensions\MetadataNamingExtensions.cs" />
     <Compile Include="Generators\BaseGenerator.cs" />
     <Compile Include="Generators\Scriban\Templates\TemplateFileManager\MultipleFileTemplateBase.cs" />
@@ -68,15 +69,15 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="GitVersion.MsBuild">
-      <Version>5.6.11</Version>
+      <Version>5.7.0</Version>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.CrmSdk.XrmTooling.CoreAssembly">
-      <Version>9.1.0.68</Version>
+      <Version>9.1.0.90</Version>
     </PackageReference>
     <PackageReference Include="Scriban">
-      <Version>3.6.0</Version>
+      <Version>4.0.2</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>

@@ -1,6 +1,6 @@
-﻿using DataverseGen.Core.Extensions;
+﻿using System;
+using DataverseGen.Core.Extensions;
 using Microsoft.Xrm.Sdk.Metadata;
-using System;
 
 namespace DataverseGen.Core.Metadata
 {
@@ -15,13 +15,14 @@ namespace DataverseGen.Core.Metadata
             Description = "";
         }
 
+        public string DescriptionXmlSafe => Description.XmlEscape();
+
         public CrmPropertyAttribute Attribute { get; set; }
-        public AttributeMetadata AttributeMetadata { get; set; }
+
         public string AttributeOf { get; set; }
         public string AttributeTypeName { get; private set; }
         public string DeprecatedVersion { get; set; }
         public string Description { get; set; }
-        public string DescriptionXmlSafe => Description.XmlEscape();
 
         public string DisplayName { get; set; }
         public MappingEntity Entity { get; set; }
@@ -45,127 +46,8 @@ namespace DataverseGen.Core.Metadata
         public decimal? Max { get; set; }
         public int? MaxLength { get; set; }
         public decimal? Min { get; set; }
+
         public string PrivatePropertyName { get; set; }
-        //public string SetMethodCall
-        //{
-        //    get
-        //    {
-        //        var methodName = "";
-
-        //        switch (FieldType)
-        //        {
-        //            case AttributeTypeCode.Picklist:
-        //                methodName = "SetPicklist"; break;
-        //            case AttributeTypeCode.BigInt:
-        //            case AttributeTypeCode.Integer:
-        //                methodName = "SetValue<int?>"; break;
-        //            case AttributeTypeCode.Boolean:
-        //                methodName = "SetValue<bool?>"; break;
-        //            case AttributeTypeCode.DateTime:
-        //                methodName = "SetValue<DateTime?>"; break;
-        //            case AttributeTypeCode.Decimal:
-        //                methodName = "SetValue<decimal?>"; break;
-        //            case AttributeTypeCode.Money:
-        //                methodName = "SetMoney"; break;
-        //            case AttributeTypeCode.Memo:
-        //            case AttributeTypeCode.String:
-        //                methodName = "SetValue<string>"; break;
-        //            case AttributeTypeCode.Double:
-        //                methodName = "SetValue<double?>"; break;
-        //            case AttributeTypeCode.Uniqueidentifier:
-        //                methodName = "SetValue<Guid?>"; break;
-        //            case AttributeTypeCode.Lookup:
-        //                methodName = "SetLookup"; break;
-        //            //methodName = "SetLookup"; break;
-        //            case AttributeTypeCode.Virtual:
-        //                if (AttributeTypeName == "MultiSelectPicklistType")
-        //                {
-        //                    return "SetValue<OptionSetValueCollection>";
-        //                }
-        //                methodName = "SetValue<string>"; break;
-        //            case AttributeTypeCode.Customer:
-        //                methodName = "SetCustomer"; break;
-        //            case AttributeTypeCode.Status:
-        //                methodName = ""; break;
-        //            case AttributeTypeCode.EntityName:
-        //                methodName = "SetEntityNameReference"; break;
-        //            default:
-        //                return "";
-        //        }
-
-        //        if (methodName == "" || !IsValidForUpdate)
-        //            return "";
-
-        //        switch (FieldType)
-        //        {
-        //            case AttributeTypeCode.Picklist:
-        //                return $"{methodName}(\"{this.Attribute.LogicalName}\", (int?)value);";
-        //            case AttributeTypeCode.Lookup:
-        //            case AttributeTypeCode.Customer:
-        //                return string.IsNullOrEmpty(LookupSingleType)
-        //                    ? $"{methodName}(\"{Attribute.LogicalName}\", {this.DisplayName}Type, value);"
-        //                    : $"{methodName}(\"{Attribute.LogicalName}\", \"{this.LookupSingleType}\", value);";
-        //        }
-
-        //        return $"{methodName}(\"{this.Attribute.LogicalName}\", value);";
-        //    }
-        //}
-
-        //public string StateName { get; set; }
-        //public string TargetType
-        //{
-        //    get
-        //    {
-        //        if (IsPrimaryKey)
-        //            return "Guid";
-
-        //        switch (FieldType)
-        //        {
-        //            case AttributeTypeCode.Picklist:
-        //                return $"Enums.{EnumData.DisplayName}?";
-
-        //            case AttributeTypeCode.BigInt:
-        //            case AttributeTypeCode.Integer:
-        //                return "int?";
-
-        //            case AttributeTypeCode.Boolean:
-        //                return "bool?";
-
-        //            case AttributeTypeCode.DateTime:
-        //                return "DateTime?";
-
-        //            case AttributeTypeCode.Decimal:
-        //            case AttributeTypeCode.Money:
-        //                return "decimal?";
-
-        //            case AttributeTypeCode.Double:
-        //                return "double?";
-
-        //            case AttributeTypeCode.Uniqueidentifier:
-        //            case AttributeTypeCode.Lookup:
-        //            case AttributeTypeCode.Owner:
-        //            case AttributeTypeCode.Customer:
-        //                return "Guid?";
-
-        //            case AttributeTypeCode.State:
-        //            case AttributeTypeCode.Status:
-        //                return "int";
-
-        //            case AttributeTypeCode.Memo:
-        //            case AttributeTypeCode.Virtual:
-        //            case AttributeTypeCode.EntityName:
-        //            case AttributeTypeCode.String:
-        //                if (AttributeTypeName == "MultiSelectPicklistType")
-        //                {
-        //                    return "OptionSetValueCollection";
-        //                }
-        //                return "string";
-
-        //            default:
-        //                return "object";
-        //        }
-        //    }
-        //}
 
         public string TargetTypeForCrmSvcUtil { get; set; }
         private bool IsPrimaryKey { get; set; }
@@ -227,18 +109,29 @@ namespace DataverseGen.Core.Metadata
             if (attribute.DisplayName?.UserLocalizedLabel != null)
                 result.Label = attribute.DisplayName.UserLocalizedLabel.Label;
 
-            result.IsRequired = attribute.RequiredLevel != null && attribute.RequiredLevel.Value == AttributeRequiredLevel.ApplicationRequired;
+            result.IsRequired = attribute.RequiredLevel != null &&
+                                attribute.RequiredLevel.Value == AttributeRequiredLevel.ApplicationRequired;
 
             result.Attribute =
                 new CrmPropertyAttribute
                 {
                     LogicalName = attribute.LogicalName,
-                    IsLookup = attribute.AttributeType == AttributeTypeCode.Lookup || attribute.AttributeType == AttributeTypeCode.Customer
+                    IsLookup = attribute.AttributeType == AttributeTypeCode.Lookup ||
+                               attribute.AttributeType == AttributeTypeCode.Customer
                 };
             result.TargetTypeForCrmSvcUtil = GetTargetType(result);
             result.FieldTypeString = result.TargetTypeForCrmSvcUtil;
 
             return result;
+        }
+
+        public MappingField CreateFileNameField(MappingField field)
+        {
+            MappingField fieldCopy = DeepCloneExtensions.CreateDeepCopy(field);
+            fieldCopy.TargetTypeForCrmSvcUtil = "string";
+            fieldCopy.DisplayName = $"{fieldCopy.DisplayName}Name";
+            fieldCopy.Attribute.LogicalName = $"{fieldCopy.Attribute.LogicalName}_name";
+            return fieldCopy;
         }
 
         private static string GetTargetType(MappingField field)
@@ -290,7 +183,17 @@ namespace DataverseGen.Core.Metadata
                 case AttributeTypeCode.Virtual:
                 case AttributeTypeCode.EntityName:
                 case AttributeTypeCode.String:
-                    return field.AttributeTypeName == "MultiSelectPicklistType" ? "OptionSetValueCollection" : "string";
+                {
+                    switch (field.AttributeTypeName)
+                    {
+                        case "FileType":
+                            return "Guid?";
+                        case "MultiSelectPicklistType":
+                            return "OptionSetValueCollection";
+                        default:
+                            return "string";
+                    }
+                }
 
                 case AttributeTypeCode.PartyList:
                     return "IEnumerable<ActivityParty>";
@@ -316,33 +219,41 @@ namespace DataverseGen.Core.Metadata
                     break;
 
                 case IntegerAttributeMetadata integerAttributeMetadata:
-                    {
-                        result.Min = integerAttributeMetadata.MinValue ?? -1;
-                        result.Max = integerAttributeMetadata.MaxValue ?? -1;
+                {
+                    result.Min = integerAttributeMetadata.MinValue ?? -1;
+                    result.Max = integerAttributeMetadata.MaxValue ?? -1;
 
-                        break;
-                    }
+                    break;
+                }
                 case DecimalAttributeMetadata decimalAttributeMetadata:
-                    {
-                        result.Min = decimalAttributeMetadata.MinValue ?? -1;
-                        result.Max = decimalAttributeMetadata.MaxValue ?? -1;
+                {
+                    result.Min = decimalAttributeMetadata.MinValue ?? -1;
+                    result.Max = decimalAttributeMetadata.MaxValue ?? -1;
 
-                        break;
-                    }
+                    break;
+                }
                 case MoneyAttributeMetadata moneyAttributeMetadata:
-                    {
-                        result.Min = moneyAttributeMetadata.MinValue != null ? (decimal)moneyAttributeMetadata.MinValue.Value : -1;
-                        result.Max = moneyAttributeMetadata.MaxValue != null ? (decimal)moneyAttributeMetadata.MaxValue.Value : -1;
+                {
+                    result.Min = moneyAttributeMetadata.MinValue != null
+                        ? (decimal)moneyAttributeMetadata.MinValue.Value
+                        : -1;
+                    result.Max = moneyAttributeMetadata.MaxValue != null
+                        ? (decimal)moneyAttributeMetadata.MaxValue.Value
+                        : -1;
 
-                        break;
-                    }
+                    break;
+                }
                 case DoubleAttributeMetadata doubleAttributeMetadata:
-                    {
-                        result.Min = doubleAttributeMetadata.MinValue != null ? (decimal)doubleAttributeMetadata.MinValue.Value : -1;
-                        result.Max = doubleAttributeMetadata.MaxValue != null ? (decimal)doubleAttributeMetadata.MaxValue.Value : -1;
+                {
+                    result.Min = doubleAttributeMetadata.MinValue != null
+                        ? (decimal)doubleAttributeMetadata.MinValue.Value
+                        : -1;
+                    result.Max = doubleAttributeMetadata.MaxValue != null
+                        ? (decimal)doubleAttributeMetadata.MaxValue.Value
+                        : -1;
 
-                        break;
-                    }
+                    break;
+                }
             }
         }
     }
