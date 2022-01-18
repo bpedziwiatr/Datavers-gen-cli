@@ -90,7 +90,6 @@
     <None Include="Generators\Scriban\Templates\Multiple\TS-Main\entity.sbncs" />
     <None Include="Generators\Scriban\Templates\Single\dataversegen-single-ts.sbncs" />
     <None Include="Generators\Scriban\Templates\Single\dataversegen-single.sbncs" />
-    <None Include="GitVersion.yml" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Generators\Scriban\Templates\ScribanTemplates.resx">

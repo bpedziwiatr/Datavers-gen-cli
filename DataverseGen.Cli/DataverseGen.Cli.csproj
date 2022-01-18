@@ -89,7 +89,6 @@
     <None Include="example-config.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="GitVersion.yml" />
     <None Include="ILMergeConfig.json" />
     <None Include="MultipleOutputHelper.ttinclude">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
