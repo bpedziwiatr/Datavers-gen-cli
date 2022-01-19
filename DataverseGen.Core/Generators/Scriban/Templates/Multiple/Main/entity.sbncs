@@ -92,7 +92,7 @@ namespace {{ namespace }}
                     return null;
                 }
             }
-						{{if attribute.is_valid_for_update ==true || attribute.is_valid_for_create ==true}}
+						{{if attribute.is_valid_for_update == true || attribute.is_valid_for_create == true || attribute.logical_name == "createdon"  || attribute.logical_name == "fullname" }}
             set
             {
                 OnPropertyChanging("{{attribute.display_name}}");
