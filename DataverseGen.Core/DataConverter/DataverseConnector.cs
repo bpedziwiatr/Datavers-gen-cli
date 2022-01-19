@@ -15,10 +15,10 @@ namespace DataverseGen.Core.DataConverter
         private readonly string _connectionString;
         private readonly string[] _selectedEntities;
 
-        public DataverseConnector(string connectionString, string selectedEntities)
+        public DataverseConnector(string connectionString, string[] selectedEntities)
         {
             _connectionString = connectionString;
-            _selectedEntities = selectedEntities.Split(';');
+            _selectedEntities = selectedEntities;
         }
 
         public MappingEntity[] GetMappedEntities()
@@ -83,13 +83,7 @@ namespace DataverseGen.Core.DataConverter
 
         private IEnumerable<EntityMetadata> SelectedEntitiesMetaData(EntityMetadata[] allEntities, IOrganizationService service)
         {
-            List<EntityMetadata> selected = allEntities.Where(p => _selectedEntities.Any(pp => pp == p.LogicalName)).ToList();
-            if (selected.Any(r => r.IsActivity == true || r.IsActivityParty == true))
-            {
-                if (!selected.Any(r => r.LogicalName.Equals("activityparty")))
-                    selected.Add(allEntities.Single(r => r.LogicalName.Equals("activityparty")));
-            }
-            List<EntityMetadata> results = new List<EntityMetadata>();
+            IEnumerable<EntityMetadata> selected = GetEntitiesToRetrieve(allEntities);
             foreach (EntityMetadata entity in selected)
             {
                 RetrieveEntityRequest req = new RetrieveEntityRequest
@@ -100,6 +94,36 @@ namespace DataverseGen.Core.DataConverter
                 };
                 RetrieveEntityResponse res = (RetrieveEntityResponse)service.Execute(req);
                 yield return res.EntityMetadata;
+            }
+        }
+
+        private IEnumerable<EntityMetadata> GetEntitiesToRetrieve(EntityMetadata[] allEntities)
+        {
+            bool isActivityPartyIncluded = false;
+
+
+            foreach (string selectedEntity in _selectedEntities)
+            {
+                EntityMetadata foundEntity =
+                    allEntities.SingleOrDefault(p => p.LogicalName == selectedEntity);
+                if (foundEntity == null)
+                {
+                    Console.WriteLine($@"!@!@!@ entity not found{selectedEntity}");
+                    yield break;
+                    
+                }
+
+                if (!isActivityPartyIncluded &&
+                    (foundEntity.IsActivity == true  || foundEntity.IsActivityParty == true))
+                {
+                    
+                    isActivityPartyIncluded = true;
+                    yield return allEntities.Single(r => r.LogicalName.Equals("activityparty"));
+
+                }
+
+                Console.WriteLine($@"found entity: {selectedEntity},metadata-id:{foundEntity.MetadataId}");
+                yield return foundEntity;
             }
         }
     }

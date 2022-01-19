@@ -1,37 +1,37 @@
 ﻿//using CommandLine;
 //using DataverseGen.Cli.CliParser;
+
+using System;
+using System.IO;
+using System.Runtime.Serialization.Json;
 using DataverseGen.Core.Config;
 using DataverseGen.Core.DataConverter;
 using DataverseGen.Core.Generators.Scriban;
 using DataverseGen.Core.Metadata;
-using System;
-using System.IO;
-using System.Runtime.Serialization.Json;
 
 namespace DataverseGen.Cli
 {
-    internal class Program
+    internal static class Program
     {
         private const string Title = @"
- _____                                                 ______                                                  ______ _       _____
-(____ \       _                                       / _____)                             _                  / _____) |     (_____)
- _   \ \ ____| |_  ____ _   _ ____  ____ ___  ____   | /  ___  ____ ____   ____  ____ ____| |_  ___   ____   | /     | |        _
-| |   | / _  |  _)/ _  | | | / _  )/ ___)___)/ _  )  | | (___)/ _  )  _ \ / _  )/ ___) _  |  _)/ _ \ / ___)  | |     | |       | |
-| |__/ ( ( | | |_( ( | |\ V ( (/ /| |  |___ ( (/ /   | \____/( (/ /| | | ( (/ /| |  ( ( | | |_| |_| | |      | \_____| |_____ _| |_
-|_____/ \_||_|\___)_||_| \_/ \____)_|  (___/ \____)   \_____/ \____)_| |_|\____)_|   \_||_|\___)___/|_|       \______)_______|_____)
-
+    ____        __       _    __                       ______         
+   / __ \____ _/ /_____ | |  / /__  _____________     / ____/__  ____ 
+  / / / / __ `/ __/ __ `/ | / / _ \/ ___/ ___/ _ \   / / __/ _ \/ __ \
+ / /_/ / /_/ / /_/ /_/ /| |/ /  __/ /  (__  )  __/  / /_/ /  __/ / / /
+/_____/\__,_/\__/\__,_/ |___/\___/_/  /____/\___/   \____/\___/_/ /_/                                                                       
 ";
 
         private static ConfigModel GetConfig()
         {
-            using (var stream = File.OpenRead("config.json"))
+            using (FileStream stream = File.OpenRead("config.json"))
             {
-                DataContractJsonSerializerSettings settings = new DataContractJsonSerializerSettings()
+                DataContractJsonSerializerSettings settings = new DataContractJsonSerializerSettings
                 {
                     UseSimpleDictionaryFormat = true
                 };
 
-                DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(ConfigModel), settings);
+                DataContractJsonSerializer ser =
+                    new DataContractJsonSerializer(typeof(ConfigModel), settings);
                 return (ConfigModel)ser.ReadObject(stream);
             }
         }
@@ -59,7 +59,8 @@ namespace DataverseGen.Cli
 
                 ConfigModel config = GetConfig();
 
-                DataverseConnector connector = new DataverseConnector(config.ConnectionString, config.Entities);
+                DataverseConnector connector =
+                    new DataverseConnector(config.ConnectionString, config.Entities);
                 MappingEntity[] data = connector.GetMappedEntities();
                 Console.WriteLine(@"Finish Load data");
                 Context context = new Context
@@ -75,7 +76,8 @@ namespace DataverseGen.Cli
                         ScribanRun(config, context);
                         break;
                     default:
-                        Console.WriteLine($@"Unsupported generator {config.TemplateEngine}, run scriban");
+                        Console.WriteLine(
+                            $@"Unsupported generator {config.TemplateEngine}, run scriban");
                         ScribanRun(config, context);
                         break;
                 }
