@@ -9,7 +9,11 @@ namespace {{ namespace }}
             public enum {{enm.display_name}}
             {
                 {{for item in enm.items}}
+                    {{if item.name != "is" }}
                 {{item.name}} = {{item.value}},
+                    {{else}}
+                {{item.name}}_ = {{item.value}},
+                    {{end}}
                 {{end}}
             }
         {{end}}
