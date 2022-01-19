@@ -48,5 +48,3 @@ type {{entity.logical_name}}nn_relationships =
         {{end}}
     {{end}}
 {{end}}
-
-

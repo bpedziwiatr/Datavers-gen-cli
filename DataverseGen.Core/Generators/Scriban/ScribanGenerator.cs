@@ -1,14 +1,14 @@
-﻿using DataverseGen.Core.Config;
+﻿using System;
+using System.Diagnostics;
+using System.IO;
+using System.Text;
+using System.Text.RegularExpressions;
+using DataverseGen.Core.Config;
 using DataverseGen.Core.Generators.Scriban.Templates;
 using DataverseGen.Core.Generators.Scriban.Templates.TemplateFileManager;
 using DataverseGen.Core.Metadata;
 using Scriban;
 using Scriban.Parsing;
-using System;
-using System.Diagnostics;
-using System.IO;
-using System.Text;
-using System.Text.RegularExpressions;
 
 namespace DataverseGen.Core.Generators.Scriban
 {
@@ -16,7 +16,8 @@ namespace DataverseGen.Core.Generators.Scriban
     {
         private string _fullOutputPath;
 
-        public ScribanGenerator(string templateName, string outPath, Context context, TemplateEngineModel templateEngineModel)
+        public ScribanGenerator(string templateName, string outPath, Context context,
+            TemplateEngineModel templateEngineModel)
             : base(templateName, outPath, context, templateEngineModel)
         {
         }
@@ -40,12 +41,17 @@ namespace DataverseGen.Core.Generators.Scriban
                     break;
 
                 default:
-                    throw new ArgumentOutOfRangeException($"_templateEngineModel.Type",
+                    throw new ArgumentOutOfRangeException("_templateEngineModel.Type",
                         $@"type {_templateEngineModel.Type} not supported use C# or TS");
             }
 
             Console.WriteLine($@"Generating Scriban template '{_templateName}' elapsed in: {stopper.Elapsed:g}");
             stopper.Stop();
+        }
+
+        private static string RemoveEmptyLines(string lines)
+        {
+            return Regex.Replace(lines, @"^\s*$\n|\r", string.Empty, RegexOptions.Multiline).TrimEnd();
         }
 
         private void MultiOutputGeneratorCSharp()
@@ -80,11 +86,6 @@ namespace DataverseGen.Core.Generators.Scriban
             }
         }
 
-        private static string RemoveEmptyLines(string lines)
-        {
-            return Regex.Replace(lines, @"^\s*$\n|\r", string.Empty, RegexOptions.Multiline).TrimEnd();
-        }
-
         private void RunCSharpGenerator()
         {
             if (_templateEngineModel.IsSingleOutput)
@@ -92,6 +93,7 @@ namespace DataverseGen.Core.Generators.Scriban
                 SingleFileCSharp();
                 return;
             }
+
             MultiOutputGeneratorCSharp();
         }
 
@@ -102,12 +104,14 @@ namespace DataverseGen.Core.Generators.Scriban
                 SingleFileTypescript();
                 return;
             }
+
             MultiOutputGeneratorTypeScript();
         }
+
         private void SingleFileCSharp()
         {
             ParserOptions options = new ParserOptions();
-            LexerOptions lexerOptions = new LexerOptions() { Mode = ScriptMode.Default };
+            LexerOptions lexerOptions = new LexerOptions { Mode = ScriptMode.Default };
             var template = Template.Parse(Encoding.UTF8.GetString(ScribanTemplates.dataversegen_single)
                 , null
                 , options
@@ -119,8 +123,8 @@ namespace DataverseGen.Core.Generators.Scriban
         private void SingleFileTypescript()
         {
             ParserOptions options = new ParserOptions();
-            LexerOptions lexerOptions = new LexerOptions() { Mode = ScriptMode.Default };
-            var template = Template.Parse(System.Text.Encoding.UTF8.GetString(ScribanTemplates.dataversegen_single_ts)
+            LexerOptions lexerOptions = new LexerOptions { Mode = ScriptMode.Default };
+            var template = Template.Parse(Encoding.UTF8.GetString(ScribanTemplates.dataversegen_single_ts)
                 , null
                 , options
                 , lexerOptions);
@@ -128,26 +132,23 @@ namespace DataverseGen.Core.Generators.Scriban
             File.WriteAllText($"{_fullOutputPath}dataverse.metadata.ts", content, Encoding.UTF8);
         }
 
-        private void TypescriptOutput()
-        {
-            Template template = Template.Parse(System.Text.Encoding.UTF8.GetString(ScribanTemplates.Main_ts_entity
-                ));
-            string dir = $"{Directory.GetCurrentDirectory()}\\{_outPath}\\";
-            if (!Directory.Exists(dir))
-                Directory.CreateDirectory(dir);
-
-            foreach (MappingEntity entity in _context.Entities)
-            {
-                string entityContent = RemoveEmptyLines(template.Render(new { _context.Namespace, _context.Info, Entity = entity }));
-                File.WriteAllText($"{dir}/{entity.LogicalName}.ts", entityContent, Encoding.UTF8);
-            }
-        }
-
-        private void WriteEntityTemplateToFile(Template template, MappingEntity entity, string outputFileSuffixWithExtension)
+        private void WriteEntityTemplateToFile(
+            Template template,
+            MappingEntity entity,
+            string outputFileSuffixWithExtension)
         {
             string entityContent =
-                RemoveEmptyLines(template.Render(new { _context.Namespace, _context.Info, Entity = entity }));
-            File.WriteAllText($"{_fullOutputPath}/{entity.HybridName.ToLower()}.{outputFileSuffixWithExtension}", entityContent, Encoding.UTF8);
+                RemoveEmptyLines(template.Render(new { _context.Namespace, _context.Info, Entity = entity }))
+                    .Replace("\n", "\r\n");
+            if (outputFileSuffixWithExtension.Contains("ts"))
+            {
+                entityContent = $"{entityContent}\r\n";
+            }
+
+            File.WriteAllText(
+                $"{_fullOutputPath}/{entity.HybridName.ToLower()}.{outputFileSuffixWithExtension}",
+                entityContent,
+                Encoding.UTF8);
         }
     }
 }

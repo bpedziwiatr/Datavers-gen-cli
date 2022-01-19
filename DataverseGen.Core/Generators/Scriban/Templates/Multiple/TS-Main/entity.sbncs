@@ -8,5 +8,4 @@ type {{entity.hybrid_name}}_attributes =
     {{else}}
     | "{{attribute.attribute.logical_name}}"
     {{end}}
-{{end}}     
-
+{{end}}
