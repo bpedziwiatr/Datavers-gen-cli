@@ -2,13 +2,13 @@
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 
-namespace DataverseGen.Core.Extensions
+namespace DataverseGen.Core.Helpers
 {
-    internal class DeepCloneExtensions
+    internal static class DeepCloneExtensions
     {
         internal static T CreateDeepCopy<T>(T obj)
         {
-            using (var ms = new MemoryStream())
+            using (MemoryStream ms = new MemoryStream())
             {
                 IFormatter formatter = new BinaryFormatter();
                 formatter.Serialize(ms, obj);

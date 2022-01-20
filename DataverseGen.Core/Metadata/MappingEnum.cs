@@ -68,22 +68,26 @@ namespace DataverseGen.Core.Metadata
         private static void RenameDuplicates(MappingEnum enm)
         {
             Dictionary<string, int> duplicates = new Dictionary<string, int>();
-            foreach (MapperEnumItem i in enm.Items)
-                if (duplicates.ContainsKey(i.Name))
+            foreach (MapperEnumItem enumItem in enm.Items)
+            {
+                if (duplicates.ContainsKey(enumItem.Name))
                 {
-                    duplicates[i.Name] = duplicates[i.Name] + 1;
-                    i.Name += "_" + duplicates[i.Name];
+                    duplicates[enumItem.Name] += 1;
+                    enumItem.Name =  $@"{enumItem.Name}_{duplicates[enumItem.Name]}";
                 }
                 else
-                    duplicates[i.Name] = 1;
+                {
+                    duplicates[enumItem.Name] = 1;
+                }
+            }
         }
 
         private static MapperEnumItem MapBoolOption(OptionMetadata option)
         {
             Debug.Assert(option.Value != null, "option.Value != null");
-            MapperEnumItem results = new MapperEnumItem()
+            MapperEnumItem results = new MapperEnumItem
             {
-                Attribute = new CrmPicklistAttribute()
+                Attribute = new CrmPicklistAttribute
                 {
                     DisplayName = option.Label.UserLocalizedLabel.Label,
                     Value = (int)option.Value
