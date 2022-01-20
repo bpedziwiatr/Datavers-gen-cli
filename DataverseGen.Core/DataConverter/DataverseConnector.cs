@@ -112,7 +112,7 @@ namespace DataverseGen.Core.DataConverter
             ColorConsole.WriteInfo(@"Retrieving All Entities");
             RetrieveAllEntitiesResponse response =
                 (RetrieveAllEntitiesResponse)connection.Execute(request);
-            ColorConsole.WriteInfo($@"All Entities  Retrieved count:{response.EntityMetadata.Length}");
+            ColorConsole.WriteInfo($@"All Entities. Retrieved count: {response.EntityMetadata.Length}");
             return response.EntityMetadata;
         }
 
