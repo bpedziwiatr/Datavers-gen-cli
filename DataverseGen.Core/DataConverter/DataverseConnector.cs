@@ -127,7 +127,7 @@ namespace DataverseGen.Core.DataConverter
                     allEntities.SingleOrDefault(p => p.LogicalName == selectedEntity);
                 if (foundEntity == null)
                 {
-                    ColorConsole.WriteError($@"!@!@!@ entity not found{selectedEntity}");
+                    ColorConsole.WriteError($@"!@!@!@ entity not found: {selectedEntity}");
                     yield break;
                 }
 
