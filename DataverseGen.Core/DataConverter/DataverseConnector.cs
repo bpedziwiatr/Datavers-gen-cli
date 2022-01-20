@@ -75,7 +75,7 @@ namespace DataverseGen.Core.DataConverter
 
             MappingEntity[] result = mappedEntities.ToArray();
             stopper.Stop();
-            ColorConsole.WriteInfo($@"Read data from cds in: {stopper.Elapsed:g}");
+            ColorConsole.WriteInfo($@"Read data from Dataverse in: {stopper.Elapsed:g}");
             return result;
         }
 
