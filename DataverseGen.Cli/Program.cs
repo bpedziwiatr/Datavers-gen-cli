@@ -62,7 +62,7 @@ namespace DataverseGen.Cli
                 ConfigModel config = GetConfig();
 
                 DataverseConnector connector =
-                    new DataverseConnector(config.ConnectionString, config.Entities,config.ThrowOnEntityNotFound);
+                    new DataverseConnector(config.ConnectionString, config.Entities, config.ThrowOnEntityNotFound);
                 MappingEntity[] data = connector.GetMappedEntities();
                 WriteLine(@"Finish Load data");
                 Context context = new Context
