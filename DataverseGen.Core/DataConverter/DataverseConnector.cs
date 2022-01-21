@@ -8,6 +8,7 @@ using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Metadata;
 using Microsoft.Xrm.Tooling.Connector;
+using static DataverseGen.Core.ColorConsole;
 
 namespace DataverseGen.Core.DataConverter
 {
@@ -15,21 +16,27 @@ namespace DataverseGen.Core.DataConverter
     {
         private readonly string _connectionString;
         private readonly string[] _selectedEntities;
+        private readonly bool _throwOnEntityNotFound;
 
-        public DataverseConnector(string connectionString, string[] selectedEntities)
+        public DataverseConnector(
+            string connectionString,
+            string[] selectedEntities,
+            bool throwOnEntityNotFound)
         {
             _connectionString = connectionString;
             _selectedEntities = selectedEntities;
+            _throwOnEntityNotFound = throwOnEntityNotFound;
+            WriteConnectorInfo();
         }
 
         public MappingEntity[] GetMappedEntities()
         {
             Stopwatch stopper = Stopwatch.StartNew();
-            ColorConsole.WriteInfo(@"Waiting for connection...");
+            WriteInfo(@"Waiting for connection...");
             CrmServiceClient connection = new CrmServiceClient(_connectionString);
             if (!connection.IsReady)
             {
-                ColorConsole.WriteInfo(@"Waiting for connection...1000ms");
+                WriteInfo(@"Waiting for connection...1000ms");
                 Thread.Sleep(1000);
             }
 
@@ -37,20 +44,18 @@ namespace DataverseGen.Core.DataConverter
             {
                 string exceptionMessage =
                     $"Connection did not connect with {_connectionString}. LastCrmError: {connection.LastCrmError}";
-                ColorConsole.WriteError(exceptionMessage);
+                WriteError(exceptionMessage);
                 throw new Exception(exceptionMessage);
             }
 
-            EntityMetadata[] allEntities = RetrieveAllEntitiesMetaData(connection);
-            ColorConsole.WriteInfo(@"Retrieving Selected Entities");
             IEnumerable<EntityMetadata> selectedEntities =
-                SelectedEntitiesMetaData(allEntities, connection);
+                SelectedEntitiesMetaData(connection);
 
             List<MappingEntity> mappedEntities = selectedEntities
                                                  .Select(MappingEntity.Parse)
                                                  .OrderBy(e => e.DisplayName)
                                                  .ToList();
-            ColorConsole.WriteInfo(@"All Selected Entities Retrieved");
+            WriteInfo(@"All Selected Entities Retrieved");
             ExcludeRelationshipsNotIncluded(mappedEntities);
             foreach (MappingEntity ent in mappedEntities)
             {
@@ -75,7 +80,7 @@ namespace DataverseGen.Core.DataConverter
 
             MappingEntity[] result = mappedEntities.ToArray();
             stopper.Stop();
-            ColorConsole.WriteInfo($@"Read data from Dataverse in: {stopper.Elapsed:g}");
+            WriteInfo($@"Read data from Dataverse in: {stopper.Elapsed:g}");
             return result;
         }
 
@@ -101,65 +106,74 @@ namespace DataverseGen.Core.DataConverter
                                                  .ToArray();
             }
         }
-
-        private static EntityMetadata[] RetrieveAllEntitiesMetaData(CrmServiceClient connection)
+        private EntityMetadata RetrieveEntityMetadata(
+            IOrganizationService organizationService,
+            string selectedEntity)
         {
-            RetrieveAllEntitiesRequest request = new RetrieveAllEntitiesRequest
+            try
             {
-                EntityFilters = EntityFilters.Default,
-                RetrieveAsIfPublished = true
-            };
-            ColorConsole.WriteInfo(@"Retrieving All Entities");
-            RetrieveAllEntitiesResponse response =
-                (RetrieveAllEntitiesResponse)connection.Execute(request);
-            ColorConsole.WriteInfo($@"All Entities. Retrieved count: {response.EntityMetadata.Length}");
-            return response.EntityMetadata;
+                RetrieveEntityRequest req = new RetrieveEntityRequest
+                {
+                    EntityFilters = EntityFilters.All,
+                    LogicalName = selectedEntity,
+                    RetrieveAsIfPublished = true
+                };
+                RetrieveEntityResponse response =
+                    (RetrieveEntityResponse)organizationService.Execute(req);
+                WriteSuccess(
+                    $@"found entity: {selectedEntity},metadata-id:{response.EntityMetadata.MetadataId}");
+                return response.EntityMetadata;
+            }
+            catch (Exception ex)
+            {
+                WriteError(
+                    $@"!@!@!@ entity not found: {selectedEntity} | {ex.Message}");
+                if (_throwOnEntityNotFound)
+                {
+                    throw;
+                }
+
+                return null;
+            }
         }
 
-        private IEnumerable<EntityMetadata> GetEntitiesToRetrieve(EntityMetadata[] allEntities)
+        private IEnumerable<EntityMetadata> SelectedEntitiesMetaData(
+            IOrganizationService organizationService)
         {
             bool isActivityPartyIncluded = false;
 
 
             foreach (string selectedEntity in _selectedEntities)
             {
-                EntityMetadata foundEntity =
-                    allEntities.SingleOrDefault(p => p.LogicalName == selectedEntity);
-                if (foundEntity == null)
+                EntityMetadata entityEntityMetadata =
+                    RetrieveEntityMetadata(organizationService, selectedEntity);
+                if (entityEntityMetadata == null)
                 {
-                    ColorConsole.WriteError($@"!@!@!@ entity not found: {selectedEntity}");
-                    yield break;
+                    continue;
                 }
 
-                if (!isActivityPartyIncluded &&
-                    (foundEntity.IsActivity == true || foundEntity.IsActivityParty == true))
+                yield return entityEntityMetadata;
+                if (isActivityPartyIncluded
+                    || entityEntityMetadata.IsActivity != true
+                    && entityEntityMetadata.IsActivityParty != true)
                 {
-                    isActivityPartyIncluded = true;
-                    yield return allEntities.Single(r => r.LogicalName.Equals("activityparty"));
+                    continue;
                 }
 
-                ColorConsole.WriteSuccess(
-                    $@"found entity: {selectedEntity},metadata-id:{foundEntity.MetadataId}");
-                yield return foundEntity;
+                isActivityPartyIncluded = true;
+                EntityMetadata activityPartyMetadata =
+                    RetrieveEntityMetadata(organizationService, "activityparty");
+                if (activityPartyMetadata != null)
+                {
+                    yield return activityPartyMetadata;
+                }
             }
         }
 
-        private IEnumerable<EntityMetadata> SelectedEntitiesMetaData(
-            EntityMetadata[] allEntities,
-            IOrganizationService service)
+        private void WriteConnectorInfo()
         {
-            IEnumerable<EntityMetadata> selectedEntities = GetEntitiesToRetrieve(allEntities);
-            foreach (EntityMetadata entity in selectedEntities)
-            {
-                RetrieveEntityRequest req = new RetrieveEntityRequest
-                {
-                    EntityFilters = EntityFilters.All,
-                    LogicalName = entity.LogicalName,
-                    RetrieveAsIfPublished = true
-                };
-                RetrieveEntityResponse res = (RetrieveEntityResponse)service.Execute(req);
-                yield return res.EntityMetadata;
-            }
+            WriteInfo($@"Selected entities: {string.Join(",", _selectedEntities)}");
+            WriteInfo($"Throw error if entity not found={_throwOnEntityNotFound}");
         }
     }
 }

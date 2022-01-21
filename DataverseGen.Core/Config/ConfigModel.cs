@@ -8,6 +8,7 @@ namespace DataverseGen.Core.Config
     public class ConfigModel
     {
         [DataMember] public string ConnectionString { get; set; }
+        [DataMember] public bool ThrowOnEntityNotFound { get; set; } = true;
 
         [DataMember] public string[] Entities { get; set; }
 
