@@ -7,39 +7,33 @@ namespace DataverseGen.Core.Config
     [DataContract]
     public class ConfigModel
     {
-        [DataMember]
-        public string ConnectionString { get; set; }
+        [DataMember] public string ConnectionString { get; set; }
 
-        [DataMember]
-        public string Entities { get; set; }
+        [DataMember] public string[] Entities { get; set; }
 
-        [DataMember]
-        public string Namespace { get; set; }
+        [DataMember] public string Namespace { get; set; }
 
-        [DataMember]
-        public string OutDirectory { get; set; }
+        [DataMember] public string OutDirectory { get; set; }
 
-        [DataMember]
-        public TemplateEngineModel TemplateEngine { get; set; }
+        [DataMember] public TemplateEngineModel TemplateEngine { get; set; }
 
-        [DataMember]
-        public string TemplateName { get; set; }
+        [DataMember] public string TemplateName { get; set; }
     }
+
     [Serializable]
     [DataContract]
     public class TemplateEngineModel
     {
-        [DataMember]
-        public bool IsSingleOutput { get; set; }
+        [DataMember] public bool IsSingleOutput { get; set; }
 
         /// <summary>
-        /// scriban/t4
+        ///     scriban/t4
         /// </summary>
         [DataMember]
         public string Name { get; set; }
 
         /// <summary>
-        /// TS,C#
+        ///     TS,C#
         /// </summary>
         [DataMember]
         public string Type { get; set; }

@@ -1,5 +1,6 @@
 ﻿using System;
 using DataverseGen.Core.Extensions;
+using DataverseGen.Core.Helpers;
 using Microsoft.Xrm.Sdk.Metadata;
 
 namespace DataverseGen.Core.Metadata

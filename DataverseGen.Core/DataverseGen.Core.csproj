@@ -43,8 +43,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Config\ConfigModel.cs" />
+    <Compile Include="ColorConsole.cs" />
     <Compile Include="DataConverter\DataverseConnector.cs" />
-    <Compile Include="Extensions\DeepCloneExtensions.cs" />
+    <Compile Include="Helpers\DeepCloneHelper.cs" />
     <Compile Include="Extensions\MetadataNamingExtensions.cs" />
     <Compile Include="Generators\BaseGenerator.cs" />
     <Compile Include="Generators\Scriban\Templates\TemplateFileManager\MultipleFileTemplateBase.cs" />
