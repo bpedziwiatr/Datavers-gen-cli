@@ -121,7 +121,7 @@ namespace DataverseGen.Core.DataConverter
                 RetrieveEntityResponse response =
                     (RetrieveEntityResponse)organizationService.Execute(req);
                 WriteSuccess(
-                    $@"found entity: {selectedEntity},metadata-id:{response.EntityMetadata.MetadataId}");
+                    $@"Found entity: {selectedEntity}, metadata-id: {response.EntityMetadata.MetadataId}");
                 return response.EntityMetadata;
             }
             catch (Exception ex)
