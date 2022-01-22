@@ -55,7 +55,7 @@ namespace DataverseGen.Core.DataConverter
                                                  .Select(MappingEntity.Parse)
                                                  .OrderBy(e => e.DisplayName)
                                                  .ToList();
-            WriteInfo(@"All Selected Entities Retrieved");
+            WriteInfo(@"Selected Entities Retrieved");
             ExcludeRelationshipsNotIncluded(mappedEntities);
             foreach (MappingEntity ent in mappedEntities)
             {
