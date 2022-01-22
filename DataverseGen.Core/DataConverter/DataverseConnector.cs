@@ -36,7 +36,7 @@ namespace DataverseGen.Core.DataConverter
             CrmServiceClient connection = new CrmServiceClient(_connectionString);
             if (!connection.IsReady)
             {
-                WriteInfo(@"Waiting for connection...1000ms");
+                WriteInfo(@"Waiting for connection... 1000ms");
                 Thread.Sleep(1000);
             }
 
