@@ -172,7 +172,7 @@ namespace DataverseGen.Core.DataConverter
 
         private void WriteConnectorInfo()
         {
-            WriteInfo($@"Selected entities: {string.Join(",", _selectedEntities)}");
+            WriteInfo($@"Selected entities: {string.Join(", ", _selectedEntities)}");
             WriteInfo($"Throw error if entity not found={_throwOnEntityNotFound}");
         }
     }
