@@ -8,7 +8,6 @@ namespace DataverseGen.Core.Config
     public class ConfigModel
     {
         [DataMember] public string ConnectionString { get; set; }
-        [DataMember] public bool ThrowOnEntityNotFound { get; set; } = true;
 
         [DataMember] public string[] Entities { get; set; }
 
@@ -19,6 +18,7 @@ namespace DataverseGen.Core.Config
         [DataMember] public TemplateEngineModel TemplateEngine { get; set; }
 
         [DataMember] public string TemplateName { get; set; }
+        [DataMember(EmitDefaultValue = true)] public bool ThrowOnEntityNotFound { get; set; }
     }
 
     [Serializable]
