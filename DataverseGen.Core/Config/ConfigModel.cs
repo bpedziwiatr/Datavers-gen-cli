@@ -18,6 +18,7 @@ namespace DataverseGen.Core.Config
         [DataMember] public TemplateEngineModel TemplateEngine { get; set; }
 
         [DataMember] public string TemplateName { get; set; }
+        [DataMember(EmitDefaultValue = true)] public bool ThrowOnEntityNotFound { get; set; }
     }
 
     [Serializable]

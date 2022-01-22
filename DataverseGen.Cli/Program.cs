@@ -4,10 +4,12 @@
 using System;
 using System.IO;
 using System.Runtime.Serialization.Json;
+using DataverseGen.Core;
 using DataverseGen.Core.Config;
 using DataverseGen.Core.DataConverter;
 using DataverseGen.Core.Generators.Scriban;
 using DataverseGen.Core.Metadata;
+using static DataverseGen.Core.ColorConsole;
 
 namespace DataverseGen.Cli
 {
@@ -55,28 +57,31 @@ namespace DataverseGen.Cli
                 //        }
                 //    });
                 Console.SetWindowSize(140, 30);
-                Console.WriteLine(Title);
+                WriteLine(Title);
 
                 ConfigModel config = GetConfig();
 
                 DataverseConnector connector =
-                    new DataverseConnector(config.ConnectionString, config.Entities);
+                    new DataverseConnector(
+                        config.ConnectionString,
+                        config.Entities,
+                        config.ThrowOnEntityNotFound);
                 MappingEntity[] data = connector.GetMappedEntities();
-                Console.WriteLine(@"Finish Load data");
+                WriteLine(@"Finish Load data");
                 Context context = new Context
                 {
                     Namespace = config.Namespace,
                     Entities = data
                 };
 
-                Console.WriteLine(@"Start generator");
+                WriteLine(@"Start generator");
                 switch (config.TemplateEngine.Name)
                 {
                     case "scriban":
                         ScribanRun(config, context);
                         break;
                     default:
-                        Console.WriteLine(
+                        WriteLine(
                             $@"Unsupported generator {config.TemplateEngine}, run scriban");
                         ScribanRun(config, context);
                         break;
@@ -84,15 +89,15 @@ namespace DataverseGen.Cli
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
-                Console.WriteLine(@"#StackTrace:");
-                Console.WriteLine(e.StackTrace);
+                WriteError(e.ToString());
+                WriteError(@"#StackTrace:");
+                WriteError(e.StackTrace);
                 throw;
             }
             finally
             {
-                Console.WriteLine(@"Bye Bye, see you next time Press any Key to exit");
-                Console.ReadKey();
+                WriteSuccess(@"Bye Bye, see you next time Press any Key to exit");
+               Console.ReadKey();
             }
         }
 
