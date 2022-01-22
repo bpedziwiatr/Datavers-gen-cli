@@ -36,7 +36,7 @@ namespace DataverseGen.Core.DataConverter
             CrmServiceClient connection = new CrmServiceClient(_connectionString);
             if (!connection.IsReady)
             {
-                WriteInfo(@"Waiting for connection...1000ms");
+                WriteInfo(@"Waiting for connection... 1000ms");
                 Thread.Sleep(1000);
             }
 
@@ -121,7 +121,7 @@ namespace DataverseGen.Core.DataConverter
                 RetrieveEntityResponse response =
                     (RetrieveEntityResponse)organizationService.Execute(req);
                 WriteSuccess(
-                    $@"found entity: {selectedEntity},metadata-id:{response.EntityMetadata.MetadataId}");
+                    $@"Found entity: {selectedEntity}, metadata-id: {response.EntityMetadata.MetadataId}");
                 return response.EntityMetadata;
             }
             catch (Exception ex)
@@ -172,7 +172,7 @@ namespace DataverseGen.Core.DataConverter
 
         private void WriteConnectorInfo()
         {
-            WriteInfo($@"Selected entities: {string.Join(",", _selectedEntities)}");
+            WriteInfo($@"Selected entities: {string.Join(", ", _selectedEntities)}");
             WriteInfo($"Throw error if entity not found={_throwOnEntityNotFound}");
         }
     }
