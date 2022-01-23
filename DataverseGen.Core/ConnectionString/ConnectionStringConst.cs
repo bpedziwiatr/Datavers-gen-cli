@@ -5,7 +5,25 @@ namespace DataverseGen.Core.ConnectionString
 {
     internal class ConnectionStringConst
     {
-        public static HashSet<string> Auth = new HashSet<string>() { "AuthenticationType", "AuthType" };
+        public readonly static HashSet<string> Auth = new HashSet<string>() {
+            "AuthenticationType",
+            "AuthType" };
+
+        public readonly static HashSet<string> UserName = new HashSet<string>() {
+            "UserName",
+            "User Name",
+            "UserId",
+            "User Id"
+            };
+
+        public const string Password = "Password";
+
+        public readonly static HashSet<string> Url = new HashSet<string>() {
+            "ServiceUri",
+            "Service Uri",
+            "Url",
+            "Server"
+        };
 
         public static string GetToken(IDictionary<string, string> tokens, HashSet<string> tokenNames)
         {

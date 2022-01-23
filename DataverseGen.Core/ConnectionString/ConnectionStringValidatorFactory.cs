@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DataverseGen.Core.ConnectionString.Validators;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,7 +9,9 @@ namespace DataverseGen.Core.ConnectionString
 {
     internal class ConnectionStringValidatorFactory
     {
-        public static IConnectionStringValidator CreateValidator(ConnectionType connectionType)
+        public static IConnectionStringValidator CreateValidator(
+            ConnectionType connectionType,
+            IDictionary<string, string> connectionStringTokens)
         {
             switch (connectionType)
             {
@@ -28,8 +31,7 @@ namespace DataverseGen.Core.ConnectionString
                     throw new NotImplementedException();
                     break;
                 case ConnectionType.Office365:
-                    throw new NotImplementedException();
-                    break;
+                    return new O365ConnectionStringValidator(connectionStringTokens);
                 default :
                     throw new NotImplementedException();
             }
@@ -41,7 +43,7 @@ namespace DataverseGen.Core.ConnectionString
             string tokenName = ConnectionStringConst.GetToken(connectionStringTokens,ConnectionStringConst.Auth);
             string authValue = connectionStringTokens[tokenName];
             ConnectionType connectionType = ConnectionStringConst.Map(authValue);
-            return CreateValidator(connectionType);
+            return CreateValidator(connectionType,connectionStringTokens);
 
         }
     }
