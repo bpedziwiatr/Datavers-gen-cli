@@ -24,8 +24,7 @@ namespace DataverseGen.Core.ConnectionString
                 case ConnectionType.OAuth:
                     return new OAuthConnectionStringValidator(connectionStringTokens);
                 case ConnectionType.Certificate:
-                    throw new NotImplementedException();
-                    break;
+                    return new CertificateBaseConnectionStringValidator(connectionStringTokens);
                 case ConnectionType.ClientSecret:
                     throw new NotImplementedException();
                     break;

@@ -6,12 +6,24 @@ namespace DataverseGen.Core.ConnectionString.Validators
     public class CertificateBaseConnectionStringValidator : BaseConnectionStringValidator,
         IConnectionStringValidator
     {
-        protected CertificateBaseConnectionStringValidator(
+        public CertificateBaseConnectionStringValidator(
             IDictionary<string, string> connectionStringTokens) : base(connectionStringTokens) { }
 
         public bool Validate()
         {
-            throw new NotImplementedException();
+            CheckIfThumbprintIsPresent();
+            CheckIfClientIdIsPresent();
+            return true;
+        }
+
+        private void CheckIfClientIdIsPresent()
+        {
+            CheckIfTokenIsPresentWithValue(ConnectionStringConst.ClientId);
+        }
+
+        private void CheckIfThumbprintIsPresent()
+        {
+            CheckIfTokenIsPresentWithValue(ConnectionStringConst.Thumbprint);
         }
     }
 }

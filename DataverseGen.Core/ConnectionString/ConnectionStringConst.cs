@@ -6,32 +6,11 @@ namespace DataverseGen.Core.ConnectionString
 {
     public static class ConnectionStringConst
     {
+        public const string Password = "Password";
+
         public static readonly HashSet<string> Auth = new HashSet<string>() {
             "AuthenticationType",
             "AuthType" };
-
-        public static readonly HashSet<string> UserName = new HashSet<string>() {
-            "UserName",
-            "Username",
-            "User Name",
-            "UserId",
-            "User Id"
-            };
-
-        public const string Password = "Password";
-
-        public static readonly HashSet<string> Url = new HashSet<string>() {
-            "ServiceUri",
-            "Service Uri",
-            "Url",
-            "Server"
-        };
-
-        public static readonly HashSet<string> TokenCacheStorePath = new HashSet<string>()
-        {
-            "TokenCacheStorePath",
-            "Tokencachestorepath"
-        };
 
         public static readonly HashSet<string> ClientId = new HashSet<string>()
         {
@@ -43,6 +22,12 @@ namespace DataverseGen.Core.ConnectionString
             "Applicationid"
         };
 
+        public static readonly HashSet<string> IntegratedSecurity = new HashSet<string>()
+        {
+            "Integrated Security",
+            "Integrated security"
+        };
+
         public static readonly HashSet<string> RedirectUri = new HashSet<string>()
         {
             "RedirectUri",
@@ -51,10 +36,32 @@ namespace DataverseGen.Core.ConnectionString
             "Replyurl"
         };
 
-        public static readonly HashSet<string> IntegratedSecurity = new HashSet<string>()
+        public static readonly HashSet<string> TokenCacheStorePath = new HashSet<string>()
         {
-            "Integrated Security",
-            "Integrated security"
+            "TokenCacheStorePath",
+            "Tokencachestorepath"
+        };
+
+        public static readonly HashSet<string> Url = new HashSet<string>() {
+            "ServiceUri",
+            "Service Uri",
+            "Url",
+            "Server"
+        };
+
+        public static readonly HashSet<string> UserName = new HashSet<string>() {
+            "UserName",
+            "Username",
+            "User Name",
+            "UserId",
+            "User Id"
+            };
+        internal static readonly HashSet<string> Thumbprint = new HashSet<string>()
+        {
+            "Thumbprint",
+            "thumbprint",
+            "CertThumbprint",
+            "certthumbprint"
         };
 
         public static string GetToken(IDictionary<string, string> tokens, HashSet<string> tokenNames)

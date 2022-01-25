@@ -20,6 +20,6 @@ namespace DataverseGen.Core.Tests.ConnectionString
         {
             new ConnectionStringValidator(connectionString)
                 .Validate();
-        } 
+        }
     }
 }
