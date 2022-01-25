@@ -1,43 +1,44 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DataverseGen.Core.ConnectionString.Validators
 {
-    internal class O365ConnectionStringValidator :BaseConnectionStringValidator, IConnectionStringValidator
+    internal class O365ConnectionStringValidator : BaseConnectionStringValidator,
+        IConnectionStringValidator
     {
-        
-
         public O365ConnectionStringValidator(IDictionary<string, string> connectionStringTokens)
-            : base(connectionStringTokens)
-        {
-        }
+            : base(connectionStringTokens) { }
 
         public bool Validate()
         {
             CheckIfPasswordIsPresent();
-            CheckIfUserNameIsPresnet();
+            CheckIfUserNameIsPresent();
             CheckIfUrlIsPresentAndValid();
 
             return true;
         }
 
-        private void CheckIfUrlIsPresentAndValid()
-        {
-            var tokenFound = ValidatorTokenHelper.CheckIfTokenIsPresentWithValue(_connectionStringTokens,ConnectionStringConst.Url);
-            //todo validate Uri
-        }
-
-        private void CheckIfUserNameIsPresnet()
-        {
-            ValidatorTokenHelper.CheckIfTokenIsPresentWithValue(_connectionStringTokens,ConnectionStringConst.UserName);
-        }
-
         private void CheckIfPasswordIsPresent()
         {
-            ValidatorTokenHelper.CheckIfTokenIsPresentWithValue(_connectionStringTokens,ConnectionStringConst.Password);
+            ValidatorTokenHelper.CheckIfTokenIsPresentWithValue(_connectionStringTokens,
+                ConnectionStringConst.Password);
+        }
+
+        private void CheckIfUrlIsPresentAndValid()
+        {
+            KeyValuePair<string, string> tokenFound =
+                ValidatorTokenHelper.CheckIfTokenIsPresentWithValue(_connectionStringTokens,
+                    ConnectionStringConst.Url);
+            if (UrlValidator.ValidUrl(tokenFound.Value))
+            {
+                throw new Exception($"Url not valid {tokenFound.Value} | key: {tokenFound.Key}");
+            }
+        }
+
+        private void CheckIfUserNameIsPresent()
+        {
+            ValidatorTokenHelper.CheckIfTokenIsPresentWithValue(_connectionStringTokens,
+                ConnectionStringConst.UserName);
         }
     }
 }
