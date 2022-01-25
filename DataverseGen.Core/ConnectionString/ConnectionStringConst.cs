@@ -1,16 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace DataverseGen.Core.ConnectionString
 {
-    internal class ConnectionStringConst
+    public static class ConnectionStringConst
     {
-        public readonly static HashSet<string> Auth = new HashSet<string>() {
+        public static readonly HashSet<string> Auth = new HashSet<string>() {
             "AuthenticationType",
             "AuthType" };
 
-        public readonly static HashSet<string> UserName = new HashSet<string>() {
+        public static readonly HashSet<string> UserName = new HashSet<string>() {
             "UserName",
+            "Username",
             "User Name",
             "UserId",
             "User Id"
@@ -18,22 +20,51 @@ namespace DataverseGen.Core.ConnectionString
 
         public const string Password = "Password";
 
-        public readonly static HashSet<string> Url = new HashSet<string>() {
+        public static readonly HashSet<string> Url = new HashSet<string>() {
             "ServiceUri",
             "Service Uri",
             "Url",
             "Server"
         };
 
+        public static readonly HashSet<string> TokenCacheStorePath = new HashSet<string>()
+        {
+            "TokenCacheStorePath",
+            "Tokencachestorepath"
+        };
+
+        public static readonly HashSet<string> ClientId = new HashSet<string>()
+        {
+            "ClientId",
+            "Clientid",
+            "AppId",
+            "Appid",
+            "ApplicationId",
+            "Applicationid"
+        };
+
+        public static readonly HashSet<string> RedirectUri = new HashSet<string>()
+        {
+            "RedirectUri",
+            "Redirecturi",
+            "ReplyUrl",
+            "Replyurl"
+        };
+
+        public static readonly HashSet<string> IntegratedSecurity = new HashSet<string>()
+        {
+            "Integrated Security",
+            "Integrated security"
+        };
+
         public static string GetToken(IDictionary<string, string> tokens, HashSet<string> tokenNames)
         {
-            foreach (string tokenName in tokenNames)
+            foreach (string tokenName in tokenNames.Where(
+                         tokens.ContainsKey))
             {
-                if (tokens.ContainsKey(tokenName))
-                {
-                    return tokenName;
-                }
+                return tokenName;
             }
+
             throw new Exception($"token not found {string.Join(", ", tokenNames)} in {string.Join(", ", tokens.Keys)}");
         }
 

@@ -22,8 +22,7 @@ namespace DataverseGen.Core.ConnectionString
                     throw new NotImplementedException();
                     break;
                 case ConnectionType.OAuth:
-                    throw new NotImplementedException();
-                    break;
+                    return new OAuthConnectionStringValidator(connectionStringTokens);
                 case ConnectionType.Certificate:
                     throw new NotImplementedException();
                     break;
