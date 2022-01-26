@@ -2,7 +2,7 @@
 
 namespace DataverseGen.Core.ConnectionString.Validators
 {
-    internal class UrlValidator
+    internal static class UrlValidator
     {
         public static bool ValidUrl(string url) => Uri.TryCreate(url, UriKind.Absolute, out Uri uriResult)
                    &&

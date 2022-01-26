@@ -6,8 +6,7 @@ namespace DataverseGen.Core.ConnectionString.Validators
         IConnectionStringValidator
     {
         public OAuthConnectionStringValidator(IDictionary<string, string> connectionStringTokens) :
-            base(connectionStringTokens)
-        { }
+            base(connectionStringTokens) { }
 
         public bool Validate()
         {
@@ -22,9 +21,8 @@ namespace DataverseGen.Core.ConnectionString.Validators
 
         private void CheckIfAppIdIsPresent()
         {
-            KeyValuePair<string, string> tokenFound =
-                ValidatorTokenHelper.CheckIfTokenIsPresentWithValue(ConnectionStringTokens,
-                    ConnectionStringConst.ClientId);
+            ValidatorTokenHelper.CheckIfTokenIsPresentWithValue(ConnectionStringTokens,
+                ConnectionStringConst.ClientId);
         }
 
         private void CheckIfRedirectUriIsPresent()

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace DataverseGen.Core.ConnectionString.Validators
 {
@@ -12,6 +11,7 @@ namespace DataverseGen.Core.ConnectionString.Validators
         {
             ConnectionStringTokens = connectionStringTokens;
         }
+
         protected void CheckIfPasswordOrIntegratedSecurityIsPresent()
         {
             bool isPasswordTokenFound = ValidatorTokenHelper.TryCheckIfTokenIsPresentWithValue(
@@ -36,6 +36,7 @@ namespace DataverseGen.Core.ConnectionString.Validators
                     $"Integrated Security Token present but missing password token , integrated token value {integratedSecurityToken.Value}");
             }
         }
+
         protected void CheckIfPasswordIsPresent()
         {
             ValidatorTokenHelper.CheckIfTokenIsPresentWithValue(ConnectionStringTokens,

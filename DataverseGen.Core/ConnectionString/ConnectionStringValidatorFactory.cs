@@ -1,36 +1,34 @@
 ﻿using DataverseGen.Core.ConnectionString.Validators;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DataverseGen.Core.ConnectionString
 {
-    internal class ConnectionStringValidatorFactory
+    internal static class ConnectionStringValidatorFactory
     {
-        public static IConnectionStringValidator CreateValidator(
+        private static IConnectionStringValidator CreateValidator(
             ConnectionType connectionType,
             IDictionary<string, string> connectionStringTokens)
         {
             switch (connectionType)
             {
                 case ConnectionType.AD:
-                    throw new NotImplementedException();
-                    break;
                 case ConnectionType.IFD:
-                    throw new NotImplementedException();
-                    break;
+                    return new AdConnectionStringValidator(connectionStringTokens);
+
                 case ConnectionType.OAuth:
                     return new OAuthConnectionStringValidator(connectionStringTokens);
+
                 case ConnectionType.Certificate:
                     return new CertificateBaseConnectionStringValidator(connectionStringTokens);
+
                 case ConnectionType.ClientSecret:
-                    throw new NotImplementedException();
-                    break;
+                    return new ClientSecretConnectionStringValidator(connectionStringTokens);
+
                 case ConnectionType.Office365:
                     return new O365ConnectionStringValidator(connectionStringTokens);
-                default :
+
+                default:
                     throw new NotImplementedException();
             }
         }
@@ -38,11 +36,11 @@ namespace DataverseGen.Core.ConnectionString
         internal static IConnectionStringValidator CreateValidator(
             IDictionary<string, string> connectionStringTokens)
         {
-            string tokenName = ConnectionStringConst.GetToken(connectionStringTokens,ConnectionStringConst.Auth);
+            string tokenName =
+                ConnectionStringConst.GetToken(connectionStringTokens, ConnectionStringConst.Auth);
             string authValue = connectionStringTokens[tokenName];
             ConnectionType connectionType = ConnectionStringConst.Map(authValue);
-            return CreateValidator(connectionType,connectionStringTokens);
-
+            return CreateValidator(connectionType, connectionStringTokens);
         }
     }
 }

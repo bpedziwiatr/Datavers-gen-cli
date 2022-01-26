@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace DataverseGen.Core.ConnectionString.Validators
 {
@@ -17,7 +16,5 @@ namespace DataverseGen.Core.ConnectionString.Validators
 
             return true;
         }
-
-      
     }
 }

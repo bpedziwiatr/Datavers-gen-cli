@@ -7,26 +7,24 @@ namespace DataverseGen.Core.ConnectionString
 {
     public class ConnectionStringValidator
     {
-        private static Regex ConnectionStringRegex = new Regex(@"(?<key>[^=;,]+)=(?<val>[^;,]+(,\d+)?)");
+        private static readonly Regex ConnectionStringRegex = new Regex(@"(?<key>[^=;,]+)=(?<val>[^;,]+(,\d+)?)");
         private readonly string _connectionString;
+
         public ConnectionStringValidator(string connectionString)
         {
             _connectionString = connectionString;
         }
 
-        public IEnumerable<KeyValuePair<string,string>> ParseConnectionStrings()
+        private IEnumerable<KeyValuePair<string, string>> ParseConnectionStrings()
         {
             if (!ConnectionStringRegex.IsMatch(_connectionString))
             {
-                throw new ArgumentException("ConnectionString not valid no match found for tokens!", _connectionString);
+                throw new ArgumentException(@"ConnectionString not valid no match found for tokens!", _connectionString);
             }
-            var names = ConnectionStringRegex.GetGroupNames();
-            foreach(Match match in ConnectionStringRegex.Matches(_connectionString))
+
+            foreach (Match match in ConnectionStringRegex.Matches(_connectionString))
             {
-               
                 yield return new KeyValuePair<string, string>(match.Groups["key"]?.Value.Trim(), match.Groups["val"].Value.Trim());
-                
-                    
             }
         }
 
@@ -47,12 +45,13 @@ namespace DataverseGen.Core.ConnectionString
         {
             InternalValidate();
         }
+
         private bool InternalValidate()
         {
-            IDictionary<string,string> connectionStrinTokens = ParseConnectionStrings()
-                .ToDictionary(k=>k.Key,v=>v.Value);
-            IConnectionStringValidator validator= ConnectionStringValidatorFactory
-                .CreateValidator(connectionStrinTokens);
+            IDictionary<string, string> connectionStringTokens = ParseConnectionStrings()
+                .ToDictionary(k => k.Key, v => v.Value);
+            IConnectionStringValidator validator = ConnectionStringValidatorFactory
+                .CreateValidator(connectionStringTokens);
             return validator.Validate();
         }
     }

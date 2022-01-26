@@ -3,6 +3,5 @@
     internal interface IConnectionStringValidator
     {
         bool Validate();
-
     }
 }

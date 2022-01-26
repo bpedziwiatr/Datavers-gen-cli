@@ -4,14 +4,11 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace DataverseGen.Core.Tests.ConnectionString
 {
     [TestClass]
-    public class CertificateBaseTests
+    public class AdTests
     {
         [TestMethod]
-        [DataRow(@"AuthType=Certificate;
-  url=https://contosotest.crm.dynamics.com;
-  thumbprint={CertThumbPrintId};
-  ClientId={AppId};")]
-        public void CertificateBase_ConnectionString_Success(string connectionString)
+        [DataRow(@"AuthType=AD;Url=https://contoso:8080/Test;")]
+        public void AD_ConnectionString_Success(string connectionString)
         {
             new ConnectionStringValidator(connectionString)
                 .Validate();

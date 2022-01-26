@@ -49,8 +49,10 @@
     <Compile Include="ConnectionString\ConnectionStringValidatorFactory.cs" />
     <Compile Include="ConnectionString\Enums.cs" />
     <Compile Include="ConnectionString\IConnectionStringValidator.cs" />
+    <Compile Include="ConnectionString\Validators\AdConnectionStringValidator.cs" />
     <Compile Include="ConnectionString\Validators\BaseConnectionStringValidator.cs" />
     <Compile Include="ConnectionString\Validators\CertificateBaseConnectionStringValidator.cs" />
+    <Compile Include="ConnectionString\Validators\ClientSecretConnectionStringValidator.cs" />
     <Compile Include="ConnectionString\Validators\O365ConnectionStringValidator.cs" />
     <Compile Include="ConnectionString\Validators\OAuthConnectionStringValidator.cs" />
     <Compile Include="ConnectionString\Validators\UrlValidator.cs" />
