@@ -132,14 +132,14 @@ namespace DataverseGen.Core.DataConverter
 
             foreach (string selectedEntity in _selectedEntities)
             {
+                if (retrievedEntitiesSchemaNames.Contains(selectedEntity))
+                {
+                    ColorConsole.WriteWarning($"duplicate entity {selectedEntity} ignoring");
+                    continue;
+                }
                 EntityMetadata entityEntityMetadata =
                     RetrieveEntityMetadata(selectedEntity);
                 if (entityEntityMetadata == null)
-                {
-                    continue;
-                }
-
-                if (retrievedEntitiesSchemaNames.Contains(entityEntityMetadata.LogicalName))
                 {
                     continue;
                 }
