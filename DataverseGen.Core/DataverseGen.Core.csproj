@@ -58,6 +58,7 @@
     <Compile Include="ConnectionString\Validators\UrlValidator.cs" />
     <Compile Include="ConnectionString\Validators\ValidatorTokenHelper.cs" />
     <Compile Include="DataConverter\DataverseConnector.cs" />
+    <Compile Include="DataConverter\DataverseMetadataConverter.cs" />
     <Compile Include="Helpers\DeepCloneHelper.cs" />
     <Compile Include="Extensions\MetadataNamingExtensions.cs" />
     <Compile Include="Generators\BaseGenerator.cs" />
