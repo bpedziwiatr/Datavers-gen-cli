@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30804.86
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31912.275
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataverseGen.Cli", "DataverseGen.Cli\DataverseGen.Cli.csproj", "{4EF3B7BA-D7B7-4DA0-A7BD-AF6D995B894D}"
 EndProject

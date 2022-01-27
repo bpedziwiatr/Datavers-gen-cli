@@ -1,12 +1,16 @@
 {
-  "Entities": "account;contact",
+  "Entities": [
+    "account",
+    "contact"
+  ],
   "ConnectionString": "AuthType=Office365;Username=@.onmicrosoft.com;Password=;Url=",
   "Namespace": "sad.CRM.Test",
   "OutDirectory": "out-crm",
   "TemplateName": "Main",
+  "ThrowOnEntityNotFound": true,
   "TemplateEngine": {
-    "IsSingleOutput": true,
+    "IsSingleOutput": false,
     "Name": "scriban",
-    "Type": "ts"
+    "Type": "C#"
   }
 }
