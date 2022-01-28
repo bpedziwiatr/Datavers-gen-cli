@@ -12,7 +12,7 @@ function copyTemplates() {
     robocopy $currentPath"\DataverseGen.Core\Generators\Scriban\Templates\Multiple\TS-Main\"  $currentPath"/publish/bin/Templates/ExampleTSTemplate/" *.sbncs /s  
 }
 function getGitVersioion(){
-    $gitv = gitversion | ConvertFrom-JSON -ErrorAction stop
+    $gitv = dotnet-gitversion | ConvertFrom-JSON -ErrorAction stop
     return $gitv
 }
 function MakeZip([string]$currentPath){
