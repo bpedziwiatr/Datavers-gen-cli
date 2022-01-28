@@ -1,6 +1,6 @@
 function main() {
     $currentPath = Get-Location
-    Remove-Item .\publish
+    Remove-Item .\publish -Recurse -ErrorAction Ignore    
     MSBuild DataverseGen.Cli/DataverseGen.Cli.csproj /t:Build /p:OutDir=$currentPath\publish\bin /p:Configuration=Release /p:DebugType=None
     
     Set-Location $currentPath
