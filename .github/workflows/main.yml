@@ -21,6 +21,7 @@ jobs:
     runs-on: windows-latest
     env:
        SolutionPath: DataverseGen.sln
+       PackageName: ''
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -54,9 +55,13 @@ jobs:
         shell: pwsh
         run: |
             ./build.ps1
-        
+      - shell: pwsh
+        run: |
+          $gitv = dotnet-gitversion | ConvertFrom-JSON -ErrorAction stop
+          $packagename = DataverseGen-CLI_"+$gitv.NuGetVersionV2+".zip"
+          echo $packagename | Out-File -FilePath $env:PackageName -Append
       - name: Step 3 - Use the Upload Artifact GitHub Action
         uses: actions/upload-artifact@v2
         with: 
-          name: assets-for-download
+          name: $PackageName
           path: publish
