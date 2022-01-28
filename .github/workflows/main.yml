@@ -57,9 +57,9 @@ jobs:
             ./build.ps1
       - shell: pwsh
         run: |
-          $gitv = dotnet-gitversion | ConvertFrom-JSON -ErrorAction stop;
+          $gitv = dotnet-gitversion | ConvertFrom-JSON -ErrorAction stop
           echo $gitv.NuGetVersionV2
-          $packagename = DataverseGen-CLI_"+$gitv.NuGetVersionV2+".zip";
+          $packagename = "DataverseGen-CLI_"+$gitv.NuGetVersionV2+".zip"
           echo $packagename | Out-File -FilePath $env:PackageName -Append
       - name: Step 3 - Use the Upload Artifact GitHub Action
         uses: actions/upload-artifact@v2
