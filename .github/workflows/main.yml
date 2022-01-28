@@ -33,11 +33,15 @@ jobs:
 
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1.1
-      - name: Setup NuGet
-        uses: NuGet/setup-nuget@v1.0.2
+        
+      - name: Setup Nuget
+        uses: Nuget/setup-nuget@v1.0.5
+        
       - name: Git Version
         uses: codacy/git-version@2.4.0
+        
       - name: Restore NuGet Packages
         run: nuget restore $env:SolutionPath
+        
       - name: PowerShell script
         run: build.ps1
