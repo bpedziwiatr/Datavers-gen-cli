@@ -44,7 +44,11 @@ jobs:
         
       - name: Restore dependencies
         run: nuget restore $SOLUTION
-        
+       
+      - name: PowerShell script
+        shell: pwsh
+        run: |
+           dotnet-gitversion
       - name: PowerShell script
         shell: pwsh
         run: |
