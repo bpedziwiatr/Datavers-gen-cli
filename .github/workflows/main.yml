@@ -61,7 +61,7 @@ jobs:
           echo $gitv.NuGetVersionV2
           $packagename = "DataverseGen-CLI_"+$gitv.NuGetVersionV2+".zip"
           echo $packagename
-          echo "{PackageName}={packagename}" >> $GITHUB_ENV
+          echo "PackageName=$packagename" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
       - name: Step 3 - Use the Upload Artifact GitHub Action
         uses: actions/upload-artifact@v2
         with: 
