@@ -35,7 +35,8 @@ jobs:
         uses: microsoft/setup-msbuild@v1.1
       - name: Setup NuGet
         uses: NuGet/setup-nuget@v1.0.2
+      - name: Git Version        
       - name: Restore NuGet Packages
         run: nuget restore $env:SolutionPath
-      - name: Build app for release
-        run: msbuild $env:SolutionPath -t:rebuild -verbosity:diag -property:Configuration=Release
+      - name: PowerShell script
+        run: build.ps1
