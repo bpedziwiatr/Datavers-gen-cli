@@ -36,7 +36,7 @@ jobs:
           $output = "aabs"
           $armOutputObj = "2345"
           
-          $webAppName = $output + '_add_"+ $armOutputObj 
+          $webAppName = $output + "_add_"+ $armOutputObj 
           echo "::set-env name=PackageName::$webAppName"
         shell: pwsh
         
