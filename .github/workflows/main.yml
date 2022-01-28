@@ -37,8 +37,10 @@ jobs:
       - name: Setup Nuget
         uses: Nuget/setup-nuget@v1.0.5
         
-      - name: Git Version
-        uses: codacy/git-version@2.4.0
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v0.9.7
+        with:
+          versionSpec: '5.x'
         
       - name: Restore dependencies
         run: nuget restore $SOLUTION
