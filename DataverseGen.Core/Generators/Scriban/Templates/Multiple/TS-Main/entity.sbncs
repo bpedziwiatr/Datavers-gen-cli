@@ -1,6 +1,6 @@
 {{info.welcome_xml}}
 {{  isFirstRow = true }}
-type {{entity.hybrid_name}}_attributes =
+export type {{entity.logical_name}}_attributes =
 {{for attribute in entity.fields}}
     {{if isFirstRow == true }}
     "{{attribute.attribute.logical_name}}"
@@ -8,4 +8,4 @@ type {{entity.hybrid_name}}_attributes =
     {{else}}
     | "{{attribute.attribute.logical_name}}"
     {{end}}
-{{end}}
+{{end}};

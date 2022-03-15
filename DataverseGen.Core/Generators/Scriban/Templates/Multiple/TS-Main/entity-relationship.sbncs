@@ -4,7 +4,7 @@
 {{  isFirstRowNN = true }}
 
 {{if entity.relationships_one_to_many.size >0 }}
-type {{entity.logical_name}}_1n_relationships =
+export type {{entity.logical_name}}_1n_relationships =
     {{for attribute in entity.relationships_one_to_many}}
         {{if attribute.schema_name == "calendar_calendar_rules" || attribute.schema_name == "service_calendar_rules"}}
 
@@ -23,10 +23,10 @@ type {{entity.logical_name}}_1n_relationships =
             {{end}}
         {{end}}
     {{end}}
-{{end}}
+{{end}};
 
 {{if entity.relationships_many_to_one.size >0 }}
-type {{entity.logical_name}}_n1_relationships =
+export type {{entity.logical_name}}_n1_relationships =
     {{for attribute in entity.relationships_many_to_one}}
         {{if isFirstRowN1 == true }}
     "{{attribute.schema_name}}"
@@ -35,10 +35,10 @@ type {{entity.logical_name}}_n1_relationships =
     | "{{attribute.schema_name}}"
         {{end}}    
     {{end}}
-{{end}}
+{{end}};
 
 {{if entity.relationships_many_to_many.size >0 }}
-type {{entity.logical_name}}nn_relationships =
+export type {{entity.logical_name}}nn_relationships =
     {{for attribute in entity.relationships_many_to_many}}
         {{if isFirstRowNN == true }}
     "{{attribute.schema_name}}"
@@ -47,4 +47,4 @@ type {{entity.logical_name}}nn_relationships =
     | "{{attribute.schema_name}}"
         {{end}}
     {{end}}
-{{end}}
+{{end}};
