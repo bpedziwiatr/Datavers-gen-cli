@@ -1,5 +1,7 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Runtime.Serialization;
+using Newtonsoft.Json;
 
 namespace DataverseGen.Core.Config
 {
@@ -7,37 +9,44 @@ namespace DataverseGen.Core.Config
     [DataContract]
     public class ConfigModel
     {
-        [DataMember] public string ConnectionString { get; set; }
+        [JsonProperty] public string ConnectionString { get; set; }
 
-        [DataMember] public string[] Entities { get; set; }
+        [JsonProperty] public string[] Entities { get; set; }
 
-        [DataMember] public string Namespace { get; set; }
+        [JsonProperty] public string Namespace { get; set; }
 
-        [DataMember] public string OutDirectory { get; set; }
+        [JsonProperty] public string OutDirectory { get; set; }
 
-        [DataMember] public TemplateEngineModel TemplateEngine { get; set; }
+        [JsonProperty] public TemplateEngineModel TemplateEngine { get; set; }
 
-        [DataMember] public string TemplateName { get; set; }
-        [DataMember(EmitDefaultValue = true)] public bool ThrowOnEntityNotFound { get; set; }
-        [DataMember(EmitDefaultValue = true)] public bool EnableConnectionStringValidation { get; set; }
+        [JsonProperty] public string TemplateName { get; set; }
+        [JsonProperty]
+        [DefaultValue("Templates")]
+        public string TemplateDirectory { get; set; } 
+        [JsonProperty]
+        [DefaultValue(true)]
+        public bool ThrowOnEntityNotFound { get; set; }
+        [JsonProperty]
+        [DefaultValue(true)]
+        public bool EnableConnectionStringValidation { get; set; }
     }
 
     [Serializable]
     [DataContract]
     public class TemplateEngineModel
     {
-        [DataMember] public bool IsSingleOutput { get; set; }
+        [JsonProperty] public bool IsSingleOutput { get; set; }
 
         /// <summary>
         ///     scriban/t4
         /// </summary>
-        [DataMember]
+        [JsonProperty]
         public string Name { get; set; }
 
         /// <summary>
         ///     TS,C#
         /// </summary>
-        [DataMember]
+        [JsonProperty]
         public string Type { get; set; }
     }
 }
