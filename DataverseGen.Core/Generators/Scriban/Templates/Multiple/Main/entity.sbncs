@@ -22,7 +22,7 @@ namespace {{ namespace }}
 	{{end}}
 
 	/// <summary>
-	/// {{entity.description_xml_safe }} //entity.DescriptionXmlSafe.Replace("\n","").Replace("\r", " \r\n\t/// ")
+	/// {{entity.description_xml_safe }}
 	/// </summary>
 	[DataContract]
 	[EntityLogicalName("{{entity.logical_name }}")]

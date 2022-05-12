@@ -1,11 +1,10 @@
-﻿using System;
+﻿using DataverseGen.Core.Metadata;
+using Microsoft.Xrm.Sdk.Metadata;
+using System;
 using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Xml;
-using DataverseGen.Core.Metadata;
-using Microsoft.Xrm.Sdk.Metadata;
 
 namespace DataverseGen.Core.Extensions
 {
@@ -55,30 +54,40 @@ namespace DataverseGen.Core.Extensions
         {
             switch (attribute.LogicalName)
             {
-                // Normally we want to use the SchemaName as it has the capitalized names (Which is what CrmSvcUtil.exe does).  
-                // HOWEVER, If you look at the 'annual' attributes on the annualfiscalcalendar you see it has schema name of Period1  
-                // So if the logicalname & schema name don't match use the logical name and try to capitalize it 
+                // Normally we want to use the SchemaName as it has the capitalized names (Which is what CrmSvcUtil.exe does).
+                // HOWEVER, If you look at the 'annual' attributes on the annualfiscalcalendar you see it has schema name of Period1
+                // So if the logicalname & schema name don't match use the logical name and try to capitalize it
                 // EXCEPT,  when it's RequiredAttendees/From/To/Cc/Bcc/SecondHalf/FirstHalf  (i have no idea how CrmSvcUtil knows to make those upper case)
                 case "requiredattendees":
                     return "RequiredAttendees";
+
                 case "from":
                     return "From";
+
                 case "to":
                     return "To";
+
                 case "cc":
                     return "Cc";
+
                 case "bcc":
                     return "Bcc";
+
                 case "firsthalf":
                     return "FirstHalf";
+
                 case "secondhalf":
                     return "SecondHalf";
+
                 case "firsthalf_base":
                     return "FirstHalf_Base";
+
                 case "secondhalf_base":
                     return "SecondHalf_Base";
+
                 case "attributes":
                     return "Attributes1";
+
                 case "id":
                     return
                         "__Id"; // LocalConfigStore has an attribute named Id, the template will already add and Id
@@ -103,10 +112,9 @@ namespace DataverseGen.Core.Extensions
 
         public static string XmlEscape(this string unescaped)
         {
-            XmlDocument doc = new XmlDocument();
-            XmlNode node = doc.CreateElement("root");
-            node.InnerText = unescaped;
-            return node.InnerXml;
+            return unescaped
+                   .Replace("\n", ";")
+                   .Replace("\r", ";");
         }
 
         private static string Capitalize(string name, bool capitalizeFirstWord)
@@ -122,7 +130,6 @@ namespace DataverseGen.Core.Extensions
 
             return string.Join("_", parts);
         }
-
 
         private static string CapitalizeWord(string word)
         {
@@ -198,7 +205,6 @@ namespace DataverseGen.Core.Extensions
 
             return regularString.Replace("æ", "");
         }
-
 
         private static string ReplaceKeywords(string keyword)
         {
