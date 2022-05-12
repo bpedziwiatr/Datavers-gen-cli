@@ -20,12 +20,13 @@ namespace DataverseGen.Core.Config
         [JsonProperty] public TemplateEngineModel TemplateEngine { get; set; }
 
         [JsonProperty] public string TemplateName { get; set; }
+
         [JsonProperty]
         [DefaultValue("Templates")]
-        public string TemplateDirectory { get; set; } 
-        [JsonProperty]
-        [DefaultValue(true)]
-        public bool ThrowOnEntityNotFound { get; set; }
+        public string TemplateDirectoryName { get; set; }
+
+        [JsonProperty] [DefaultValue(true)] public bool ThrowOnEntityNotFound { get; set; }
+
         [JsonProperty]
         [DefaultValue(true)]
         public bool EnableConnectionStringValidation { get; set; }

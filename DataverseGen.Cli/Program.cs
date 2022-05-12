@@ -28,7 +28,8 @@ namespace DataverseGen.Cli
         {
             if (!File.Exists(DataverseGenConfigJson))
             {
-                throw new FileNotFoundException("Config not found in current directory", DataverseGenConfigJson);
+                throw new FileNotFoundException("Config not found in current directory",
+                    DataverseGenConfigJson);
             }
 
             string json = File.ReadAllText(DataverseGenConfigJson);
@@ -39,20 +40,6 @@ namespace DataverseGen.Cli
         {
             try
             {
-                //Parser.Default.ParseArguments<Options>(args)
-                //    .WithParsed<Options>(o =>
-                //    {
-                //        if (o.Verbose)
-                //        {
-                //            Console.WriteLine($"Verbose output enabled. Current Arguments: -v {o.Verbose}");
-                //            Console.WriteLine("Quick Start Example! App is in Verbose mode!");
-                //        }
-                //        else
-                //        {
-                //            Console.WriteLine($"Current Arguments: -v {o.Verbose}");
-                //            Console.WriteLine("Quick Start Example!");
-                //        }
-                //    });s
                 Console.SetWindowSize(140, 30);
                 WriteLine(Title);
 
@@ -104,7 +91,7 @@ namespace DataverseGen.Cli
         {
             ScribanGenerator scribanGenerator = new ScribanGenerator(
                 config.TemplateName,
-                config.TemplateDirectory,
+                config.TemplateDirectoryName,
                 config.OutDirectory,
                 context,
                 config.TemplateEngine);
