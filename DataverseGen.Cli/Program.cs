@@ -3,12 +3,11 @@
 
 using System;
 using System.IO;
-using System.Runtime.Serialization.Json;
-using DataverseGen.Core;
 using DataverseGen.Core.Config;
 using DataverseGen.Core.DataConverter;
 using DataverseGen.Core.Generators.Scriban;
 using DataverseGen.Core.Metadata;
+using Newtonsoft.Json;
 using static DataverseGen.Core.ColorConsole;
 
 namespace DataverseGen.Cli
@@ -25,17 +24,26 @@ namespace DataverseGen.Cli
 
         private static ConfigModel GetConfig()
         {
-            using (FileStream stream = File.OpenRead("config.json"))
-            {
-                DataContractJsonSerializerSettings settings = new DataContractJsonSerializerSettings
-                {
-                    UseSimpleDictionaryFormat = true
-                };
 
-                DataContractJsonSerializer ser =
-                    new DataContractJsonSerializer(typeof(ConfigModel), settings);
-                return (ConfigModel)ser.ReadObject(stream);
-            }
+            
+            var json = File.ReadAllText("dataversegen.config.json");
+            return JsonConvert.DeserializeObject<ConfigModel>(json);
+
+            //using (JsonReader stream = JsonReader..OpenRead("config.json"))
+            //{
+            //    JsonSerializer serializer = new JsonSerializer();
+            //    return serializer.Deserialize<ConfigModel>(stream);
+
+
+            //    //DataContractJsonSerializerSettings settings = new DataContractJsonSerializerSettings
+            //    //{
+            //    //    UseSimpleDictionaryFormat = true
+            //    //};
+
+            //    //DataContractJsonSerializer ser =
+            //    //    new DataContractJsonSerializer(typeof(ConfigModel), settings);
+            //    //return (ConfigModel)ser.ReadObject(stream);
+            //}
         }
 
         private static void Main(string[] args)
