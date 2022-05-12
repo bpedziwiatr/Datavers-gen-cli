@@ -9,7 +9,7 @@ namespace DataverseGen.Core.Generators.Scriban.Templates.TemplateFileManager
         private string _xrmServiceContextTemplateFilePath;
         private string _fieldsTemplateFilePath;
 
-        public MultipleFileTemplateCsharp(string templateName) : base(templateName)
+        public MultipleFileTemplateCsharp(string templateName,string templateDirName) : base(templateName, templateDirName)
         {
         }
 

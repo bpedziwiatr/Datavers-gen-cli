@@ -14,6 +14,8 @@ namespace DataverseGen.Cli
 {
     internal static class Program
     {
+        private const string DataverseGenConfigJson = "dataversegen.config.json";
+
         private const string Title = @"
     ____        __       _    __                       ______         
    / __ \____ _/ /_____ | |  / /__  _____________     / ____/__  ____ 
@@ -24,46 +26,20 @@ namespace DataverseGen.Cli
 
         private static ConfigModel GetConfig()
         {
+            if (!File.Exists(DataverseGenConfigJson))
+            {
+                throw new FileNotFoundException("Config not found in current directory",
+                    DataverseGenConfigJson);
+            }
 
-            
-            var json = File.ReadAllText("dataversegen.config.json");
+            string json = File.ReadAllText(DataverseGenConfigJson);
             return JsonConvert.DeserializeObject<ConfigModel>(json);
-
-            //using (JsonReader stream = JsonReader..OpenRead("config.json"))
-            //{
-            //    JsonSerializer serializer = new JsonSerializer();
-            //    return serializer.Deserialize<ConfigModel>(stream);
-
-
-            //    //DataContractJsonSerializerSettings settings = new DataContractJsonSerializerSettings
-            //    //{
-            //    //    UseSimpleDictionaryFormat = true
-            //    //};
-
-            //    //DataContractJsonSerializer ser =
-            //    //    new DataContractJsonSerializer(typeof(ConfigModel), settings);
-            //    //return (ConfigModel)ser.ReadObject(stream);
-            //}
         }
 
         private static void Main(string[] args)
         {
             try
             {
-                //Parser.Default.ParseArguments<Options>(args)
-                //    .WithParsed<Options>(o =>
-                //    {
-                //        if (o.Verbose)
-                //        {
-                //            Console.WriteLine($"Verbose output enabled. Current Arguments: -v {o.Verbose}");
-                //            Console.WriteLine("Quick Start Example! App is in Verbose mode!");
-                //        }
-                //        else
-                //        {
-                //            Console.WriteLine($"Current Arguments: -v {o.Verbose}");
-                //            Console.WriteLine("Quick Start Example!");
-                //        }
-                //    });
                 Console.SetWindowSize(140, 30);
                 WriteLine(Title);
 
@@ -107,7 +83,7 @@ namespace DataverseGen.Cli
             finally
             {
                 WriteSuccess(@"Bye Bye, see you next time Press any Key to exit");
-               Console.ReadKey();
+                Console.ReadKey();
             }
         }
 
@@ -115,6 +91,7 @@ namespace DataverseGen.Cli
         {
             ScribanGenerator scribanGenerator = new ScribanGenerator(
                 config.TemplateName,
+                config.TemplateDirectoryName,
                 config.OutDirectory,
                 context,
                 config.TemplateEngine);

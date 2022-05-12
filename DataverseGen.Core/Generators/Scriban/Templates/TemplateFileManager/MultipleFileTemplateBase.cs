@@ -8,13 +8,15 @@ namespace DataverseGen.Core.Generators.Scriban.Templates.TemplateFileManager
     {
         protected string DirectoryPath;
         private readonly string _templateName;
+        private readonly string _templateDirName;
         private string _entityTemplateFilePath;
         private string _enumsTemplateFilePath;
-        private string _restrictedTemplateMain = "Main";
+        private const string RestrictedTemplateMain = "Main";
 
-        protected MultipleFileTemplateBase(string templateName)
+        protected MultipleFileTemplateBase(string templateName, string templateDirName)
         {
             _templateName = templateName;
+            _templateDirName = templateDirName;
         }
 
         internal Template EntityTemplate { get; set; }
@@ -23,7 +25,7 @@ namespace DataverseGen.Core.Generators.Scriban.Templates.TemplateFileManager
 
         public void Init()
         {
-            if (string.Equals(_templateName, _restrictedTemplateMain, StringComparison.InvariantCultureIgnoreCase))
+            if (string.Equals(_templateName, RestrictedTemplateMain, StringComparison.InvariantCultureIgnoreCase))
             {
                 SetMainTemplate();
                 return;
@@ -33,7 +35,7 @@ namespace DataverseGen.Core.Generators.Scriban.Templates.TemplateFileManager
 
         protected virtual void CheckFiles()
         {
-            DirectoryPath = $"{Directory.GetCurrentDirectory()}\\Templates\\{_templateName}\\";
+            DirectoryPath = $"{Directory.GetCurrentDirectory()}\\{_templateDirName}\\{_templateName}\\";
             Console.WriteLine($@"Loading templates from  path: {DirectoryPath}");
             if (!Directory.Exists(DirectoryPath))
             {

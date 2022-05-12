@@ -6,7 +6,7 @@
   "TemplateName": "Main",
   "EnableConnectionStringValidation": true, //optional
   "ThrowOnEntityNotFound": true, //optional
-  "TemplateDirectory": "Templates",
+  "TemplateDirectoryName": "Templates", //optional only dir name
   "TemplateEngine": {
     "IsSingleOutput": true,
     "Name": "scriban",
