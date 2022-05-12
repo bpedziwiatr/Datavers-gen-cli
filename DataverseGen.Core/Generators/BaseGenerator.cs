@@ -5,16 +5,26 @@ namespace DataverseGen.Core.Generators
 {
     public abstract class BaseGenerator
     {
-        protected readonly TemplateEngineModel _templateEngineModel;
-        protected readonly Context _context;
-        protected readonly string _outPath;
-        protected readonly string _templateName;
-        public BaseGenerator(string templateName, string outPath, Context context,TemplateEngineModel templateEngineModel)
+        protected readonly TemplateEngineModel TemplateEngineModel;
+        protected readonly Context Context;
+        protected readonly string OutPath;
+        protected readonly string TemplateName;
+        protected readonly string TemplateDirName;
+
+
+        protected BaseGenerator(
+            string templateName,
+            string templateDirName,
+            string outPath,
+            Context context,
+            TemplateEngineModel templateEngineModel
+            )
         {
-            _templateEngineModel = templateEngineModel;
-            _templateName = templateName;
-            _outPath = outPath;
-            _context = context;
+            TemplateEngineModel = templateEngineModel;
+            TemplateDirName = templateDirName;
+            TemplateName = templateName;
+            OutPath = outPath;
+            Context = context;
         }
 
         public abstract void GenerateTemplate();

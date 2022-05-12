@@ -8,7 +8,7 @@ namespace DataverseGen.Core.Generators.Scriban.Templates.TemplateFileManager
     {
         private string _relationshipsTemplateFilePath;
 
-        public MultipleFileTemplateTypescript(string templateName) : base(templateName)
+        public MultipleFileTemplateTypescript(string templateName,string templateDir) : base(templateName, templateDir)
         {
         }
 

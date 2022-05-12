@@ -16,9 +16,13 @@ namespace DataverseGen.Core.Generators.Scriban
     {
         private string _fullOutputPath;
 
-        public ScribanGenerator(string templateName, string outPath, Context context,
+        public ScribanGenerator(
+            string templateName,
+            string templateDirName,
+            string outPath,
+            Context context,
             TemplateEngineModel templateEngineModel)
-            : base(templateName, outPath, context, templateEngineModel)
+            : base(templateName, templateDirName, outPath, context, templateEngineModel)
         {
         }
 
@@ -26,10 +30,13 @@ namespace DataverseGen.Core.Generators.Scriban
         {
             Console.WriteLine(@"Welcome to Scriban template generator");
             Stopwatch stopper = Stopwatch.StartNew();
-            _fullOutputPath = $"{Directory.GetCurrentDirectory()}\\{_outPath}\\";
+            _fullOutputPath = $"{Directory.GetCurrentDirectory()}\\{OutPath}\\";
             if (!Directory.Exists(_fullOutputPath))
+            {
                 Directory.CreateDirectory(_fullOutputPath);
-            switch (_templateEngineModel.Type.ToLowerInvariant())
+            }
+
+            switch (TemplateEngineModel.Type.ToLowerInvariant())
             {
                 case "c#":
                     RunCSharpGenerator();
@@ -41,54 +48,62 @@ namespace DataverseGen.Core.Generators.Scriban
                     break;
 
                 default:
-                    throw new ArgumentOutOfRangeException("_templateEngineModel.Type",
-                        $@"type {_templateEngineModel.Type} not supported use C# or TS");
+                    throw new ArgumentOutOfRangeException($"_templateEngineModel.Type",
+                        $@"type {TemplateEngineModel.Type} not supported use C# or TS");
             }
 
-            Console.WriteLine($@"Generating Scriban template '{_templateName}' elapsed in: {stopper.Elapsed:g}");
+            Console.WriteLine(
+                $@"Generating Scriban template '{TemplateName}' elapsed in: {stopper.Elapsed:g}");
             stopper.Stop();
         }
 
         private static string RemoveEmptyLines(string lines)
         {
-            return Regex.Replace(lines, @"^\s*$\n|\r", string.Empty, RegexOptions.Multiline).TrimEnd();
+            return Regex.Replace(lines, @"^\s*$\n|\r", string.Empty, RegexOptions.Multiline)
+                        .TrimEnd();
         }
 
         private void MultiOutputGeneratorCSharp()
         {
-            MultipleFileTemplateCsharp templates = new MultipleFileTemplateCsharp(_templateName);
+            MultipleFileTemplateCsharp templates =
+                new MultipleFileTemplateCsharp(TemplateName, TemplateDirName);
             templates.Init();
-            string dir = $"{Directory.GetCurrentDirectory()}\\{_outPath}\\";
+            string dir = $"{Directory.GetCurrentDirectory()}\\{OutPath}\\";
             if (!Directory.Exists(dir))
+            {
                 Directory.CreateDirectory(dir);
+            }
 
-            foreach (MappingEntity entity in _context.Entities)
+            foreach (MappingEntity entity in Context.Entities)
             {
                 WriteEntityTemplateToFile(templates.EntityTemplate, entity, "cs");
                 WriteEntityTemplateToFile(templates.FieldsTemplate, entity, "Fields.cs");
                 WriteEntityTemplateToFile(templates.EnumsTemplate, entity, "Enums.cs");
             }
 
-            string xrmContextContent = RemoveEmptyLines(templates.XrmContextTemplate.Render(_context));
+            string xrmContextContent =
+                RemoveEmptyLines(templates.XrmContextTemplate.Render(Context));
             File.WriteAllText($"{dir}/XrmServiceContext.cs", xrmContextContent, Encoding.UTF8);
         }
 
         private void MultiOutputGeneratorTypeScript()
         {
-            MultipleFileTemplateTypescript templates = new MultipleFileTemplateTypescript(_templateName);
+            MultipleFileTemplateTypescript templates =
+                new MultipleFileTemplateTypescript(TemplateName, TemplateDirName);
             templates.Init();
 
-            foreach (MappingEntity entity in _context.Entities)
+            foreach (MappingEntity entity in Context.Entities)
             {
                 WriteEntityTemplateToFile(templates.EntityTemplate, entity, "attributes.ts");
                 WriteEntityTemplateToFile(templates.EnumsTemplate, entity, "enums.ts");
-                WriteEntityTemplateToFile(templates.RelationshipTemplate, entity, "relationships.ts");
+                WriteEntityTemplateToFile(templates.RelationshipTemplate, entity,
+                    "relationships.ts");
             }
         }
 
         private void RunCSharpGenerator()
         {
-            if (_templateEngineModel.IsSingleOutput)
+            if (TemplateEngineModel.IsSingleOutput)
             {
                 SingleFileCSharp();
                 return;
@@ -99,7 +114,7 @@ namespace DataverseGen.Core.Generators.Scriban
 
         private void RunTypeScriptGenerator()
         {
-            if (_templateEngineModel.IsSingleOutput)
+            if (TemplateEngineModel.IsSingleOutput)
             {
                 SingleFileTypescript();
                 return;
@@ -111,24 +126,26 @@ namespace DataverseGen.Core.Generators.Scriban
         private void SingleFileCSharp()
         {
             ParserOptions options = new ParserOptions();
-            LexerOptions lexerOptions = new LexerOptions { Mode = ScriptMode.Default };
-            var template = Template.Parse(Encoding.UTF8.GetString(ScribanTemplates.dataversegen_single)
+            LexerOptions lexerOptions = new LexerOptions {Mode = ScriptMode.Default};
+            Template template = Template.Parse(
+                Encoding.UTF8.GetString(ScribanTemplates.dataversegen_single)
                 , null
                 , options
                 , lexerOptions);
-            string content = RemoveEmptyLines(template.Render(_context));
+            string content = RemoveEmptyLines(template.Render(Context));
             File.WriteAllText($"{_fullOutputPath}XrmServiceContext.cs", content, Encoding.UTF8);
         }
 
         private void SingleFileTypescript()
         {
             ParserOptions options = new ParserOptions();
-            LexerOptions lexerOptions = new LexerOptions { Mode = ScriptMode.Default };
-            var template = Template.Parse(Encoding.UTF8.GetString(ScribanTemplates.dataversegen_single_ts)
+            LexerOptions lexerOptions = new LexerOptions {Mode = ScriptMode.Default};
+            Template template = Template.Parse(
+                Encoding.UTF8.GetString(ScribanTemplates.dataversegen_single_ts)
                 , null
                 , options
                 , lexerOptions);
-            string content = RemoveEmptyLines(template.Render(_context));
+            string content = RemoveEmptyLines(template.Render(Context));
             File.WriteAllText($"{_fullOutputPath}dataverse.metadata.ts", content, Encoding.UTF8);
         }
 
@@ -138,7 +155,8 @@ namespace DataverseGen.Core.Generators.Scriban
             string outputFileSuffixWithExtension)
         {
             string entityContent =
-                RemoveEmptyLines(template.Render(new { _context.Namespace, _context.Info, Entity = entity }))
+                RemoveEmptyLines(template.Render(new
+                        {Context.Namespace, Context.Info, Entity = entity}))
                     .Replace("\n", "\r\n");
             if (outputFileSuffixWithExtension.Contains("ts"))
             {
