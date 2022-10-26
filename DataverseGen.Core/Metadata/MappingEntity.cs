@@ -64,6 +64,11 @@ namespace DataverseGen.Core.Metadata
                     {
                         f.DisplayName += "1";
                     }
+
+                    if (f.DisplayName == entity.DisplayName)
+                    {
+                        f.DisplayName = $"{f.DisplayName}Field";
+                    }
                 }
             );
 
