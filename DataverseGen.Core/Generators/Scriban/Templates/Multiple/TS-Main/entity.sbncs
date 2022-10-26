@@ -1,3 +1,4 @@
+/* eslint-disable no-alert */
 {{info.welcome_xml}}
 {{  isFirstRow = true }}
 export type {{entity.logical_name}}_attributes =

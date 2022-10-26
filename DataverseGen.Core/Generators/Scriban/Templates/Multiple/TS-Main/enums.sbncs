@@ -1,3 +1,4 @@
+/* eslint-disable no-alert */
 {{info.welcome_xml}}
 
 {{for enm in entity.enums}}

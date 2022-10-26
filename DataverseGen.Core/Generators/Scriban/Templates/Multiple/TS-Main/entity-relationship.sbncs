@@ -1,3 +1,4 @@
+/* eslint-disable no-alert */
 {{info.welcome_xml}}
 {{  isFirstRow1N = true }}
 {{  isFirstRowN1 = true }}
