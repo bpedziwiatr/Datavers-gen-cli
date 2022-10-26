@@ -58,6 +58,11 @@ namespace DataverseGen.Core.DataConverter
             while (!_crmServiceClient.IsReady)
             {
                 WriteInfo($@"Waiting for connection... {waitForConnection}ms");
+                if (_crmServiceClient.LastCrmException != null)
+                {
+                    WriteError(_crmServiceClient.LastCrmException.Message);
+                    throw _crmServiceClient.LastCrmException;
+                }
                 Thread.Sleep(waitForConnection);
             }
         }
