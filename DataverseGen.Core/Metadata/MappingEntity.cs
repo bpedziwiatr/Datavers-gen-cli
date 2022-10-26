@@ -54,12 +54,16 @@ namespace DataverseGen.Core.Metadata
             if (entityMetadata.Description?.UserLocalizedLabel != null)
                 entity.Description = entityMetadata.Description.UserLocalizedLabel.Label;
 
-            List<MappingField> fields = MapFieldsFromEntityMetadata(entityMetadata, entity).ToList();
+            List<MappingField> fields = MapFieldsFromEntityMetadata(entityMetadata, entity)
+                                        .OrderBy(p=>p.LogicalName)
+                                        .ToList();
 
             fields.ForEach(f =>
                 {
                     if (f.DisplayName == entity.DisplayName)
+                    {
                         f.DisplayName += "1";
+                    }
                 }
             );
 
@@ -74,7 +78,7 @@ namespace DataverseGen.Core.Metadata
                 .Where(a => a is PicklistAttributeMetadata || a is StateAttributeMetadata ||
                             a is StatusAttributeMetadata || a is BooleanAttributeMetadata ||
                             a is MultiSelectPicklistAttributeMetadata)
-                .Select(a => MappingEnum.Parse(a)).ToArray();
+                .Select(MappingEnum.Parse).ToArray();
 
             entity.PrimaryKey = entity.Fields.First(f => f.Attribute.LogicalName == entity.Attribute.PrimaryKey);
             entity.PrimaryKeyProperty = entity.PrimaryKey.DisplayName;
