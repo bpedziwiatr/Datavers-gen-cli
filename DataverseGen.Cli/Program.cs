@@ -2,7 +2,9 @@
 //using DataverseGen.Cli.CliParser;
 
 using System;
+using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using DataverseGen.Core.Config;
 using DataverseGen.Core.DataConverter;
 using DataverseGen.Core.Generators.Scriban;
@@ -42,6 +44,7 @@ namespace DataverseGen.Cli
             {
                 Console.SetWindowSize(140, 30);
                 WriteLine(Title);
+				WriteVersion();
 
                 ConfigModel config = GetConfig();
 
@@ -87,7 +90,18 @@ namespace DataverseGen.Cli
             }
         }
 
-        private static void ScribanRun(ConfigModel config, Context context)
+		private static void WriteVersion()
+		{
+			Assembly assembly = Assembly.GetExecutingAssembly();
+			string assemblyVersion = assembly.GetName().Version?.ToString();
+			FileVersionInfo assemblyFileVersion =
+				FileVersionInfo.GetVersionInfo(assembly.Location);
+
+            WriteLine($"Runtime Version: {assemblyVersion}");
+			WriteLine($"File Version: {assemblyFileVersion.FileVersion}");
+		}
+
+		private static void ScribanRun(ConfigModel config, Context context)
         {
             ScribanGenerator scribanGenerator = new ScribanGenerator(
                 config.TemplateName,
