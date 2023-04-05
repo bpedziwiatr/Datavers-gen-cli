@@ -5,7 +5,7 @@ using System;
 namespace DataverseGen.Core.Metadata
 {
     [Serializable]
-    public class MappingRelationshipMn : ICloneable
+    public class MappingRelationshipMn : ICloneable,IMappingRelationship
     {
         public CrmRelationshipAttribute Attribute { get; set; }
 
@@ -13,7 +13,10 @@ namespace DataverseGen.Core.Metadata
         public string EntityRole { get; set; }
         public string ForeignKey { get; set; }
         public string HybridName { get; set; }
-        public bool IsSelfReferenced { get; set; }
+
+		
+
+		public bool IsSelfReferenced { get; set; }
         public string PrivateName { get; set; }
         public string SchemaName { get; set; }
         public MappingEntity ToEntity { get; set; }

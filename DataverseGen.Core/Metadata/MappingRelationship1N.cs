@@ -6,7 +6,7 @@ using Microsoft.Xrm.Sdk.Metadata;
 namespace DataverseGen.Core.Metadata
 {
     [Serializable]
-    public class MappingRelationship1N
+    public class MappingRelationship1N: IMappingRelationship
     {
         public CrmRelationshipAttribute Attribute { get; set; }
         public string DisplayName { get; set; }
@@ -45,8 +45,12 @@ namespace DataverseGen.Core.Metadata
                 Type = MetadataNamingExtensions.GetProperVariableName(rel.ReferencingEntity),
             };
 
-            if (rel.ReferencedEntity != rel.ReferencingEntity) return result;
-            result.DisplayName = "Referenced" + result.DisplayName;
+            if (rel.ReferencedEntity != rel.ReferencingEntity)
+			{
+				return result;
+			}
+
+			result.DisplayName = "Referenced" + result.DisplayName;
             result.EntityRole = "Microsoft.Xrm.Sdk.EntityRole.Referenced";
 
             return result;

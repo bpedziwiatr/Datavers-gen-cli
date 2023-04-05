@@ -6,8 +6,8 @@ using System.Linq;
 namespace DataverseGen.Core.Metadata
 {
     [Serializable]
-    public class MappingRelationshipN1
-    {
+    public class MappingRelationshipN1 : IMappingRelationship
+	{
         public CrmRelationshipAttribute Attribute { get; set; }
 
         public string DisplayName { get; set; }
