@@ -74,6 +74,7 @@
     <Compile Include="Generators\Scriban\ScribanGenerator.cs" />
     <Compile Include="Metadata\Context.cs" />
     <Compile Include="Metadata\CrmAttribute.cs" />
+    <Compile Include="Metadata\IMappingRelationship.cs" />
     <Compile Include="Metadata\MappingEntity.cs" />
     <Compile Include="Metadata\MappingEnum.cs" />
     <Compile Include="Metadata\MappingField.cs" />
