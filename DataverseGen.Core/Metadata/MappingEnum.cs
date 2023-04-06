@@ -84,7 +84,7 @@ namespace DataverseGen.Core.Metadata
 
         private static MapperEnumItem MapBoolOption(OptionMetadata option)
         {
-            Debug.Assert(option.Value != null, "option.Value != null");
+			Debug.Assert(option.Value != null, "option.Value != null ");
             MapperEnumItem results = new MapperEnumItem
             {
                 Attribute = new CrmPicklistAttribute
