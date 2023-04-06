@@ -28,7 +28,7 @@ namespace DataverseGen.Core.Metadata
 
 		public MappingEnum[] Enums { get; set; }
 
-		public MappingField[] Fields { get; set; }
+		public IList<MappingField> Fields { get; set; }
 
 		public string HybridName { get; set; }
 
@@ -78,17 +78,17 @@ namespace DataverseGen.Core.Metadata
 				entity.Description = entityMetadata.Description.UserLocalizedLabel.Label;
 			}
 
-			MappingField[] fields =
+			IList<MappingField> fields =
 				MapFieldsFromEntityMetadata(entityMetadata, entity)
 				   .OrderBy(p => p.LogicalName)
-				   .ToArray();
+				   .ToList();
 
 			FixDuplicateNames(entityMetadata, fields, entity);
 
 			AddEntityImageCrm2013(fields);
 			AddLookupFields(fields);
 
-			entity.Fields = fields.ToArray();
+			entity.Fields = fields;
 			MapStates(entityMetadata, entity);
 
 			MapEnums(entityMetadata, entity);

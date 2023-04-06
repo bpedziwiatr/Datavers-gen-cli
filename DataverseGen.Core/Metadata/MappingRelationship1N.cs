@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using DataverseGen.Core.Extensions;
 using Microsoft.Xrm.Sdk.Metadata;
@@ -32,7 +33,7 @@ namespace DataverseGen.Core.Metadata
 
 		public static MappingRelationship1N Parse(
 			OneToManyRelationshipMetadata rel,
-			MappingField[] properties)
+			IList<MappingField> properties)
 		{
 			string propertyName =
 				properties.First(p => string.Equals(p.Attribute.LogicalName,
