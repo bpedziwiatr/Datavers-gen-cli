@@ -1,12 +1,11 @@
-﻿namespace DataverseGen.Core.ConnectionString
+﻿namespace DataverseGen.Core.ConnectionString;
+
+public enum ConnectionType
 {
-    public enum ConnectionType
-    {
-        AD,
-        IFD,
-        OAuth,
-        Certificate,
-        ClientSecret,
-        Office365
-    }
+	AD,
+	IFD,
+	OAuth,
+	Certificate,
+	ClientSecret,
+	Office365
 }

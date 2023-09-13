@@ -1,38 +1,36 @@
-﻿using System.Collections.Generic;
+﻿namespace DataverseGen.Core.ConnectionString.Validators;
 
-namespace DataverseGen.Core.ConnectionString.Validators
+public class OAuthConnectionStringValidator : BaseConnectionStringValidator,
+	IConnectionStringValidator
 {
-    public class OAuthConnectionStringValidator : BaseConnectionStringValidator,
-        IConnectionStringValidator
-    {
-        public OAuthConnectionStringValidator(IDictionary<string, string> connectionStringTokens) :
-            base(connectionStringTokens) { }
+	public OAuthConnectionStringValidator(IDictionary<string, string> connectionStringTokens) :
+		base(connectionStringTokens) { }
 
-        public bool Validate()
-        {
-            CheckIfPasswordOrIntegratedSecurityIsPresent();
-            CheckIfUserNameIsPresent();
-            CheckIfUrlIsPresentAndValid();
-            CheckIfAppIdIsPresent();
-            CheckIfRedirectUriIsPresent();
-            CheckIfTokenCacheStorePathIsPresent();
-            return true;
-        }
+	public bool Validate()
+	{
+		CheckIfPasswordOrIntegratedSecurityIsPresent();
+		CheckIfUserNameIsPresent();
+		CheckIfUrlIsPresentAndValid();
+		CheckIfAppIdIsPresent();
+		CheckIfRedirectUriIsPresent();
+		CheckIfTokenCacheStorePathIsPresent();
 
-        private void CheckIfAppIdIsPresent()
-        {
-            ValidatorTokenHelper.CheckIfTokenIsPresentWithValue(ConnectionStringTokens,
-                ConnectionStringConst.ClientId);
-        }
+		return true;
+	}
 
-        private void CheckIfRedirectUriIsPresent()
-        {
-            CheckIfTokenIsPresentWithValue(ConnectionStringConst.RedirectUri);
-        }
+	private void CheckIfAppIdIsPresent()
+	{
+		ValidatorTokenHelper.CheckIfTokenIsPresentWithValue(ConnectionStringTokens,
+			ConnectionStringConst.ClientId);
+	}
 
-        private void CheckIfTokenCacheStorePathIsPresent()
-        {
-            CheckIfTokenIsPresentWithValue(ConnectionStringConst.TokenCacheStorePath);
-        }
-    }
+	private void CheckIfRedirectUriIsPresent()
+	{
+		CheckIfTokenIsPresentWithValue(ConnectionStringConst.RedirectUri);
+	}
+
+	private void CheckIfTokenCacheStorePathIsPresent()
+	{
+		CheckIfTokenIsPresentWithValue(ConnectionStringConst.TokenCacheStorePath);
+	}
 }

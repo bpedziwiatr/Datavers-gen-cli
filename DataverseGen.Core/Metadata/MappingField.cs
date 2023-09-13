@@ -1,261 +1,300 @@
-﻿using System;
-using DataverseGen.Core.Extensions;
+﻿using DataverseGen.Core.Extensions;
 using DataverseGen.Core.Helpers;
 using Microsoft.Xrm.Sdk.Metadata;
 
-namespace DataverseGen.Core.Metadata
+namespace DataverseGen.Core.Metadata;
+
+[Serializable]
+public class MappingField
 {
-    [Serializable]
-    public class MappingField
-    {
-        public MappingField()
-        {
-            IsValidForUpdate = false;
-            IsValidForCreate = false;
-            IsDeprecated = false;
-            Description = "";
-        }
+	public string DescriptionXmlSafe => Description.XmlEscape();
 
-        public string DescriptionXmlSafe => Description.XmlEscape();
+	public CrmPropertyAttribute Attribute { get; set; }
 
-        public CrmPropertyAttribute Attribute { get; set; }
+	public string AttributeOf { get; set; }
 
-        public string AttributeOf { get; set; }
-        public string AttributeTypeName { get; private set; }
-        public string DeprecatedVersion { get; set; }
-        public string Description { get; set; }
+	public string AttributeTypeName { get; private set; }
 
-        public string DisplayName { get; set; }
-        public MappingEntity Entity { get; set; }
-        public MappingEnum EnumData { get; set; }
-        public AttributeTypeCode FieldType { get; set; }
-        public string FieldTypeString { get; set; }
-        public string GetMethod { get; set; }
-        public string HybridName { get; set; }
-        public bool IsActivityParty { get; set; }
-        public bool IsDeprecated { get; set; }
-        public bool IsOptionSet { get; private set; }
-        public bool IsRequired { get; set; }
-        public bool IsStateCode { get; set; }
-        public bool IsTwoOption { get; private set; }
-        public bool IsValidForCreate { get; set; }
-        public bool IsValidForRead { get; set; }
-        public bool IsValidForUpdate { get; set; }
-        public string Label { get; set; }
-        public string LogicalName { get; set; }
-        public string LookupSingleType { get; set; }
-        public decimal? Max { get; set; }
-        public int? MaxLength { get; set; }
-        public decimal? Min { get; set; }
+	public string DeprecatedVersion { get; set; }
 
-        public string PrivatePropertyName { get; set; }
+	public string Description { get; set; } = "";
 
-        public string TargetTypeForCrmSvcUtil { get; set; }
-        private bool IsPrimaryKey { get; set; }
+	public string DisplayName { get; set; }
 
-        public static MappingField Parse(AttributeMetadata attribute, MappingEntity entity)
-        {
-            MappingField result = new MappingField
-            {
-                Entity = entity,
-                AttributeOf = attribute.AttributeOf
-            };
-            if (attribute.IsValidForCreate != null) result.IsValidForCreate = (bool)attribute.IsValidForCreate;
-            if (attribute.IsValidForRead != null) result.IsValidForRead = (bool)attribute.IsValidForRead;
-            if (attribute.IsValidForUpdate != null) result.IsValidForUpdate = (bool)attribute.IsValidForUpdate;
-            result.IsActivityParty = attribute.AttributeType == AttributeTypeCode.PartyList;
-            result.IsStateCode = attribute.AttributeType == AttributeTypeCode.State;
-            result.IsOptionSet = attribute.AttributeType == AttributeTypeCode.Picklist;
-            result.IsTwoOption = attribute.AttributeType == AttributeTypeCode.Boolean;
-            result.DeprecatedVersion = attribute.DeprecatedVersion;
-            result.IsDeprecated = !string.IsNullOrWhiteSpace(attribute.DeprecatedVersion);
+	public MappingEntity Entity { get; set; }
 
-            switch (attribute)
-            {
-                case PicklistAttributeMetadata pickList:
-                    result.EnumData =
-                        MappingEnum.Parse(pickList);
-                    break;
+	public MappingEnum EnumData { get; set; }
 
-                case MultiSelectPicklistAttributeMetadata multiSelectPickListAttributeMetadata:
-                    result.EnumData =
-                        MappingEnum.Parse(multiSelectPickListAttributeMetadata);
-                    break;
-            }
+	public AttributeTypeCode FieldType { get; set; }
 
-            LookupAttributeMetadata lookup = attribute as LookupAttributeMetadata;
+	public string FieldTypeString { get; set; }
 
-            if (lookup?.Targets.Length == 1)
-                result.LookupSingleType = lookup.Targets[0];
+	public string GetMethod { get; set; }
 
-            ParseMinMaxValues(attribute, result);
+	public string HybridName { get; set; }
 
-            if (attribute.AttributeType != null)
-                result.FieldType = attribute.AttributeType.Value;
-            if (attribute.AttributeTypeName != null)
-            {
-                result.AttributeTypeName = attribute.AttributeTypeName.Value;
-            }
+	public bool IsActivityParty { get; set; }
 
-            result.IsPrimaryKey = attribute.IsPrimaryId == true;
+	public bool IsDeprecated { get; set; }
 
-            result.LogicalName = attribute.LogicalName;
-            result.DisplayName = attribute.GetProperVariableName();
-            result.PrivatePropertyName = attribute.SchemaName.GetEntityPropertyPrivateName();
-            result.HybridName = result.GetProperHybridFieldName();
+	public bool IsOptionSet { get; private set; }
 
-            if (attribute.Description?.UserLocalizedLabel != null)
-                result.Description = attribute.Description.UserLocalizedLabel.Label;
+	public bool IsRequired { get; set; }
 
-            if (attribute.DisplayName?.UserLocalizedLabel != null)
-                result.Label = attribute.DisplayName.UserLocalizedLabel.Label;
+	public bool IsStateCode { get; set; }
 
-            result.IsRequired = attribute.RequiredLevel != null &&
-                                attribute.RequiredLevel.Value == AttributeRequiredLevel.ApplicationRequired;
+	public bool IsTwoOption { get; private set; }
 
-            result.Attribute =
-                new CrmPropertyAttribute
-                {
-                    LogicalName = attribute.LogicalName,
-                    IsLookup = attribute.AttributeType == AttributeTypeCode.Lookup ||
-                               attribute.AttributeType == AttributeTypeCode.Customer
-                };
-            result.TargetTypeForCrmSvcUtil = GetTargetType(result);
-            result.FieldTypeString = result.TargetTypeForCrmSvcUtil;
+	public bool IsValidForCreate { get; set; }
 
-            return result;
-        }
+	public bool IsValidForRead { get; set; }
 
-        public MappingField CreateFileNameField(MappingField field)
-        {
-            MappingField fieldCopy = DeepCloneExtensions.CreateDeepCopy(field);
-            fieldCopy.TargetTypeForCrmSvcUtil = "string";
-            fieldCopy.DisplayName = $"{fieldCopy.DisplayName}Name";
-            fieldCopy.Attribute.LogicalName = $"{fieldCopy.Attribute.LogicalName}_name";
-            return fieldCopy;
-        }
+	public bool IsValidForUpdate { get; set; }
 
-        private static string GetTargetType(MappingField field)
-        {
-            if (field.IsPrimaryKey)
-                return "Guid?";
+	public string Label { get; set; }
 
-            switch (field.FieldType)
-            {
-                case AttributeTypeCode.Picklist:
-                    return "OptionSetValue";
+	public string LogicalName { get; set; }
 
-                case AttributeTypeCode.BigInt:
-                    return "long?";
+	public string LookupSingleType { get; set; }
 
-                case AttributeTypeCode.Integer:
-                    return "int?";
+	public decimal? Max { get; set; }
 
-                case AttributeTypeCode.Boolean:
-                    return "bool?";
+	public int? MaxLength { get; set; }
 
-                case AttributeTypeCode.DateTime:
-                    return "DateTime?";
+	public decimal? Min { get; set; }
 
-                case AttributeTypeCode.Decimal:
-                    return "decimal?";
+	public string PrivatePropertyName { get; set; }
 
-                case AttributeTypeCode.Money:
-                    return "Money";
+	public string TargetTypeForCrmSvcUtil { get; set; }
 
-                case AttributeTypeCode.Double:
-                    return "double?";
+	private bool IsPrimaryKey { get; set; }
 
-                case AttributeTypeCode.Uniqueidentifier:
-                    return "Guid?";
+	public static MappingField Parse(AttributeMetadata attribute, MappingEntity entity)
+	{
+		MappingField result = new()
+		{
+			Entity = entity,
+			AttributeOf = attribute.AttributeOf
+		};
 
-                case AttributeTypeCode.Lookup:
-                case AttributeTypeCode.Owner:
-                case AttributeTypeCode.Customer:
-                    return "EntityReference";
+		if (attribute.IsValidForCreate != null)
+		{
+			result.IsValidForCreate = (bool)attribute.IsValidForCreate;
+		}
 
-                case AttributeTypeCode.State:
-                    return field.Entity.StateName + "?";
+		if (attribute.IsValidForRead != null)
+		{
+			result.IsValidForRead = (bool)attribute.IsValidForRead;
+		}
 
-                case AttributeTypeCode.Status:
-                    return "OptionSetValue";
+		if (attribute.IsValidForUpdate != null)
+		{
+			result.IsValidForUpdate = (bool)attribute.IsValidForUpdate;
+		}
 
-                case AttributeTypeCode.Memo:
-                case AttributeTypeCode.Virtual:
-                case AttributeTypeCode.EntityName:
-                case AttributeTypeCode.String:
-                {
-                    switch (field.AttributeTypeName)
-                    {
-                        case "FileType":
-                            return "Guid?";
-                        case "MultiSelectPicklistType":
-                            return "OptionSetValueCollection";
-                        default:
-                            return "string";
-                    }
-                }
+		result.IsActivityParty = attribute.AttributeType == AttributeTypeCode.PartyList;
+		result.IsStateCode = attribute.AttributeType == AttributeTypeCode.State;
+		result.IsOptionSet = attribute.AttributeType == AttributeTypeCode.Picklist;
+		result.IsTwoOption = attribute.AttributeType == AttributeTypeCode.Boolean;
+		result.DeprecatedVersion = attribute.DeprecatedVersion;
+		result.IsDeprecated = !string.IsNullOrWhiteSpace(attribute.DeprecatedVersion);
 
-                case AttributeTypeCode.PartyList:
-                    return "IEnumerable<ActivityParty>";
+		result.EnumData = attribute switch
+		{
+			PicklistAttributeMetadata pickList => MappingEnum.Parse(pickList),
+			MultiSelectPicklistAttributeMetadata multiSelectPickListAttributeMetadata => MappingEnum.Parse(
+				multiSelectPickListAttributeMetadata),
+			_ => result.EnumData
+		};
 
-                case AttributeTypeCode.ManagedProperty:
-                    return "BooleanManagedProperty";
+		LookupAttributeMetadata lookup = attribute as LookupAttributeMetadata;
 
-                default:
-                    return "object";
-            }
-        }
+		if (lookup?.Targets.Length == 1)
+		{
+			result.LookupSingleType = lookup.Targets[0];
+		}
 
-        private static void ParseMinMaxValues(AttributeMetadata attribute, MappingField result)
-        {
-            switch (attribute)
-            {
-                case StringAttributeMetadata stringAttributeMetadata:
-                    result.MaxLength = stringAttributeMetadata.MaxLength ?? -1;
-                    break;
+		ParseMinMaxValues(attribute, result);
 
-                case MemoAttributeMetadata memoAttributeMetadata:
-                    result.MaxLength = memoAttributeMetadata.MaxLength ?? -1;
-                    break;
+		if (attribute.AttributeType != null)
+		{
+			result.FieldType = attribute.AttributeType.Value;
+		}
 
-                case IntegerAttributeMetadata integerAttributeMetadata:
-                {
-                    result.Min = integerAttributeMetadata.MinValue ?? -1;
-                    result.Max = integerAttributeMetadata.MaxValue ?? -1;
+		if (attribute.AttributeTypeName != null)
+		{
+			result.AttributeTypeName = attribute.AttributeTypeName.Value;
+		}
 
-                    break;
-                }
-                case DecimalAttributeMetadata decimalAttributeMetadata:
-                {
-                    result.Min = decimalAttributeMetadata.MinValue ?? -1;
-                    result.Max = decimalAttributeMetadata.MaxValue ?? -1;
+		result.IsPrimaryKey = attribute.IsPrimaryId == true;
 
-                    break;
-                }
-                case MoneyAttributeMetadata moneyAttributeMetadata:
-                {
-                    result.Min = moneyAttributeMetadata.MinValue != null
-                        ? (decimal)moneyAttributeMetadata.MinValue.Value
-                        : -1;
-                    result.Max = moneyAttributeMetadata.MaxValue != null
-                        ? (decimal)moneyAttributeMetadata.MaxValue.Value
-                        : -1;
+		result.LogicalName = attribute.LogicalName;
+		result.DisplayName = attribute.GetProperVariableName();
+		result.PrivatePropertyName = attribute.SchemaName.GetEntityPropertyPrivateName();
+		result.HybridName = result.GetProperHybridFieldName();
 
-                    break;
-                }
-                case DoubleAttributeMetadata doubleAttributeMetadata:
-                {
-                    result.Min = doubleAttributeMetadata.MinValue != null
-                        ? (decimal)doubleAttributeMetadata.MinValue.Value
-                        : -1;
-                    result.Max = doubleAttributeMetadata.MaxValue != null
-                        ? (decimal)doubleAttributeMetadata.MaxValue.Value
-                        : -1;
+		if (attribute.Description?.UserLocalizedLabel != null)
+		{
+			result.Description = attribute.Description.UserLocalizedLabel.Label;
+		}
 
-                    break;
-                }
-            }
-        }
-    }
+		if (attribute.DisplayName?.UserLocalizedLabel != null)
+		{
+			result.Label = attribute.DisplayName.UserLocalizedLabel.Label;
+		}
+
+		result.IsRequired = attribute.RequiredLevel != null &&
+			attribute.RequiredLevel.Value == AttributeRequiredLevel.ApplicationRequired;
+
+		result.Attribute =
+			new CrmPropertyAttribute
+			{
+				LogicalName = attribute.LogicalName,
+				IsLookup = attribute.AttributeType is AttributeTypeCode.Lookup or AttributeTypeCode.Customer
+			};
+
+		result.TargetTypeForCrmSvcUtil = GetTargetType(result);
+		result.FieldTypeString = result.TargetTypeForCrmSvcUtil;
+
+		return result;
+	}
+
+	public MappingField CreateFileNameField(MappingField field)
+	{
+		MappingField fieldCopy = DeepCloneExtensions.CreateDeepCopy(field);
+		fieldCopy.TargetTypeForCrmSvcUtil = "string";
+		fieldCopy.DisplayName = $"{fieldCopy.DisplayName}Name";
+		fieldCopy.Attribute.LogicalName = $"{fieldCopy.Attribute.LogicalName}_name";
+
+		return fieldCopy;
+	}
+
+	private static string GetTargetType(MappingField field)
+	{
+		if (field.IsPrimaryKey)
+		{
+			return "Guid?";
+		}
+
+		switch (field.FieldType)
+		{
+			case AttributeTypeCode.Picklist:
+				return "OptionSetValue";
+
+			case AttributeTypeCode.BigInt:
+				return "long?";
+
+			case AttributeTypeCode.Integer:
+				return "int?";
+
+			case AttributeTypeCode.Boolean:
+				return "bool?";
+
+			case AttributeTypeCode.DateTime:
+				return "DateTime?";
+
+			case AttributeTypeCode.Decimal:
+				return "decimal?";
+
+			case AttributeTypeCode.Money:
+				return "Money";
+
+			case AttributeTypeCode.Double:
+				return "double?";
+
+			case AttributeTypeCode.Uniqueidentifier:
+				return "Guid?";
+
+			case AttributeTypeCode.Lookup:
+			case AttributeTypeCode.Owner:
+			case AttributeTypeCode.Customer:
+				return "EntityReference";
+
+			case AttributeTypeCode.State:
+				return field.Entity.StateName + "?";
+
+			case AttributeTypeCode.Status:
+				return "OptionSetValue";
+
+			case AttributeTypeCode.Memo:
+			case AttributeTypeCode.Virtual:
+			case AttributeTypeCode.EntityName:
+			case AttributeTypeCode.String:
+			{
+				return field.AttributeTypeName switch
+				{
+					"FileType" => "Guid?",
+					"MultiSelectPicklistType" => "OptionSetValueCollection",
+					_ => "string"
+				};
+			}
+
+			case AttributeTypeCode.PartyList:
+				return "IEnumerable<ActivityParty>";
+
+			case AttributeTypeCode.ManagedProperty:
+				return "BooleanManagedProperty";
+
+			default:
+				return "object";
+		}
+	}
+
+	private static void ParseMinMaxValues(AttributeMetadata attribute, MappingField result)
+	{
+		switch (attribute)
+		{
+			case StringAttributeMetadata stringAttributeMetadata:
+				result.MaxLength = stringAttributeMetadata.MaxLength ?? -1;
+
+				break;
+
+			case MemoAttributeMetadata memoAttributeMetadata:
+				result.MaxLength = memoAttributeMetadata.MaxLength ?? -1;
+
+				break;
+
+			case IntegerAttributeMetadata integerAttributeMetadata:
+			{
+				result.Min = integerAttributeMetadata.MinValue ?? -1;
+				result.Max = integerAttributeMetadata.MaxValue ?? -1;
+
+				break;
+			}
+
+			case DecimalAttributeMetadata decimalAttributeMetadata:
+			{
+				result.Min = decimalAttributeMetadata.MinValue ?? -1;
+				result.Max = decimalAttributeMetadata.MaxValue ?? -1;
+
+				break;
+			}
+
+			case MoneyAttributeMetadata moneyAttributeMetadata:
+			{
+				result.Min = moneyAttributeMetadata.MinValue != null
+					? (decimal)moneyAttributeMetadata.MinValue.Value
+					: -1;
+
+				result.Max = moneyAttributeMetadata.MaxValue != null
+					? (decimal)moneyAttributeMetadata.MaxValue.Value
+					: -1;
+
+				break;
+			}
+
+			case DoubleAttributeMetadata doubleAttributeMetadata:
+			{
+				result.Min = doubleAttributeMetadata.MinValue != null
+					? (decimal)doubleAttributeMetadata.MinValue.Value
+					: -1;
+
+				result.Max = doubleAttributeMetadata.MaxValue != null
+					? (decimal)doubleAttributeMetadata.MaxValue.Value
+					: -1;
+
+				break;
+			}
+		}
+	}
 }

@@ -1,75 +1,79 @@
 ﻿using DataverseGen.Core.ConnectionString;
-using Microsoft.Xrm.Sdk;
-using Microsoft.Xrm.Tooling.Connector;
-using System;
-using System.Threading;
+using Microsoft.PowerPlatform.Dataverse.Client;
 using static DataverseGen.Core.ColorConsole;
 
-namespace DataverseGen.Core.DataConverter
+namespace DataverseGen.Core.DataConverter;
+
+public class DataverseConnector
 {
-    public class DataverseConnector
-    {
-        private readonly string _connectionString;
-        private readonly bool _isConnectionStringValidatorEnabled;
-        private CrmServiceClient _crmServiceClient;
-        public DataverseConnector(
-            string connectionString,
-            bool isConnectionStringValidatorEnabled)
-        {
-            _connectionString = connectionString;
-            _isConnectionStringValidatorEnabled = isConnectionStringValidatorEnabled;
-            WriteConnectorInfo();
-            ValidateConnectionStringIfEnabled();
-        }
+	private readonly string _connectionString;
+	private readonly bool _isConnectionStringValidatorEnabled;
 
-        public IOrganizationService OrganizationService => _crmServiceClient;
-        public void Connect()
-        {
-            WriteInfo(@"Waiting for connection...");
-            _crmServiceClient = new CrmServiceClient(_connectionString);
-            WaitForConnection();
+	public DataverseConnector(
+		string connectionString,
+		bool isConnectionStringValidatorEnabled)
+	{
+		_connectionString = connectionString;
+		_isConnectionStringValidatorEnabled = isConnectionStringValidatorEnabled;
+		WriteConnectorInfo();
+		ValidateConnectionStringIfEnabled();
+	}
 
-            CheckIfThereWasErrorOnConnecting();
-        }
+	public ServiceClient OrganizationService { get; private set; }
 
-        private void CheckIfThereWasErrorOnConnecting()
-        {
-            if (string.IsNullOrWhiteSpace(_crmServiceClient.LastCrmError))
-            {
-                return;
-            }
-            string exceptionMessage =
-                $"Connection did not connect with {_connectionString}. LastCrmError: {_crmServiceClient.LastCrmError} | {_crmServiceClient.LastCrmException}";
-            WriteError(exceptionMessage);
-            throw new Exception(exceptionMessage);
-        }
+	public void Connect()
+	{
+		WriteInfo(@"Waiting for connection...");
+		OrganizationService = new ServiceClient(_connectionString);
+		WaitForConnection();
 
-        private void ValidateConnectionStringIfEnabled()
-        {
-            if (_isConnectionStringValidatorEnabled)
-            {
-                new ConnectionStringValidator(_connectionString).Validate();
-            }
-        }
+		CheckIfThereWasErrorOnConnecting();
+	}
 
-        private void WaitForConnection()
-        {
-            const int waitForConnection = 1000;
-            while (!_crmServiceClient.IsReady)
-            {
-                WriteInfo($@"Waiting for connection... {waitForConnection}ms");
-                if (_crmServiceClient.LastCrmException != null)
-                {
-                    WriteError(_crmServiceClient.LastCrmException.Message);
-                    throw _crmServiceClient.LastCrmException;
-                }
-                Thread.Sleep(waitForConnection);
-            }
-        }
+	private void CheckIfThereWasErrorOnConnecting()
+	{
+		if (string.IsNullOrWhiteSpace(OrganizationService.LastError))
+		{
+			return;
+		}
 
-        private void WriteConnectorInfo()
-        {
-            WriteInfo($"Validate ConnectionsString {_isConnectionStringValidatorEnabled}");
-        }
-    }
+		string exceptionMessage =
+			$"Connection did not connect with {_connectionString}. LastCrmError: {OrganizationService.LastError} | {OrganizationService.LastException}";
+
+		WriteError(exceptionMessage);
+
+		throw new Exception(exceptionMessage);
+	}
+
+	private void ValidateConnectionStringIfEnabled()
+	{
+		if (_isConnectionStringValidatorEnabled)
+		{
+			new ConnectionStringValidator(_connectionString).Validate();
+		}
+	}
+
+	private void WaitForConnection()
+	{
+		const int waitForConnection = 1000;
+
+		while (!OrganizationService.IsReady)
+		{
+			WriteInfo($@"Waiting for connection... {waitForConnection}ms");
+
+			if (OrganizationService.LastException != null)
+			{
+				WriteError(OrganizationService.LastException.Message);
+
+				throw OrganizationService.LastException;
+			}
+
+			Thread.Sleep(waitForConnection);
+		}
+	}
+
+	private void WriteConnectorInfo()
+	{
+		WriteInfo($"Validate ConnectionsString {_isConnectionStringValidatorEnabled}");
+	}
 }

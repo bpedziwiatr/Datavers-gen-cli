@@ -1,121 +1,29 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{9C57355D-7EE0-4438-A87F-50B5C121BFBA}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DataverseGen.Core</RootNamespace>
-    <AssemblyName>DataverseGen.Core</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <Deterministic>true</Deterministic>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Data.Linq" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Config\ConfigModel.cs" />
-    <Compile Include="ColorConsole.cs" />
-    <Compile Include="ConnectionString\ConnectionStringConst.cs" />
-    <Compile Include="ConnectionString\ConnectionStringValidator.cs" />
-    <Compile Include="ConnectionString\ConnectionStringValidatorFactory.cs" />
-    <Compile Include="ConnectionString\Enums.cs" />
-    <Compile Include="ConnectionString\IConnectionStringValidator.cs" />
-    <Compile Include="ConnectionString\Validators\AdConnectionStringValidator.cs" />
-    <Compile Include="ConnectionString\Validators\BaseConnectionStringValidator.cs" />
-    <Compile Include="ConnectionString\Validators\CertificateBaseConnectionStringValidator.cs" />
-    <Compile Include="ConnectionString\Validators\ClientSecretConnectionStringValidator.cs" />
-    <Compile Include="ConnectionString\Validators\O365ConnectionStringValidator.cs" />
-    <Compile Include="ConnectionString\Validators\OAuthConnectionStringValidator.cs" />
-    <Compile Include="ConnectionString\Validators\UrlValidator.cs" />
-    <Compile Include="ConnectionString\Validators\ValidatorTokenHelper.cs" />
-    <Compile Include="DataConverter\DataverseConnector.cs" />
-    <Compile Include="DataConverter\DataverseMetadataConverter.cs" />
-    <Compile Include="Helpers\DeepCloneHelper.cs" />
-    <Compile Include="Extensions\MetadataNamingExtensions.cs" />
-    <Compile Include="Generators\BaseGenerator.cs" />
-    <Compile Include="Generators\Scriban\Templates\TemplateFileManager\MultipleFileTemplateBase.cs" />
-    <Compile Include="Generators\Scriban\Templates\TemplateFileManager\MultipleFileTemplateTypescript.cs" />
-    <Compile Include="Generators\Scriban\Templates\ScribanTemplates.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>ScribanTemplates.resx</DependentUpon>
-    </Compile>
-    <Compile Include="Metadata\GeneratorInfo.cs" />
-    <Compile Include="Generators\Scriban\Templates\TemplateFileManager\MultipleFileTemplateCsharp.cs" />
-    <Compile Include="Generators\Scriban\ScribanGenerator.cs" />
-    <Compile Include="Metadata\Context.cs" />
-    <Compile Include="Metadata\CrmAttribute.cs" />
-    <Compile Include="Metadata\IMappingRelationship.cs" />
-    <Compile Include="Metadata\MappingEntity.cs" />
-    <Compile Include="Metadata\MappingEnum.cs" />
-    <Compile Include="Metadata\MappingField.cs" />
-    <Compile Include="Metadata\MappingRelationship1N.cs" />
-    <Compile Include="Metadata\MappingRelationshipMN.cs" />
-    <Compile Include="Metadata\MappingRelationshipN1.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="GitVersion.MsBuild">
-      <Version>5.7.0</Version>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.CrmSdk.XrmTooling.CoreAssembly">
-      <Version>9.1.0.90</Version>
-    </PackageReference>
-    <PackageReference Include="Newtonsoft.Json">
-      <Version>13.0.1</Version>
-    </PackageReference>
-    <PackageReference Include="Scriban">
-      <Version>4.0.2</Version>
-    </PackageReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Generators\Scriban\Templates\Multiple\Main\entity.sbncs" />
-    <None Include="Generators\Scriban\Templates\Multiple\Main\enums.sbncs" />
-    <None Include="Generators\Scriban\Templates\Multiple\Main\fields.sbncs" />
-    <None Include="Generators\Scriban\Templates\Multiple\Main\xrmservicecontext.sbncs" />
-    <None Include="Generators\Scriban\Templates\Multiple\TS-Main\entity-relationship.sbncs" />
-    <None Include="Generators\Scriban\Templates\Multiple\TS-Main\enums.sbncs" />
-    <None Include="Generators\Scriban\Templates\Multiple\TS-Main\entity.sbncs" />
-    <None Include="Generators\Scriban\Templates\Single\dataversegen-single-ts.sbncs" />
-    <None Include="Generators\Scriban\Templates\Single\dataversegen-single.sbncs" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Generators\Scriban\Templates\ScribanTemplates.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>ScribanTemplates.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>disable</Nullable>
+        <LangVersion>latest</LangVersion>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+        <PlatformTarget>x64</PlatformTarget>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="CommunityToolkit.Diagnostics">
+            <Version>8.2.1</Version>
+        </PackageReference>
+        <PackageReference Include="Microsoft.PowerPlatform.Dataverse.Client">
+            <Version>1.1.14</Version>
+        </PackageReference>
+        <PackageReference Include="Microsoft.PowerPlatform.Dataverse.Client.Dynamics">
+            <Version>1.1.14</Version>
+        </PackageReference>
+        <PackageReference Include="Scriban">
+            <Version>5.9.0</Version>
+        </PackageReference>
+    </ItemGroup>
+
 </Project>

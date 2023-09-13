@@ -1,28 +1,26 @@
-﻿using System.Collections.Generic;
+﻿namespace DataverseGen.Core.ConnectionString.Validators;
 
-namespace DataverseGen.Core.ConnectionString.Validators
+public class CertificateBaseConnectionStringValidator : BaseConnectionStringValidator,
+	IConnectionStringValidator
 {
-    public class CertificateBaseConnectionStringValidator : BaseConnectionStringValidator,
-        IConnectionStringValidator
-    {
-        public CertificateBaseConnectionStringValidator(
-            IDictionary<string, string> connectionStringTokens) : base(connectionStringTokens) { }
+	public CertificateBaseConnectionStringValidator(IDictionary<string, string> connectionStringTokens) : base(
+		connectionStringTokens) { }
 
-        public bool Validate()
-        {
-            CheckIfThumbprintIsPresent();
-            CheckIfClientIdIsPresent();
-            return true;
-        }
+	public bool Validate()
+	{
+		CheckIfThumbprintIsPresent();
+		CheckIfClientIdIsPresent();
 
-        private void CheckIfClientIdIsPresent()
-        {
-            CheckIfTokenIsPresentWithValue(ConnectionStringConst.ClientId);
-        }
+		return true;
+	}
 
-        private void CheckIfThumbprintIsPresent()
-        {
-            CheckIfTokenIsPresentWithValue(ConnectionStringConst.Thumbprint);
-        }
-    }
+	private void CheckIfClientIdIsPresent()
+	{
+		CheckIfTokenIsPresentWithValue(ConnectionStringConst.ClientId);
+	}
+
+	private void CheckIfThumbprintIsPresent()
+	{
+		CheckIfTokenIsPresentWithValue(ConnectionStringConst.Thumbprint);
+	}
 }
