@@ -1,7 +1,6 @@
-﻿namespace DataverseGen.Core.ConnectionString
+﻿namespace DataverseGen.Core.ConnectionString;
+
+internal interface IConnectionStringValidator
 {
-    internal interface IConnectionStringValidator
-    {
-        bool Validate();
-    }
+	bool Validate();
 }

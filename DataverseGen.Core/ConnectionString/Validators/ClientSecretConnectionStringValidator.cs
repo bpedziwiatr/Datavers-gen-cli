@@ -1,32 +1,27 @@
-﻿using System.Collections.Generic;
+﻿namespace DataverseGen.Core.ConnectionString.Validators;
 
-namespace DataverseGen.Core.ConnectionString.Validators
+public class ClientSecretConnectionStringValidator : BaseConnectionStringValidator,
+	IConnectionStringValidator
 {
-    public class ClientSecretConnectionStringValidator : BaseConnectionStringValidator,
-        IConnectionStringValidator
-    {
-        public ClientSecretConnectionStringValidator(
-            IDictionary<string, string> connectionStringTokens)
-            : base(connectionStringTokens)
-        {
-        }
+	public ClientSecretConnectionStringValidator(IDictionary<string, string> connectionStringTokens)
+		: base(connectionStringTokens) { }
 
-        public bool Validate()
-        {
-            CheckIfUrlIsPresentAndValid();
-            CheckIfClientIdIsPresent();
-            CheckIfClientSecretIdIsPresent();
-            return true;
-        }
+	public bool Validate()
+	{
+		CheckIfUrlIsPresentAndValid();
+		CheckIfClientIdIsPresent();
+		CheckIfClientSecretIdIsPresent();
 
-        private void CheckIfClientIdIsPresent()
-        {
-            CheckIfTokenIsPresentWithValue(ConnectionStringConst.ClientId);
-        }
+		return true;
+	}
 
-        private void CheckIfClientSecretIdIsPresent()
-        {
-            CheckIfTokenIsPresentWithValue(ConnectionStringConst.ClientSecret);
-        }
-    }
+	private void CheckIfClientIdIsPresent()
+	{
+		CheckIfTokenIsPresentWithValue(ConnectionStringConst.ClientId);
+	}
+
+	private void CheckIfClientSecretIdIsPresent()
+	{
+		CheckIfTokenIsPresentWithValue(ConnectionStringConst.ClientSecret);
+	}
 }

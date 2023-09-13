@@ -1,17 +1,16 @@
-﻿namespace DataverseGen.Core.Metadata
+﻿namespace DataverseGen.Core.Metadata;
+
+public interface IMappingRelationship
 {
-	public interface IMappingRelationship
-	{
-		string DisplayName { get; set; }
+	string DisplayName { get; set; }
 
-		string EntityRole { get; set; }
+	string EntityRole { get; set; }
 
-		string ForeignKey { get; set; }
+	string ForeignKey { get; set; }
 
-		string HybridName { get; set; }
+	string HybridName { get; set; }
 
-		string PrivateName { get; set; }
+	string PrivateName { get; set; }
 
-		string SchemaName { get; set; }
-	}
+	string SchemaName { get; set; }
 }

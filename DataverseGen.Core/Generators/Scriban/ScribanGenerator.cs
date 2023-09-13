@@ -1,6 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using System.IO;
+﻿using System.Diagnostics;
 using System.Text;
 using System.Text.RegularExpressions;
 using DataverseGen.Core.Config;
@@ -10,163 +8,184 @@ using DataverseGen.Core.Metadata;
 using Scriban;
 using Scriban.Parsing;
 
-namespace DataverseGen.Core.Generators.Scriban
+namespace DataverseGen.Core.Generators.Scriban;
+
+public partial class ScribanGenerator : BaseGenerator
 {
-    public class ScribanGenerator : BaseGenerator
-    {
-        private string _fullOutputPath;
+	private string _fullOutputPath;
 
-        public ScribanGenerator(
-            string templateName,
-            string templateDirName,
-            string outPath,
-            Context context,
-            TemplateEngineModel templateEngineModel)
-            : base(templateName, templateDirName, outPath, context, templateEngineModel)
-        {
-        }
+	public ScribanGenerator(
+		string templateName,
+		string templateDirName,
+		string outPath,
+		Context context,
+		TemplateEngineModel templateEngineModel)
+		: base(templateName,
+			templateDirName,
+			outPath,
+			context,
+			templateEngineModel) { }
 
-        public override void GenerateTemplate()
-        {
-            Console.WriteLine(@"Welcome to Scriban template generator");
-            Stopwatch stopper = Stopwatch.StartNew();
-            _fullOutputPath = $"{Directory.GetCurrentDirectory()}\\{OutPath}\\";
-            if (!Directory.Exists(_fullOutputPath))
-            {
-                Directory.CreateDirectory(_fullOutputPath);
-            }
+	public override void GenerateTemplate()
+	{
+		Console.WriteLine(@"Welcome to Scriban template generator");
+		Stopwatch stopper = Stopwatch.StartNew();
+		_fullOutputPath = $"{Directory.GetCurrentDirectory()}\\{OutPath}\\";
 
-            switch (TemplateEngineModel.Type.ToLowerInvariant())
-            {
-                case "c#":
-                    RunCSharpGenerator();
+		if (!Directory.Exists(_fullOutputPath))
+		{
+			Directory.CreateDirectory(_fullOutputPath);
+		}
 
-                    break;
+		switch (TemplateEngineModel.Type.ToLowerInvariant())
+		{
+			case "c#":
+				RunCSharpGenerator();
 
-                case "ts":
-                    RunTypeScriptGenerator();
-                    break;
+				break;
 
-                default:
-                    throw new ArgumentOutOfRangeException($"_templateEngineModel.Type",
-                        $@"type {TemplateEngineModel.Type} not supported use C# or TS");
-            }
+			case "ts":
+				RunTypeScriptGenerator();
 
-            Console.WriteLine(
-                $@"Generating Scriban template '{TemplateName}' elapsed in: {stopper.Elapsed:g}");
-            stopper.Stop();
-        }
+				break;
 
-        private static string RemoveEmptyLines(string lines)
-        {
-            return Regex.Replace(lines, @"^\s*$\n|\r", string.Empty, RegexOptions.Multiline)
-                        .TrimEnd();
-        }
+			default:
+				throw new ArgumentOutOfRangeException("_templateEngineModel.Type",
+					$@"type {TemplateEngineModel.Type} not supported use C# or TS");
+		}
 
-        private void MultiOutputGeneratorCSharp()
-        {
-            MultipleFileTemplateCsharp templates =
-                new MultipleFileTemplateCsharp(TemplateName, TemplateDirName);
-            templates.Init();
-            string dir = $"{Directory.GetCurrentDirectory()}\\{OutPath}\\";
-            if (!Directory.Exists(dir))
-            {
-                Directory.CreateDirectory(dir);
-            }
+		Console.WriteLine($@"Generating Scriban template '{TemplateName}' elapsed in: {stopper.Elapsed:g}");
+		stopper.Stop();
+	}
 
-            foreach (MappingEntity entity in Context.Entities)
-            {
-                WriteEntityTemplateToFile(templates.EntityTemplate, entity, "cs");
-                WriteEntityTemplateToFile(templates.FieldsTemplate, entity, "Fields.cs");
-                WriteEntityTemplateToFile(templates.EnumsTemplate, entity, "Enums.cs");
-            }
+	private static string RemoveEmptyLines(string lines)
+	{
+		return RemoveEmptyLinesRegexCompiled()
+		   .Replace(lines, string.Empty)
+		   .TrimEnd();
+	}
 
-            string xrmContextContent =
-                RemoveEmptyLines(templates.XrmContextTemplate.Render(Context));
-            File.WriteAllText($"{dir}/XrmServiceContext.cs", xrmContextContent, Encoding.UTF8);
-        }
+	private void MultiOutputGeneratorCSharp()
+	{
+		MultipleFileTemplateCsharp templates = new(TemplateName, TemplateDirName);
+		templates.Init();
+		string dir = $"{Directory.GetCurrentDirectory()}\\{OutPath}\\";
 
-        private void MultiOutputGeneratorTypeScript()
-        {
-            MultipleFileTemplateTypescript templates =
-                new MultipleFileTemplateTypescript(TemplateName, TemplateDirName);
-            templates.Init();
+		if (!Directory.Exists(dir))
+		{
+			Directory.CreateDirectory(dir);
+		}
 
-            foreach (MappingEntity entity in Context.Entities)
-            {
-                WriteEntityTemplateToFile(templates.EntityTemplate, entity, "attributes.ts");
-                WriteEntityTemplateToFile(templates.EnumsTemplate, entity, "enums.ts");
-                WriteEntityTemplateToFile(templates.RelationshipTemplate, entity,
-                    "relationships.ts");
-            }
-        }
+		foreach (MappingEntity entity in Context.Entities)
+		{
+			WriteEntityTemplateToFile(templates.EntityTemplate, entity, "cs");
+			WriteEntityTemplateToFile(templates.FieldsTemplate, entity, "Fields.cs");
+			WriteEntityTemplateToFile(templates.EnumsTemplate, entity, "Enums.cs");
+		}
 
-        private void RunCSharpGenerator()
-        {
-            if (TemplateEngineModel.IsSingleOutput)
-            {
-                SingleFileCSharp();
-                return;
-            }
+		string xrmContextContent =
+			RemoveEmptyLines(templates.XrmContextTemplate.Render(Context));
 
-            MultiOutputGeneratorCSharp();
-        }
+		File.WriteAllText($"{dir}/XrmServiceContext.cs", xrmContextContent, Encoding.UTF8);
+	}
 
-        private void RunTypeScriptGenerator()
-        {
-            if (TemplateEngineModel.IsSingleOutput)
-            {
-                SingleFileTypescript();
-                return;
-            }
+	private void MultiOutputGeneratorTypeScript()
+	{
+		MultipleFileTemplateTypescript templates = new(TemplateName, TemplateDirName);
+		templates.Init();
 
-            MultiOutputGeneratorTypeScript();
-        }
+		foreach (MappingEntity entity in Context.Entities)
+		{
+			WriteEntityTemplateToFile(templates.EntityTemplate, entity, "attributes.ts");
+			WriteEntityTemplateToFile(templates.EnumsTemplate, entity, "enums.ts");
+			WriteEntityTemplateToFile(templates.RelationshipTemplate,
+				entity,
+				"relationships.ts");
+		}
+	}
 
-        private void SingleFileCSharp()
-        {
-            ParserOptions options = new ParserOptions();
-            LexerOptions lexerOptions = new LexerOptions {Mode = ScriptMode.Default};
-            Template template = Template.Parse(
-                Encoding.UTF8.GetString(ScribanTemplates.dataversegen_single)
-                , null
-                , options
-                , lexerOptions);
-            string content = RemoveEmptyLines(template.Render(Context));
-            File.WriteAllText($"{_fullOutputPath}XrmServiceContext.cs", content, Encoding.UTF8);
-        }
+	private void RunCSharpGenerator()
+	{
+		if (TemplateEngineModel.IsSingleOutput)
+		{
+			SingleFileCSharp();
 
-        private void SingleFileTypescript()
-        {
-            ParserOptions options = new ParserOptions();
-            LexerOptions lexerOptions = new LexerOptions {Mode = ScriptMode.Default};
-            Template template = Template.Parse(
-                Encoding.UTF8.GetString(ScribanTemplates.dataversegen_single_ts)
-                , null
-                , options
-                , lexerOptions);
-            string content = RemoveEmptyLines(template.Render(Context));
-            File.WriteAllText($"{_fullOutputPath}dataverse.metadata.ts", content, Encoding.UTF8);
-        }
+			return;
+		}
 
-        private void WriteEntityTemplateToFile(
-            Template template,
-            MappingEntity entity,
-            string outputFileSuffixWithExtension)
-        {
-            string entityContent =
-                RemoveEmptyLines(template.Render(new
-                        {Context.Namespace, Context.Info, Entity = entity}))
-                    .Replace("\n", "\r\n");
-            if (outputFileSuffixWithExtension.Contains("ts"))
-            {
-                entityContent = $"{entityContent}\r\n";
-            }
+		MultiOutputGeneratorCSharp();
+	}
 
-            File.WriteAllText(
-                $"{_fullOutputPath}/{entity.HybridName.ToLower()}.{outputFileSuffixWithExtension}",
-                entityContent,
-                Encoding.UTF8);
-        }
-    }
+	private void RunTypeScriptGenerator()
+	{
+		if (TemplateEngineModel.IsSingleOutput)
+		{
+			SingleFileTypescript();
+
+			return;
+		}
+
+		MultiOutputGeneratorTypeScript();
+	}
+
+	private void SingleFileCSharp()
+	{
+		ParserOptions options = new();
+		LexerOptions lexerOptions = new()
+		{
+			Mode = ScriptMode.Default
+		};
+
+		Template template = Template.Parse(Encoding.UTF8.GetString(ScribanTemplates.dataversegen_single),
+			null,
+			options,
+			lexerOptions);
+
+		string content = RemoveEmptyLines(template.Render(Context));
+		File.WriteAllText($"{_fullOutputPath}XrmServiceContext.cs", content, Encoding.UTF8);
+	}
+
+	private void SingleFileTypescript()
+	{
+		ParserOptions options = new();
+		LexerOptions lexerOptions = new()
+		{
+			Mode = ScriptMode.Default
+		};
+
+		Template template = Template.Parse(Encoding.UTF8.GetString(ScribanTemplates.dataversegen_single_ts),
+			null,
+			options,
+			lexerOptions);
+
+		string content = RemoveEmptyLines(template.Render(Context));
+		File.WriteAllText($"{_fullOutputPath}dataverse.metadata.ts", content, Encoding.UTF8);
+	}
+
+	private void WriteEntityTemplateToFile(
+		Template template,
+		MappingEntity entity,
+		string outputFileSuffixWithExtension)
+	{
+		string entityContent =
+			RemoveEmptyLines(template.Render(new
+				{
+					Context.Namespace,
+					Context.Info,
+					Entity = entity
+				}))
+			   .Replace("\n", "\r\n");
+
+		if (outputFileSuffixWithExtension.Contains("ts"))
+		{
+			entityContent = $"{entityContent}\r\n";
+		}
+
+		File.WriteAllText($"{_fullOutputPath}/{entity.HybridName.ToLower()}.{outputFileSuffixWithExtension}",
+			entityContent,
+			Encoding.UTF8);
+	}
+
+	[GeneratedRegex("^\\s*$\\n|\\r", RegexOptions.Multiline)]
+	private static partial Regex RemoveEmptyLinesRegexCompiled();
 }
