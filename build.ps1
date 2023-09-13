@@ -1,7 +1,7 @@
 function main() {
     $currentPath = Get-Location
     Remove-Item .\publish -Recurse -ErrorAction Ignore    
-    dotnet publish "DataverseGen.Cli/DataverseGen.Cli.csproj" /p:DebugType=None /p:DebugSymbols=false -f "net7.0" -r win-x64 -p:PublishSingleFile=true --self-contained true -p:PublishReadyToRun=true -p:PublishDir=$currentPath\publish\bin
+    dotnet publish "DataverseGen.Cli/DataverseGen.Cli.csproj" /p:DebugType=None /p:DebugSymbols=false -c 'Release' -f "net7.0" -r win-x64 -p:PublishSingleFile=true --self-contained true -p:PublishReadyToRun=true -p:PublishDir=$currentPath\publish\bin
 	
     Set-Location $currentPath
     copyTemplates

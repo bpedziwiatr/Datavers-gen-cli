@@ -1,20 +1,18 @@
 ﻿using DataverseGen.Core.ConnectionString;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace DataverseGen.Core.Tests.ConnectionString
+namespace DataverseGen.Core.Tests.ConnectionString;
+
+[TestClass]
+public class CertificateBaseTests
 {
-    [TestClass]
-    public class CertificateBaseTests
-    {
-        [TestMethod]
-        [DataRow(@"AuthType=Certificate;
+	[TestMethod]
+	[DataRow(@"AuthType=Certificate;
   url=https://contosotest.crm.dynamics.com;
   thumbprint={CertThumbPrintId};
   ClientId={AppId};")]
-        public void CertificateBase_ConnectionString_Success(string connectionString)
-        {
-            new ConnectionStringValidator(connectionString)
-                .Validate();
-        }
-    }
+	public void CertificateBase_ConnectionString_Success(string connectionString)
+	{
+		new ConnectionStringValidator(connectionString)
+		   .Validate();
+	}
 }
