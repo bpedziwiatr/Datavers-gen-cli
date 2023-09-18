@@ -54,7 +54,7 @@ namespace {{ namespace }}
             PropertyChanging?.Invoke(this, new PropertyChangingEventArgs(propertyName));
         }
 		
-		[AttributeLogicalName("{{entity.primary_key.logical_name}}")]
+		[AttributeLogicalName(Fields.{{entity.primary_key.display_name}})]
 		public override Guid Id
 		{
 			get => base.Id;
@@ -72,7 +72,7 @@ namespace {{ namespace }}
         /// {{attribute.description_xml_safe}}
         /// </summary>
 				{{end}}
-        [AttributeLogicalName("{{attribute.attribute.logical_name}}")]
+        [AttributeLogicalName(Fields.{{attribute.display_name}})]
 				{{if attribute.is_deprecated == true}}
         [System.Obsolete]
 				{{end}}
@@ -81,7 +81,7 @@ namespace {{ namespace }}
 					{{if attribute.is_activity_party == true}}
             get
             {
-                EntityCollection collection = GetAttributeValue<EntityCollection>("{{attribute.attribute.logical_name}}");
+                EntityCollection collection = GetAttributeValue<EntityCollection>(Fields.{{attribute.display_name}});
                 if (((collection != null) 
                             && (collection.Entities != null)))
                 {
@@ -95,22 +95,22 @@ namespace {{ namespace }}
 						{{if attribute.is_valid_for_update == true || attribute.is_valid_for_create == true || attribute.logical_name == "createdon"  || attribute.logical_name == "fullname" }}
             set
             {
-                OnPropertyChanging("{{attribute.display_name}}");
+                OnPropertyChanging(nameof({{attribute.display_name}}));
                 if ((value == null))
                 {
-                    SetAttributeValue("{{attribute.attribute.logical_name}}", value);
+                    SetAttributeValue(Fields.{{attribute.display_name}}, value);
                 }
                 else
                 {
-                    SetAttributeValue("{{attribute.attribute.logical_name}}", new EntityCollection(new List<Entity>(value)));
+                    SetAttributeValue(Fields.{{attribute.display_name}}, new EntityCollection(new List<Entity>(value)));
                 }
-                OnPropertyChanged("{{attribute.display_name}}");
+                OnPropertyChanged(nameof({{attribute.display_name}}));
             }
 						{{end}}		
 					{{else if attribute.is_state_code}}
             get
             {
-                OptionSetValue optionSet = GetAttributeValue<OptionSetValue>("{{attribute.attribute.logical_name}}");
+                OptionSetValue optionSet = GetAttributeValue<OptionSetValue>(Fields.{{attribute.display_name}});
                 if ((optionSet != null))
                 {
                     return (({{entity.state_name}})(Enum.ToObject(typeof({{entity.state_name}}), optionSet.Value)));
@@ -123,30 +123,30 @@ namespace {{ namespace }}
 					{{if attribute.is_valid_for_update ==true || attribute.is_valid_for_create ==true}}		
             set
             {
-                OnPropertyChanging("{{attribute.display_name}}");
+                OnPropertyChanging(nameof({{attribute.display_name}}));
                 if ((value == null))
                 {
-                    SetAttributeValue("{{attribute.attribute.logical_name}}", null);
+                    SetAttributeValue(Fields.{{attribute.display_name}}, null);
                 }
                 else
                 {
-                    SetAttributeValue("{{attribute.attribute.logical_name}}", new OptionSetValue(((int)(value))));
+                    SetAttributeValue(Fields.{{attribute.display_name}}, new OptionSetValue(((int)(value))));
                 }
-                OnPropertyChanged("{{attribute.display_name}}");
+                OnPropertyChanged(nameof({{attribute.display_name}}));
             }
 							{{end}}
 					{{else}}
-            get =>  GetAttributeValue<{{attribute.target_type_for_crm_svc_util}}>("{{attribute.attribute.logical_name}}");
+            get =>  GetAttributeValue<{{attribute.target_type_for_crm_svc_util}}>(Fields.{{attribute.display_name}});
 					
 						{{if attribute.is_valid_for_update ==true || attribute.is_valid_for_create ==true}}
             set
             {
-                OnPropertyChanging("{{attribute.display_name}}");
-                SetAttributeValue("{{attribute.attribute.logical_name}}", value);
+                OnPropertyChanging(nameof({{attribute.display_name}}));
+                SetAttributeValue(Fields.{{attribute.display_name}}, value);
 							{{if attribute == entity.primary_key}}
                 base.Id = value ?? Guid.Empty;
 							{{end}}
-                OnPropertyChanged("{{attribute.display_name}}");
+                OnPropertyChanged(nameof({{attribute.display_name}}));
             }
 						{{end}}
 					{{end}}
@@ -190,9 +190,9 @@ namespace {{ namespace }}
             get => GetRelatedEntities<{{attribute.to_entity.hybrid_name}}>("{{attribute.schema_name}}", {{attribute.entity_role}});
             set
             {
-                OnPropertyChanging("{{attribute.display_name}}");
+                OnPropertyChanging(nameof({{attribute.display_name}}));
                 SetRelatedEntities("{{attribute.schema_name}}", {{attribute.entity_role}}, value);
-                OnPropertyChanged("{{attribute.display_name}}");
+                OnPropertyChanged(nameof({{attribute.display_name}}));
             }
         }
 				{{end}}
@@ -211,9 +211,9 @@ namespace {{ namespace }}
             get => GetRelatedEntity< {{attribute.to_entity.hybrid_name}}>("{{attribute.schema_name}}",{{attribute.entity_role}});				
             set
                 {
-                    OnPropertyChanging("{{attribute.display_name}}");
+                    OnPropertyChanging(nameof({{attribute.display_name}}));
                     SetRelatedEntity("{{attribute.schema_name}}", {{attribute.entity_role}}, value);
-                    OnPropertyChanged("{{attribute.display_name}}");
+                    OnPropertyChanged(nameof({{attribute.display_name}}));
                 }
             
         }
@@ -233,9 +233,9 @@ namespace {{ namespace }}
             get => GetRelatedEntities<{{attribute.to_entity.hybrid_name}}>("{{attribute.schema_name}}",{{attribute.entity_role}});
             set
                 {
-                    OnPropertyChanging("{{attribute.display_name}}");
+                    OnPropertyChanging(nameof({{attribute.display_name}}));
                     SetRelatedEntities<{{attribute.to_entity.hybrid_name}}>("{{attribute.schema_name}}", {{attribute.entity_role}}, value);
-                    OnPropertyChanged("{{attribute.display_name}}");
+                    OnPropertyChanged(nameof({{attribute.display_name}}));
                 }
         }
 		{{end}}
