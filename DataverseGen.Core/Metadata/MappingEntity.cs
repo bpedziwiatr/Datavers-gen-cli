@@ -111,7 +111,16 @@ public class MappingEntity
 		entity.RelationshipsManyToMany =
 			relationshipsManyToMany.OrderBy(r => r.DisplayName).ToArray();
 
+		RemoveDuplicatedRelationship(entity);
+
 		return entity;
+	}
+
+	private static void RemoveDuplicatedRelationship(MappingEntity entity)
+	{
+		entity.RelationshipsManyToMany = entity.RelationshipsManyToMany.DistinctBy(p => p.SchemaName).ToArray();
+		entity.RelationshipsManyToOne = entity.RelationshipsManyToOne.DistinctBy(p => p.SchemaName).ToArray();
+		entity.RelationshipsOneToMany = entity.RelationshipsOneToMany.DistinctBy(p => p.SchemaName).ToArray();
 	}
 
 	private static void MapStates(EntityMetadata entityMetadata, MappingEntity entity)
