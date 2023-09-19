@@ -38,12 +38,9 @@ internal static class Program
 		ConfigModel? deserializedObject = JsonConvert.DeserializeObject<ConfigModel>(json);
 		Guard.IsNotNull(deserializedObject);
 
-		if (deserializedObject.ConnectionString is not (null or ""))
-		{
-			return deserializedObject;
-		}
-
-		return GetCredentials(deserializedObject);
+		return deserializedObject.ConnectionString is not (null or "")
+			? deserializedObject
+			: GetCredentials(deserializedObject);
 	}
 
 	private static ConfigModel GetCredentials(ConfigModel deserializedObject)
