@@ -43,32 +43,37 @@ internal static class Program
 			return deserializedObject;
 		}
 
+		return GetCredentials(deserializedObject);
+	}
+
+	private static ConfigModel GetCredentials(ConfigModel deserializedObject)
+	{
 		string credentialKey = $"DataverseGen-{deserializedObject.Namespace}";
 		Credential? creds = CredentialManager.ReadCredential(credentialKey);
 
-		if (creds is null)
+		if (creds is not null)
 		{
-			CredentialResult? newCreds = null;
-
-			while (newCreds is null)
-			{
-				newCreds = CredentialManager.PromptForCredentials(captionText:"New connection string prompt",
-					messageText:$"Provide valid connection string for {credentialKey}",
-					userName:"DO NOT USE",
-					saveCredential:CredentialSaveOption.Hidden);
-			}
-
-			CredentialManager.WriteCredential(credentialKey,
-				"UNUSED",
-				newCreds.Password,
-				CredentialPersistence.LocalMachine);
-
-			deserializedObject.ConnectionString = newCreds.Password;
+			deserializedObject.ConnectionString = creds.Password;
 
 			return deserializedObject;
 		}
 
-		deserializedObject.ConnectionString = creds.Password;
+		CredentialResult? newCreds = null;
+
+		while (newCreds is null)
+		{
+			newCreds = CredentialManager.PromptForCredentials(captionText:"New connection string prompt",
+				messageText:$"Provide valid connection string for {credentialKey}",
+				userName:"DO NOT USE",
+				saveCredential:CredentialSaveOption.Hidden);
+		}
+
+		CredentialManager.WriteCredential(credentialKey,
+			"UNUSED",
+			newCreds.Password,
+			CredentialPersistence.LocalMachine);
+
+		deserializedObject.ConnectionString = newCreds.Password;
 
 		return deserializedObject;
 	}
