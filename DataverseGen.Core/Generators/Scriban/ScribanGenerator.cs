@@ -7,6 +7,7 @@ using DataverseGen.Core.Generators.Scriban.Templates.TemplateFileManager;
 using DataverseGen.Core.Metadata;
 using Scriban;
 using Scriban.Parsing;
+using Scriban.Runtime;
 
 namespace DataverseGen.Core.Generators.Scriban;
 
@@ -141,7 +142,18 @@ public partial class ScribanGenerator : BaseGenerator
 			options,
 			lexerOptions);
 
-		string content = RemoveEmptyLines(template.Render(Context));
+		ScriptObject dataScriptObject = new();
+		dataScriptObject.Import(Context);
+
+		TemplateContext context = new()
+		{
+			LoopLimit = 0,
+			RecursiveLimit = 0
+		};
+
+		context.PushGlobal(dataScriptObject);
+
+		string content = RemoveEmptyLines(template.Render(context));
 		File.WriteAllText($"{_fullOutputPath}XrmServiceContext.cs", content, Encoding.UTF8);
 	}
 
@@ -158,7 +170,18 @@ public partial class ScribanGenerator : BaseGenerator
 			options,
 			lexerOptions);
 
-		string content = RemoveEmptyLines(template.Render(Context));
+		ScriptObject dataScriptObject = new();
+		dataScriptObject.Import(Context);
+
+		TemplateContext context = new()
+		{
+			LoopLimit = 0,
+			RecursiveLimit = 0
+		};
+
+		context.PushGlobal(dataScriptObject);
+
+		string content = RemoveEmptyLines(template.Render(context));
 		File.WriteAllText($"{_fullOutputPath}dataverse.metadata.ts", content, Encoding.UTF8);
 	}
 
@@ -167,13 +190,23 @@ public partial class ScribanGenerator : BaseGenerator
 		MappingEntity entity,
 		string outputFileSuffixWithExtension)
 	{
+		ScriptObject dataScriptObject = new();
+		dataScriptObject.Import(new
+		{
+			Context.Namespace,
+			Context.Info,
+			Entity = entity
+		});
+
+		TemplateContext context = new()
+		{
+			LoopLimit = 0,
+			RecursiveLimit = 0
+		};
+
+		context.PushGlobal(dataScriptObject);
 		string entityContent =
-			RemoveEmptyLines(template.Render(new
-				{
-					Context.Namespace,
-					Context.Info,
-					Entity = entity
-				}))
+			RemoveEmptyLines(template.Render(context))
 			   .Replace("\n", "\r\n");
 
 		if (outputFileSuffixWithExtension.Contains("ts"))
