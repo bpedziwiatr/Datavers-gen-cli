@@ -267,7 +267,7 @@ namespace {{ namespace }}
 			{{info.generated_code_attribute}}
 			public class Fields
 			{
-				public const string SchemaName = "{{entity.attribute.logical_name}}";
+				public const string TableSchemaName = "{{entity.attribute.logical_name}}";
 	
 				#region Fields.{{entity.attribute.logical_name}}	
 				{{for field in entity.fields}}			
