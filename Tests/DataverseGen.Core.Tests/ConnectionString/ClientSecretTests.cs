@@ -11,7 +11,7 @@ public class ClientSecretTests
   ClientId={AppId};
   ClientSecret={ClientSecret}")]
 	[DataRow(
-		"AuthType=ClientSecret;url=https://rwrgbsmdrsdev.crm4.dynamics.com/main.aspx?appid=bcedab73-941b-ec11-b6e6-000d3adbbffa;ClientId=27aa45a2-7b10-15f3-b123-53b53de124e1;ClientSecret=vz3246578*&*&!;")]
+        "AuthType=ClientSecret;url=https://conrosodev.crm4.dynamics.com/main.aspx?appid=256c6c51-9c0a-46d4-8fde-3d9bc0b4af9f;ClientId=6702e612-b6a9-4eed-bfab-967d5565df69;ClientSecret=vz3246578*&*&!;")]
 	public void ClientSecret_ConnectionString_Success(string connectionString)
 	{
 		new ConnectionStringValidator(connectionString)
