@@ -80,7 +80,7 @@ public class MappingEntity
 		AddEntityImageCrm2013(fields);
 		AddLookupFields(fields);
 
-		entity.Fields = fields;
+		entity.Fields = fields.OrderBy(f => f.LogicalName).ToList();
 		MapStates(entityMetadata, entity);
 
 		MapEnums(entityMetadata, entity);
@@ -195,6 +195,7 @@ public class MappingEntity
 			   .Select(r =>
 					MappingRelationshipN1.Parse(r,
 						entity.Fields))
+			   .OrderBy(r => r.DisplayName)
 			   .ToArray();
 	}
 
@@ -206,16 +207,16 @@ public class MappingEntity
 			   .Select(r =>
 					MappingRelationship1N.Parse(r,
 						entity.Fields))
+			   .OrderBy(r => r.DisplayName)
 			   .ToArray();
 	}
 
 	private static void MapPrimaryKey(MappingEntity entity)
 	{
 		entity.PrimaryKey =
-			entity
-			   .Fields
-			   .First(f =>
-					f.Attribute.LogicalName == entity.Attribute.PrimaryKey);
+			entity.Fields.FirstOrDefault(f => f.Attribute.LogicalName == entity.Attribute.PrimaryKey)
+			?? throw new InvalidOperationException(
+				$"Primary key field '{entity.Attribute.PrimaryKey}' not found in entity '{entity.Attribute.LogicalName}'.");
 	}
 
 	private static void MapEnums(EntityMetadata entityMetadata, MappingEntity entity)
@@ -226,6 +227,7 @@ public class MappingEntity
 			   .Where(a => a is PicklistAttributeMetadata or StateAttributeMetadata or StatusAttributeMetadata
 					or BooleanAttributeMetadata or MultiSelectPicklistAttributeMetadata)
 			   .Select(MappingEnum.Parse)
+			   .OrderBy(e => e.DisplayName)
 			   .ToArray();
 	}
 

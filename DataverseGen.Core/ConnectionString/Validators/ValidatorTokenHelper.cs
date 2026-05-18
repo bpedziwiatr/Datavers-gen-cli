@@ -18,7 +18,7 @@ internal static class ValidatorTokenHelper
 		string tokenName = CheckIfTokenKeyPresent(tokens, searchToken);
 		CheckIfTokenValuePresent(tokens, searchToken);
 
-		return tokens.Single(p => p.Key == tokenName);
+		return new KeyValuePair<string, string>(tokenName, tokens[tokenName]);
 	}
 
 	public static bool TryCheckIfTokenIsPresentWithValue(
@@ -34,7 +34,7 @@ internal static class ValidatorTokenHelper
 
 			return true;
 		}
-		catch (Exception)
+		catch (ArgumentNullException)
 		{
 			return false;
 		}
@@ -53,7 +53,7 @@ internal static class ValidatorTokenHelper
 
 			return true;
 		}
-		catch (Exception)
+		catch (ArgumentNullException)
 		{
 			return false;
 		}

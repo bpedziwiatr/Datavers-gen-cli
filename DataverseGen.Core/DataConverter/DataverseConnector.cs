@@ -4,10 +4,11 @@ using static DataverseGen.Core.ColorConsole;
 
 namespace DataverseGen.Core.DataConverter;
 
-public class DataverseConnector
+public class DataverseConnector : IDisposable
 {
 	private readonly string _connectionString;
 	private readonly bool _isConnectionStringValidatorEnabled;
+	private bool _disposed;
 
 	public DataverseConnector(
 		string connectionString,
@@ -70,6 +71,17 @@ public class DataverseConnector
 
 			Thread.Sleep(waitForConnection);
 		}
+	}
+
+	public void Dispose()
+	{
+		if (_disposed)
+		{
+			return;
+		}
+
+		OrganizationService?.Dispose();
+		_disposed = true;
 	}
 
 	private void WriteConnectorInfo()

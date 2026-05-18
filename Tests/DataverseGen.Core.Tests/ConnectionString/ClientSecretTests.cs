@@ -17,4 +17,32 @@ public class ClientSecretTests
 		new ConnectionStringValidator(connectionString)
 		   .Validate();
 	}
+
+	[TestMethod]
+	public void ClientSecret_MissingUrl_Throws()
+	{
+		Assert.ThrowsException<Exception>(() =>
+			new ConnectionStringValidator("AuthType=ClientSecret;ClientId=abc;ClientSecret=xyz;").Validate());
+	}
+
+	[TestMethod]
+	public void ClientSecret_MissingClientId_Throws()
+	{
+		Assert.ThrowsException<Exception>(() =>
+			new ConnectionStringValidator("AuthType=ClientSecret;url=https://contoso.crm.dynamics.com;ClientSecret=xyz;").Validate());
+	}
+
+	[TestMethod]
+	public void ClientSecret_MissingClientSecret_Throws()
+	{
+		Assert.ThrowsException<Exception>(() =>
+			new ConnectionStringValidator("AuthType=ClientSecret;url=https://contoso.crm.dynamics.com;ClientId=abc;").Validate());
+	}
+
+	[TestMethod]
+	public void ClientSecret_InvalidUrl_Throws()
+	{
+		Assert.ThrowsException<Exception>(() =>
+			new ConnectionStringValidator("AuthType=ClientSecret;url=ftp://contoso.crm.dynamics.com;ClientId=abc;ClientSecret=xyz;").Validate());
+	}
 }

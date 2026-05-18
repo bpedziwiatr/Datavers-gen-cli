@@ -33,10 +33,12 @@ public class MappingRelationship1N : IMappingRelationship
 		IList<MappingField> properties)
 	{
 		string propertyName =
-			properties.First(p => string.Equals(p.Attribute.LogicalName,
+			(properties.FirstOrDefault(p => string.Equals(p.Attribute.LogicalName,
 					rel.ReferencedAttribute,
 					StringComparison.CurrentCultureIgnoreCase))
-			   .DisplayName;
+			?? throw new InvalidOperationException(
+				$"Referenced attribute '{rel.ReferencedAttribute}' not found in properties for relationship '{rel.SchemaName}'."))
+			.DisplayName;
 
 		MappingRelationship1N result = new()
 		{

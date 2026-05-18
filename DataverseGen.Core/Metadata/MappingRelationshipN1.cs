@@ -32,9 +32,12 @@ public class MappingRelationshipN1 : IMappingRelationship
 		OneToManyRelationshipMetadata rel,
 		IList<MappingField> properties)
 	{
-		MappingField property = properties.First(p => string.Equals(p.Attribute.LogicalName,
-			rel.ReferencingAttribute,
-			StringComparison.CurrentCultureIgnoreCase));
+		MappingField property =
+			properties.FirstOrDefault(p => string.Equals(p.Attribute.LogicalName,
+				rel.ReferencingAttribute,
+				StringComparison.CurrentCultureIgnoreCase))
+			?? throw new InvalidOperationException(
+				$"Referencing attribute '{rel.ReferencingAttribute}' not found in properties for relationship '{rel.SchemaName}'.");
 
 		string propertyName = property.DisplayName;
 

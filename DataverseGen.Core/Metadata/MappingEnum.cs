@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using DataverseGen.Core.Extensions;
+﻿using DataverseGen.Core.Extensions;
 using Microsoft.Xrm.Sdk.Metadata;
 
 namespace DataverseGen.Core.Metadata;
@@ -30,7 +29,8 @@ public class MappingEnum
 					MetadataNamingExtensions.GetProperVariableName(pickList.SchemaName)),
 			Items =
 				pickList.OptionSet.Options
-				   .Where(p => p.Label.UserLocalizedLabel != null)
+				   .Where(p => p.Label?.UserLocalizedLabel != null)
+				   .OrderBy(o => o.Value)
 				   .Select(o => new MapperEnumItem
 					{
 						Attribute = new CrmPicklistAttribute
@@ -85,18 +85,23 @@ public class MappingEnum
 
 	private static MapperEnumItem MapBoolOption(OptionMetadata option)
 	{
-		Debug.Assert(option.Value != null, "option.Value != null ");
-		MapperEnumItem results = new()
+		if (option.Value == null)
+		{
+			throw new InvalidOperationException("Boolean option value is null.");
+		}
+
+		string label = option.Label?.UserLocalizedLabel?.Label
+			?? throw new InvalidOperationException("Boolean option label or UserLocalizedLabel is null.");
+
+		return new MapperEnumItem
 		{
 			Attribute = new CrmPicklistAttribute
 			{
-				DisplayName = option.Label.UserLocalizedLabel.Label,
+				DisplayName = label,
 				Value = (int)option.Value
 			},
-			Name = MetadataNamingExtensions.GetProperVariableName(option.Label.UserLocalizedLabel.Label)
+			Name = MetadataNamingExtensions.GetProperVariableName(label)
 		};
-
-		return results;
 	}
 }
 
