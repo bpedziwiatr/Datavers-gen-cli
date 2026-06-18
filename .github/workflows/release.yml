@@ -1,0 +1,189 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - "release/**"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  package-and-pr:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 7.0.x
+
+      - name: Install GitVersion tool
+        shell: pwsh
+        run: dotnet tool install --global GitVersion.Tool --version 5.12.0
+
+      - name: Add dotnet tools to PATH
+        shell: pwsh
+        run: echo "$env:USERPROFILE\.dotnet\tools" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+      - name: Build release packages
+        shell: pwsh
+        run: .\build.ps1
+
+      - name: Upload release artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-packages-${{ github.ref_name }}
+          path: publish/*.zip
+          if-no-files-found: error
+
+      - name: Prepare release metadata
+        id: release_meta
+        shell: pwsh
+        run: |
+          $gitv = dotnet-gitversion | ConvertFrom-Json -ErrorAction Stop
+          $tag = "v$($gitv.NuGetVersionV2)"
+          $title = "Release $tag"
+          $notesPath = Join-Path $env:GITHUB_WORKSPACE 'release-notes.md'
+          $previousTag = git describe --tags --abbrev=0 --match "v*" 2>$null
+          $commitRange = if ($previousTag) { "$previousTag..HEAD" } else { "HEAD" }
+          $releaseDate = (Get-Date).ToString('yyyy-MM-dd')
+          $compareUrl = if ($previousTag) {
+            "https://github.com/${{ github.repository }}/compare/$previousTag...$tag"
+          }
+          else {
+            "https://github.com/${{ github.repository }}/commits/$tag"
+          }
+
+          $commits = if ($previousTag) {
+            git log $commitRange --no-merges --reverse --pretty=format:"%s%x09%h"
+          }
+          else {
+            git log --no-merges --reverse --pretty=format:"%s%x09%h"
+          }
+
+          $buckets = @{
+            Added = New-Object System.Collections.Generic.List[string]
+            Changed = New-Object System.Collections.Generic.List[string]
+            Fixed = New-Object System.Collections.Generic.List[string]
+            Removed = New-Object System.Collections.Generic.List[string]
+            Security = New-Object System.Collections.Generic.List[string]
+          }
+
+          foreach ($line in $commits) {
+            if ([string]::IsNullOrWhiteSpace($line)) {
+              continue
+            }
+
+            $parts = $line -split "`t", 2
+            $subject = $parts[0].Trim()
+            $hash = if ($parts.Count -gt 1) { $parts[1].Trim() } else { '' }
+            $entry = if ($hash) { "- $subject ($hash)" } else { "- $subject" }
+
+            switch -Regex ($subject) {
+              '^(feat|add)(\([^)]+\))?:\s+' { $buckets.Added.Add($entry); continue }
+              '^(fix)(\([^)]+\))?:\s+' { $buckets.Fixed.Add($entry); continue }
+              '^(remove|delete|drop)(\([^)]+\))?:\s+' { $buckets.Removed.Add($entry); continue }
+              '^(sec|security)(\([^)]+\))?:\s+' { $buckets.Security.Add($entry); continue }
+              '^(refactor|perf|docs|test|ci|build|chore|style)(\([^)]+\))?:\s+' { $buckets.Changed.Add($entry); continue }
+              default { $buckets.Changed.Add($entry); continue }
+            }
+          }
+
+          $sectionLines = New-Object System.Collections.Generic.List[string]
+
+          foreach ($sectionName in @('Added', 'Changed', 'Fixed', 'Removed', 'Security')) {
+            if ($buckets[$sectionName].Count -gt 0) {
+              $sectionLines.Add("### $sectionName")
+              $sectionLines.Add('')
+              $sectionLines.AddRange($buckets[$sectionName])
+              $sectionLines.Add('')
+            }
+          }
+
+          if ($sectionLines.Count -eq 0) {
+            $sectionLines.Add('### Changed')
+            $sectionLines.Add('')
+            $sectionLines.Add('- No notable changes were detected for this release.')
+            $sectionLines.Add('')
+          }
+
+          @"
+# Release Notes
+
+## [$tag] - $releaseDate
+
+### Summary
+
+- Release branch: `$env:GITHUB_REF_NAME`
+- Version: `$($gitv.FullSemVer)`
+- SemVer: `$($gitv.SemVer)`
+- NuGetVersion: `$($gitv.NuGetVersionV2)`
+- Commit: `$($gitv.Sha)`
+- Base tag: `$($previousTag ?? 'none')`
+- Commit range: `$commitRange`
+- Compare: [$compareUrl]($compareUrl)
+
+$($sectionLines -join "`r`n")
+
+## Packages
+
+- `DataverseGen-CLI_includedotnet_$($gitv.NuGetVersionV2).zip`
+- `DataverseGen-CLI_nodotnet_$($gitv.NuGetVersionV2).zip`
+"@ | Set-Content -Path $notesPath -Encoding utf8
+
+          "tag=$tag" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          "title=$title" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          "notes_path=$notesPath" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+
+      - name: Check for existing pull request
+        id: pr_check
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $prs = gh pr list --head $env:GITHUB_REF_NAME --base main --state open --json number | ConvertFrom-Json
+          $exists = ($prs | Measure-Object).Count -gt 0
+          "exists=$exists" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+
+      - name: Create pull request to main
+        if: steps.pr_check.outputs.exists != 'true'
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr create `
+            --base main `
+            --head $env:GITHUB_REF_NAME `
+            --title "${{ steps.release_meta.outputs.title }}" `
+            --body-file "${{ steps.release_meta.outputs.notes_path }}"
+
+      - name: Publish GitHub release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $tag = "${{ steps.release_meta.outputs.tag }}"
+          $title = "${{ steps.release_meta.outputs.title }}"
+          $notesPath = "${{ steps.release_meta.outputs.notes_path }}"
+          $releaseExists = $false
+
+          gh release view $tag --json tagName | Out-Null
+          if ($LASTEXITCODE -eq 0) {
+            $releaseExists = $true
+          }
+
+          if ($releaseExists) {
+            gh release edit $tag --title $title --notes-file $notesPath
+            gh release upload $tag publish/*.zip --clobber
+          }
+          else {
+            gh release create $tag publish/*.zip --title $title --notes-file $notesPath --target $env:GITHUB_SHA
+          }
