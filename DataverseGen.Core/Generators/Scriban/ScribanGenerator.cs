@@ -2,6 +2,8 @@
 using System.Text;
 using System.Text.RegularExpressions;
 using DataverseGen.Core.Config;
+using DataverseGen.Core.CustomApi;
+using DataverseGen.Core.Generators;
 using DataverseGen.Core.Generators.Scriban.Templates;
 using DataverseGen.Core.Generators.Scriban.Templates.TemplateFileManager;
 using DataverseGen.Core.Metadata;
@@ -122,11 +124,13 @@ public partial class ScribanGenerator : BaseGenerator
 		if (TemplateEngineModel.IsSingleOutput)
 		{
 			SingleFileTypescript();
+			GenerateCustomApis();
 
 			return;
 		}
 
 		MultiOutputGeneratorTypeScript();
+		GenerateCustomApis();
 	}
 
 	private void SingleFileCSharp()
@@ -217,6 +221,16 @@ public partial class ScribanGenerator : BaseGenerator
 		File.WriteAllText($"{_fullOutputPath}/{entity.HybridName.ToLower()}.{outputFileSuffixWithExtension}",
 			entityContent,
 			Encoding.UTF8);
+	}
+
+	private void GenerateCustomApis()
+	{
+		if (Context.CustomApis == null || Context.CustomApis.Length == 0)
+		{
+			return;
+		}
+
+		CustomApiTypeScriptGenerator.WriteCustomApis(_fullOutputPath, Context.CustomApis);
 	}
 
 	[GeneratedRegex("^\\s*$\\n|\\r", RegexOptions.Multiline)]

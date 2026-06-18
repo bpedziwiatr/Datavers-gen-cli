@@ -8,4 +8,6 @@ public class Context
 	public GeneratorInfo Info { get; set; } = new();
 
 	public string Namespace { get; set; }
+
+	public CustomApi.CustomApiModel[] CustomApis { get; set; } = Array.Empty<CustomApi.CustomApiModel>();
 }

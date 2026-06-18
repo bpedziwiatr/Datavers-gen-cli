@@ -2,6 +2,7 @@
 using CommunityToolkit.Diagnostics;
 using DataverseGen.Core.Config;
 using DataverseGen.Core.DataConverter;
+using DataverseGen.Core.CustomApi;
 using DataverseGen.Core.Generators.Scriban;
 using DataverseGen.Core.Metadata;
 using Meziantou.Framework.Win32;
@@ -92,10 +93,19 @@ internal static class Program
 
 			MappingEntity[] data = dataConverter.GetMappedEntities();
 			WriteLine(@"Finish Load data");
+
+			CustomApiModel[] customApis = Array.Empty<CustomApiModel>();
+			if (config.TemplateEngine.Type.Equals("ts", StringComparison.InvariantCultureIgnoreCase))
+			{
+				DataverseCustomApiConverter customApiConverter = new(dataverseConnector);
+				customApis = customApiConverter.GetCustomApis();
+			}
+
 			Context context = new()
 			{
 				Namespace = config.Namespace,
-				Entities = data
+				Entities = data,
+				CustomApis = customApis
 			};
 
 			WriteLine(@"Start generator");
