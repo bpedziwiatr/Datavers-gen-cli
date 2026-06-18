@@ -1,0 +1,11 @@
+feat: short summary
+
+# Type one of:
+# feat, fix, refactor, perf, docs, test, ci, build, chore, style, remove, delete, drop, sec, security
+#
+# Examples:
+# feat(cli): add release package upload
+# fix(core): handle empty entity list
+#
+# Keep the subject short, imperative, and specific.
+# Use the body only when the change needs context, risk notes, or follow-up items.

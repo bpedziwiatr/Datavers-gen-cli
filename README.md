@@ -1,18 +1,55 @@
 # Datavers-gen-cli
-Power Platform Dataverse early bound generator based on T4 template as cli with GUI options.
 
-## C# Template Dataverse Configuration Example
+Dataverse early-bound generator for Power Platform, built as a .NET 7 CLI on top of Scriban templates.
+
+## What Changed Recently
+
+- The CLI now reads `dataversegen.config.json` from the current working directory.
+- If `ConnectionString` is missing, the app falls back to Windows Credential Manager and prompts for one.
+- The Scriban generator supports both `C#` and `ts` output types.
+- Generation can run in single-file or multi-file mode.
+- Built-in templates are available through `TemplateName = "Main"`, and project templates can be copied under a `Templates` folder.
+- Release builds are packaged into self-contained and framework-dependent ZIP archives by `build.ps1`.
+
+## Current Behavior
+
+- The app loads Dataverse metadata for the entities listed in `Entities`.
+- It validates the connection string when `EnableConnectionStringValidation` is enabled.
+- It can throw when an entity from `Entities` is missing if `ThrowOnEntityNotFound` is enabled.
+- `TemplateEngine.Name` currently supports `scriban`.
+- `TemplateEngine.Type` accepts `C#` or `ts`.
+- When `TemplateEngine.IsSingleOutput` is `true`, the generator writes one output file per target.
+- When `TemplateEngine.IsSingleOutput` is `false`, the generator writes multiple files per entity.
+
+## Quick Start
+
+1. Create `dataversegen.config.json` in the directory where you want to run the generator.
+2. Fill in the Dataverse connection string, entity names, namespace, and output directory.
+3. Run the CLI from that directory.
+
+Example:
+
+```powershell
+dotnet run --project DataverseGen.Cli
+```
+
+## Configuration Example
+
+### C# output
 
 ```json
 {
   "Entities": [
-    "account", 
+    "account",
     "contact"
   ],
   "ConnectionString": "AuthType=ClientSecret;Url={url};ClientId={ClientId};ClientSecret={ClientSecret}",
   "Namespace": "sad.Dataverse.DataAccess.Entities",
   "OutDirectory": "Dataverse",
-  "TemplateName": "Main", //Template get from Dataverse-Gen.Cli
+  "TemplateName": "Main",
+  "TemplateDirectoryName": "Templates",
+  "EnableConnectionStringValidation": true,
+  "ThrowOnEntityNotFound": true,
   "TemplateEngine": {
     "IsSingleOutput": false,
     "Name": "scriban",
@@ -21,69 +58,84 @@ Power Platform Dataverse early bound generator based on T4 template as cli with 
 }
 ```
 
-## TypeScript Template Dataverse Configuration Example
+### TypeScript output
 
 ```json
 {
   "Entities": [
-    "account", 
+    "account",
     "contact"
   ],
   "ConnectionString": "AuthType=ClientSecret;Url={url};ClientId={ClientId};ClientSecret={ClientSecret}",
   "Namespace": "sad.dataverse.ui.webresource",
   "OutDirectory": "/src/dataversegen/",
   "TemplateName": "dataverse-template",
+  "TemplateDirectoryName": "Templates",
   "EnableConnectionStringValidation": true,
   "ThrowOnEntityNotFound": true,
-  "TemplateDirectoryName": "template",
   "TemplateEngine": {
-    "IsSingleOutput": false,
+    "IsSingleOutput": true,
     "Name": "scriban",
     "Type": "ts"
   }
 }
 ```
 
-## Templates configuration
+## Configuration Fields
 
-### Build in template
+- `Entities` - Dataverse schema names to generate.
+- `ConnectionString` - Dataverse connection string. If omitted, the CLI asks for it and stores it in Windows Credential Manager.
+- `Namespace` - Namespace used in generated code.
+- `OutDirectory` - Output folder for generated files.
+- `TemplateName` - Template set to use. `Main` selects the built-in templates.
+- `TemplateDirectoryName` - Folder name that contains project templates.
+- `EnableConnectionStringValidation` - Enables connection string validation. Default: `false`.
+- `ThrowOnEntityNotFound` - Throws when an entity from `Entities` is not found. Default: `false`.
+- `TemplateEngine.Name` - Template engine name. Current value: `scriban`.
+- `TemplateEngine.Type` - Output type. Use `C#` or `ts`.
+- `TemplateEngine.IsSingleOutput` - Controls single-file or multi-file generation.
 
-To use build in template configure TemplateName params as **Main**.
-```json
-{
-    "TemplateName": "Main"
-}
-```
+## Templates
 
-### Project Templates
+### Built-in templates
 
-To use project template you need to copy T4 Templates files to project, where the configuration file exist in folder **template**.
-
-**Folder structure**
-
-- sad.Dataverse.DataAccess.Entities
-    - Template
-        - Dataverse-Template
-            - _t4_template_files_
-    - dataversegen.config.json
+Use the built-in template set with:
 
 ```json
 {
-    "TemplateName": "Dataverse-Template"
+  "TemplateName": "Main"
 }
 ```
 
-## Params
+### Project templates
 
-- **Entities** - array with schema name list of generated entities
-- **ConnectionString** - connection string use to connetct to the specific Dataverse. Recomended use ClientSecret.
-- **Namespace** - namespace generated with the entities
-- **OutDirectory** - folder where file are generated
-- **TemplateName** - name of template used in generated files.
-- **TemplateDirectoryName** - folder name where the folder with templates exist.
-- **EnableConnectionStringValidation** - validate if connection string is correct.
-- **ThrowOnEntityNotFound** - throw error if generator cannot find a record specify in entities array.
-- **TemplateEngine** - configuration what should generate
-    - **IsSingleOutput** - true/false. If true then generated all records in one file. 
-    - **Name** - scriban
-    - **Type** - type of generated values. Use: C# or ts
+Copy the Scriban template files into a `Templates` folder next to your config file:
+
+```text
+MyProject
+  Templates
+    Dataverse-Template
+      ...
+  dataversegen.config.json
+```
+
+Then reference the template folder name in the config:
+
+```json
+{
+  "TemplateName": "Dataverse-Template",
+  "TemplateDirectoryName": "Templates"
+}
+```
+
+## Release Build
+
+- `pwsh -NoProfile -File build.ps1` publishes the CLI in Release mode.
+- The script creates both `includedotnet` and `nodotnet` ZIP packages under `publish/`.
+- Release automation also publishes those ZIPs as GitHub Release assets.
+
+## Development Notes
+
+- The solution targets `net7.0`.
+- Run `dotnet test DataverseGen.sln` after changing generator logic.
+- The test project is `Tests/DataverseGen.Core.Tests`.
