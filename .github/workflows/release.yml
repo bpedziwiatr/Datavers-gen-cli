@@ -115,29 +115,31 @@ jobs:
             $sectionLines.Add('')
           }
 
-          @"
-# Release Notes
+          $releaseNotes = @(
+            '# Release Notes'
+            ''
+            "## [$tag] - $releaseDate"
+            ''
+            '### Summary'
+            ''
+            "- Release branch: `$env:GITHUB_REF_NAME`"
+            "- Version: `$($gitv.FullSemVer)`"
+            "- SemVer: `$($gitv.SemVer)`"
+            "- NuGetVersion: `$($gitv.NuGetVersionV2)`"
+            "- Commit: `$($gitv.Sha)`"
+            "- Base tag: `$($previousTag ?? 'none')`"
+            "- Commit range: `$commitRange`"
+            "- Compare: [$compareUrl]($compareUrl)"
+            ''
+          ) + $sectionLines + @(
+            ''
+            '## Packages'
+            ''
+            "- `DataverseGen-CLI_includedotnet_$($gitv.NuGetVersionV2).zip`"
+            "- `DataverseGen-CLI_nodotnet_$($gitv.NuGetVersionV2).zip`"
+          )
 
-## [$tag] - $releaseDate
-
-### Summary
-
-- Release branch: `$env:GITHUB_REF_NAME`
-- Version: `$($gitv.FullSemVer)`
-- SemVer: `$($gitv.SemVer)`
-- NuGetVersion: `$($gitv.NuGetVersionV2)`
-- Commit: `$($gitv.Sha)`
-- Base tag: `$($previousTag ?? 'none')`
-- Commit range: `$commitRange`
-- Compare: [$compareUrl]($compareUrl)
-
-$($sectionLines -join "`r`n")
-
-## Packages
-
-- `DataverseGen-CLI_includedotnet_$($gitv.NuGetVersionV2).zip`
-- `DataverseGen-CLI_nodotnet_$($gitv.NuGetVersionV2).zip`
-"@ | Set-Content -Path $notesPath -Encoding utf8
+          $releaseNotes | Set-Content -Path $notesPath -Encoding utf8
 
           "tag=$tag" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
           "title=$title" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
