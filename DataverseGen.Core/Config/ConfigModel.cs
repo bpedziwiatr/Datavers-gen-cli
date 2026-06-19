@@ -15,6 +15,9 @@ public class ConfigModel
 	public string[] Entities { get; set; }
 	[JsonProperty]
 
+	public string[] CustomApis { get; set; }
+	[JsonProperty]
+
 	public string Namespace { get; set; }
 	[JsonProperty]
 

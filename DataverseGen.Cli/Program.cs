@@ -85,9 +85,11 @@ internal static class Program
 			WriteVersion();
 
 			ConfigModel config = GetConfig();
+			ConfigValidation.Validate(config);
+			DataverseConnector dataverseConnector = new(config.ConnectionString,
+				config.EnableConnectionStringValidation);
 
-			DataverseMetadataConverter dataConverter = new(new DataverseConnector(config.ConnectionString,
-					config.EnableConnectionStringValidation),
+			DataverseMetadataConverter dataConverter = new(dataverseConnector,
 				config.ThrowOnEntityNotFound,
 				config.Entities);
 
@@ -97,7 +99,7 @@ internal static class Program
 			CustomApiModel[] customApis = Array.Empty<CustomApiModel>();
 			if (config.TemplateEngine.Type.Equals("ts", StringComparison.InvariantCultureIgnoreCase))
 			{
-				DataverseCustomApiConverter customApiConverter = new(dataverseConnector);
+				DataverseCustomApiConverter customApiConverter = new(dataverseConnector, config.CustomApis);
 				customApis = customApiConverter.GetCustomApis();
 			}
 

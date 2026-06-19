@@ -16,10 +16,15 @@ public class DataverseCustomApiConverter
 	private const string CustomApiResponsePropertyTableName = "customapiresponseproperty";
 
 	private readonly DataverseConnector _dataverseConnector;
+	private readonly string[] _selectedCustomApis;
 
-	public DataverseCustomApiConverter(DataverseConnector dataverseConnector)
+	public DataverseCustomApiConverter(
+		DataverseConnector dataverseConnector,
+		string[] selectedCustomApis)
 	{
 		_dataverseConnector = dataverseConnector;
+		_selectedCustomApis = selectedCustomApis ?? Array.Empty<string>();
+		WriteInfo($@"Selected custom APIs: {string.Join(", ", _selectedCustomApis)}");
 	}
 
 	public CustomApiModel[] GetCustomApis()
@@ -28,15 +33,20 @@ public class DataverseCustomApiConverter
 		WriteInfo(@"Loading custom APIs");
 
 		List<Entity> customApiEntities = RetrieveCustomApiEntities();
+		List<Entity> selectedCustomApiEntities = FilterCustomApiEntities(customApiEntities, _selectedCustomApis);
+		HashSet<string> selectedCustomApiIds = new(
+			selectedCustomApiEntities.Select(GetEntityId),
+			StringComparer.InvariantCultureIgnoreCase);
+
 		List<Entity> requestParameterEntities = RetrieveRelatedEntities(CustomApiRequestParameterTableName);
 		List<Entity> responsePropertyEntities = RetrieveRelatedEntities(CustomApiResponsePropertyTableName);
 
 		Dictionary<string, List<CustomApiParameterModel>> requestParametersByApiId =
-			GroupParametersByApiId(requestParameterEntities);
+			GroupParametersByApiId(requestParameterEntities, selectedCustomApiIds);
 		Dictionary<string, List<CustomApiParameterModel>> responsePropertiesByApiId =
-			GroupParametersByApiId(responsePropertyEntities);
+			GroupParametersByApiId(responsePropertyEntities, selectedCustomApiIds);
 
-		List<CustomApiModel> result = customApiEntities
+		List<CustomApiModel> result = selectedCustomApiEntities
 		   .Select(entity => ParseCustomApi(entity,
 				requestParametersByApiId.GetValueOrDefault(GetEntityId(entity)) ?? new List<CustomApiParameterModel>(),
 				responsePropertiesByApiId.GetValueOrDefault(GetEntityId(entity)) ?? new List<CustomApiParameterModel>()))
@@ -49,7 +59,60 @@ public class DataverseCustomApiConverter
 		return result.ToArray();
 	}
 
-	private static Dictionary<string, List<CustomApiParameterModel>> GroupParametersByApiId(IEnumerable<Entity> entities)
+	internal static List<Entity> FilterCustomApiEntities(
+		IReadOnlyCollection<Entity> customApiEntities,
+		IReadOnlyCollection<string> selectedCustomApis)
+	{
+		if (selectedCustomApis == null || selectedCustomApis.Count == 0)
+		{
+			return customApiEntities.ToList();
+		}
+
+		List<string> selectedCustomApiNames = new();
+		HashSet<string> selectedCustomApiNamesLookup = new(StringComparer.InvariantCultureIgnoreCase);
+		foreach (string selectedCustomApi in selectedCustomApis)
+		{
+			if (string.IsNullOrWhiteSpace(selectedCustomApi))
+			{
+				continue;
+			}
+
+			string normalizedSelectedCustomApi = selectedCustomApi.Trim();
+			if (selectedCustomApiNamesLookup.Add(normalizedSelectedCustomApi))
+			{
+				selectedCustomApiNames.Add(normalizedSelectedCustomApi);
+			}
+		}
+
+		if (selectedCustomApiNames.Count == 0)
+		{
+			return customApiEntities.ToList();
+		}
+
+		Dictionary<string, Entity> availableCustomApis = customApiEntities
+		   .Where(entity => !string.IsNullOrWhiteSpace(GetString(entity, "uniquename")))
+		   .GroupBy(entity => GetString(entity, "uniquename"), StringComparer.InvariantCultureIgnoreCase)
+		   .ToDictionary(group => group.Key, group => group.First(), StringComparer.InvariantCultureIgnoreCase);
+
+		List<Entity> filteredCustomApis = new();
+
+		foreach (string selectedCustomApi in selectedCustomApiNames)
+		{
+			if (!availableCustomApis.TryGetValue(selectedCustomApi, out Entity customApiEntity))
+			{
+				WriteWarning($@"Custom API not found: {selectedCustomApi}");
+				continue;
+			}
+
+			filteredCustomApis.Add(customApiEntity);
+		}
+
+		return filteredCustomApis;
+	}
+
+	private static Dictionary<string, List<CustomApiParameterModel>> GroupParametersByApiId(
+		IEnumerable<Entity> entities,
+		ISet<string> selectedApiIds)
 	{
 		Dictionary<string, List<CustomApiParameterModel>> grouped = new(StringComparer.InvariantCultureIgnoreCase);
 
@@ -58,6 +121,11 @@ public class DataverseCustomApiConverter
 			string apiId = GetLookupId(entity, "customapiid");
 
 			if (string.IsNullOrWhiteSpace(apiId))
+			{
+				continue;
+			}
+
+			if (selectedApiIds is { Count: > 0 } && !selectedApiIds.Contains(apiId))
 			{
 				continue;
 			}
@@ -80,16 +148,7 @@ public class DataverseCustomApiConverter
 	{
 		QueryExpression query = new(CustomApiTableName)
 		{
-			ColumnSet = new ColumnSet(
-				"customapiid",
-				"uniquename",
-				"name",
-				"description",
-				"bindingtype",
-				"boundentitylogicalname",
-				"executeprivilegename",
-				"isfunction",
-				"isprivate")
+			ColumnSet = new ColumnSet(true)
 		};
 
 		EntityCollection response = _dataverseConnector.OrganizationService.RetrieveMultiple(query);
@@ -101,16 +160,7 @@ public class DataverseCustomApiConverter
 	{
 		QueryExpression query = new(tableName)
 		{
-			ColumnSet = new ColumnSet(
-				$"{tableName}id",
-				"customapiid",
-				"uniquename",
-				"name",
-				"description",
-				"type",
-				"logicalentityname",
-				"isoptional",
-				"position")
+			ColumnSet = new ColumnSet(true)
 		};
 
 		EntityCollection response = _dataverseConnector.OrganizationService.RetrieveMultiple(query);
@@ -162,7 +212,7 @@ public class DataverseCustomApiConverter
 		string displayName = GetString(entity, "name");
 		string uniqueName = GetString(entity, "uniquename");
 		string sourceName = string.IsNullOrWhiteSpace(uniqueName) ? displayName : uniqueName;
-		string propertyName = ToPascalCase(sourceName, false);
+		string propertyName = MetadataNamingExtensions.GetProperVariableName(sourceName);
 		string typeLabel = GetFormattedOrRawValue(entity, "type");
 		string logicalEntityName = GetString(entity, "logicalentityname");
 
@@ -180,6 +230,8 @@ public class DataverseCustomApiConverter
 			IsOptional = GetBool(entity, "isoptional"),
 			Position = GetInt(entity, "position"),
 			PropertyName = propertyName,
+			RequestPropertyName = MetadataNamingExtensions.GetProperVariableName(string.IsNullOrWhiteSpace(uniqueName) ? propertyName : uniqueName),
+			ConstructorParameterName = MetadataNamingExtensions.GetProperVariableName(string.IsNullOrWhiteSpace(displayName) ? propertyName : displayName),
 			TypeScriptType = tsType,
 			WebApiTypeName = webApiTypeName,
 			WebApiStructuralProperty = structuralProperty
