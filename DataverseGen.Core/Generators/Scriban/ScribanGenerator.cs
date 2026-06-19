@@ -56,6 +56,8 @@ public partial class ScribanGenerator : BaseGenerator
 					$@"type {TemplateEngineModel.Type} not supported use C# or TS");
 		}
 
+		GenerateCustomApis();
+
 		Console.WriteLine($@"Generating Scriban template '{TemplateName}' elapsed in: {stopper.Elapsed:g}");
 		stopper.Stop();
 	}
@@ -123,13 +125,11 @@ public partial class ScribanGenerator : BaseGenerator
 		if (TemplateEngineModel.IsSingleOutput)
 		{
 			SingleFileTypescript();
-			GenerateCustomApis();
 
 			return;
 		}
 
 		MultiOutputGeneratorTypeScript();
-		GenerateCustomApis();
 	}
 
 	private void SingleFileCSharp()
@@ -229,7 +229,16 @@ public partial class ScribanGenerator : BaseGenerator
 			return;
 		}
 
-		CustomApiTypeScriptGenerator.WriteCustomApis(_fullOutputPath, Context.CustomApis);
+		switch (TemplateEngineModel.Type.ToLowerInvariant())
+		{
+			case "c#":
+				CustomApiCSharpGenerator.WriteCustomApis(_fullOutputPath, Context.Namespace, Context.CustomApis);
+				break;
+
+			case "ts":
+				CustomApiTypeScriptGenerator.WriteCustomApis(_fullOutputPath, Context.CustomApis);
+				break;
+		}
 	}
 
 	[GeneratedRegex("^\\s*$\\n|\\r", RegexOptions.Multiline)]

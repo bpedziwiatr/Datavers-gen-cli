@@ -216,7 +216,12 @@ public class DataverseCustomApiConverter
 		string typeLabel = GetFormattedOrRawValue(entity, "type");
 		string logicalEntityName = GetString(entity, "logicalentityname");
 
-		NormalizeCustomApiParameterType(typeLabel, logicalEntityName, out string tsType, out string webApiTypeName, out string structuralProperty);
+		NormalizeCustomApiParameterType(typeLabel,
+			logicalEntityName,
+			out string tsType,
+			out string cSharpTypeName,
+			out string webApiTypeName,
+			out string structuralProperty);
 
 		return new CustomApiParameterModel
 		{
@@ -233,6 +238,7 @@ public class DataverseCustomApiConverter
 			RequestPropertyName = MetadataNamingExtensions.GetProperVariableName(string.IsNullOrWhiteSpace(uniqueName) ? propertyName : uniqueName),
 			ConstructorParameterName = MetadataNamingExtensions.GetProperVariableName(string.IsNullOrWhiteSpace(displayName) ? propertyName : displayName),
 			TypeScriptType = tsType,
+			CSharpTypeName = cSharpTypeName,
 			WebApiTypeName = webApiTypeName,
 			WebApiStructuralProperty = structuralProperty
 		};
@@ -299,14 +305,27 @@ public class DataverseCustomApiConverter
 		string typeLabel,
 		string logicalEntityName,
 		out string typeScriptType,
+		out string cSharpTypeName,
 		out string webApiTypeName,
 		out string structuralProperty)
 	{
-		string normalizedType = typeLabel.Trim().ToLowerInvariant();
+		string normalizedType = (typeLabel ?? string.Empty).Trim().ToLowerInvariant();
+
+		if (string.IsNullOrWhiteSpace(normalizedType))
+		{
+			typeScriptType = "string";
+			cSharpTypeName = "string";
+			webApiTypeName = "Edm.String";
+			structuralProperty = "WebApiRequestStructuralProperty.PrimitiveType";
+			return;
+		}
 
 		if (normalizedType.Contains("collection"))
 		{
 			typeScriptType = "string[]";
+			cSharpTypeName = string.IsNullOrWhiteSpace(logicalEntityName)
+				? "string[]"
+				: "EntityReference[]";
 			webApiTypeName = string.IsNullOrWhiteSpace(logicalEntityName)
 				? "Collection(Edm.String)"
 				: $"Collection(mscrm.{logicalEntityName})";
@@ -317,6 +336,7 @@ public class DataverseCustomApiConverter
 		if (normalizedType.Contains("entity"))
 		{
 			typeScriptType = "any";
+			cSharpTypeName = "EntityReference";
 			webApiTypeName = string.IsNullOrWhiteSpace(logicalEntityName)
 				? "mscrm.crmbaseentity"
 				: $"mscrm.{logicalEntityName}";
@@ -327,6 +347,7 @@ public class DataverseCustomApiConverter
 		if (normalizedType.Contains("bool"))
 		{
 			typeScriptType = "boolean";
+			cSharpTypeName = "bool";
 			webApiTypeName = "Edm.Boolean";
 			structuralProperty = "WebApiRequestStructuralProperty.PrimitiveType";
 			return;
@@ -335,6 +356,7 @@ public class DataverseCustomApiConverter
 		if (normalizedType.Contains("int") || normalizedType.Contains("whole"))
 		{
 			typeScriptType = "number";
+			cSharpTypeName = "int";
 			webApiTypeName = "Edm.Int32";
 			structuralProperty = "WebApiRequestStructuralProperty.PrimitiveType";
 			return;
@@ -343,6 +365,7 @@ public class DataverseCustomApiConverter
 		if (normalizedType.Contains("decimal") || normalizedType.Contains("double") || normalizedType.Contains("money") || normalizedType.Contains("float"))
 		{
 			typeScriptType = "number";
+			cSharpTypeName = "decimal";
 			webApiTypeName = "Edm.Decimal";
 			structuralProperty = "WebApiRequestStructuralProperty.PrimitiveType";
 			return;
@@ -351,6 +374,7 @@ public class DataverseCustomApiConverter
 		if (normalizedType.Contains("date"))
 		{
 			typeScriptType = "Date";
+			cSharpTypeName = "DateTime";
 			webApiTypeName = "Edm.DateTimeOffset";
 			structuralProperty = "WebApiRequestStructuralProperty.PrimitiveType";
 			return;
@@ -359,12 +383,14 @@ public class DataverseCustomApiConverter
 		if (normalizedType.Contains("guid") || normalizedType.Contains("unique"))
 		{
 			typeScriptType = "string";
+			cSharpTypeName = "Guid";
 			webApiTypeName = "Edm.Guid";
 			structuralProperty = "WebApiRequestStructuralProperty.PrimitiveType";
 			return;
 		}
 
 		typeScriptType = "string";
+		cSharpTypeName = "string";
 		webApiTypeName = "Edm.String";
 		structuralProperty = "WebApiRequestStructuralProperty.PrimitiveType";
 	}

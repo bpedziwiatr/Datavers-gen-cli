@@ -27,7 +27,7 @@ public static class CustomApiTypeScriptGenerator
 		StringBuilder sb = new();
 		string className = customApi.RequestClassName;
 		List<CustomApiParameterModel> constructorParameters = customApi.RequestParameters.ToList();
-		CustomApiParameterModel? boundParameter = GetBoundParameter(customApi);
+		CustomApiParameterModel boundParameter = GetBoundParameter(customApi);
 
 		sb.AppendLine($"export default class {className} implements IWebApiRequest {{");
 		sb.AppendLine("\tprivate operationName: string;");
@@ -111,7 +111,7 @@ public static class CustomApiTypeScriptGenerator
 		return sb.ToString();
 	}
 
-	private static CustomApiParameterModel? GetBoundParameter(CustomApiModel customApi)
+	private static CustomApiParameterModel GetBoundParameter(CustomApiModel customApi)
 	{
 		if (string.IsNullOrWhiteSpace(customApi.BoundEntityLogicalName))
 		{
@@ -129,7 +129,7 @@ public static class CustomApiTypeScriptGenerator
 		};
 	}
 
-	private static string GetBoundParameterName(CustomApiParameterModel? boundParameter)
+	private static string GetBoundParameterName(CustomApiParameterModel boundParameter)
 	{
 		return boundParameter == null
 			? "null"

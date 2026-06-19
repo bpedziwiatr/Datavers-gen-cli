@@ -73,7 +73,7 @@ public class ConfigModelTests
 	}
 
 	[TestMethod]
-	public void ConfigValidation_ThrowsWhenCustomApisUsedWithNonTsOutput()
+	public void ConfigValidation_AllowsCustomApisForCsOutput()
 	{
 		var model = new ConfigModel
 		{
@@ -83,6 +83,20 @@ public class ConfigModelTests
 				Type = "C#"
 			}
 		};
+
+		ConfigValidation.Validate(model);
+	}
+
+	[TestMethod]
+	public void ConfigValidation_ThrowsWhenConfigIsNull()
+	{
+		Assert.ThrowsException<ArgumentNullException>(() => ConfigValidation.Validate(null));
+	}
+
+	[TestMethod]
+	public void ConfigValidation_ThrowsWhenTemplateEngineIsMissing()
+	{
+		var model = new ConfigModel();
 
 		Assert.ThrowsException<InvalidOperationException>(() => ConfigValidation.Validate(model));
 	}

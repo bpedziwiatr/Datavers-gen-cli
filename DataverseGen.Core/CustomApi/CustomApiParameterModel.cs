@@ -47,6 +47,9 @@ public class CustomApiParameterModel
 	public string TypeScriptType { get; set; }
 
 	[JsonProperty]
+	public string CSharpTypeName { get; set; }
+
+	[JsonProperty]
 	public string WebApiTypeName { get; set; }
 
 	[JsonProperty]
