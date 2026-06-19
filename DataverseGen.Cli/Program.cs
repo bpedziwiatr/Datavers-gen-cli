@@ -96,12 +96,8 @@ internal static class Program
 			MappingEntity[] data = dataConverter.GetMappedEntities();
 			WriteLine(@"Finish Load data");
 
-			CustomApiModel[] customApis = Array.Empty<CustomApiModel>();
-			if (config.TemplateEngine.Type.Equals("ts", StringComparison.InvariantCultureIgnoreCase))
-			{
-				DataverseCustomApiConverter customApiConverter = new(dataverseConnector, config.CustomApis);
-				customApis = customApiConverter.GetCustomApis();
-			}
+			DataverseCustomApiConverter customApiConverter = new(dataverseConnector, config.CustomApis);
+			CustomApiModel[] customApis = customApiConverter.GetCustomApis();
 
 			Context context = new()
 			{

@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 
 namespace DataverseGen.Core.Config;
 
@@ -12,20 +11,9 @@ public static class ConfigValidation
 			throw new ArgumentNullException(nameof(config));
 		}
 
-		if (!HasCustomApis(config.CustomApis))
+		if (config.TemplateEngine == null)
 		{
-			return;
+			throw new InvalidOperationException("TemplateEngine must be configured.");
 		}
-
-		if (config.TemplateEngine == null ||
-			!string.Equals(config.TemplateEngine.Type, "ts", StringComparison.InvariantCultureIgnoreCase))
-		{
-			throw new InvalidOperationException("CustomApis can only be used when TemplateEngine.Type is set to 'ts'.");
-		}
-	}
-
-	private static bool HasCustomApis(string[] customApis)
-	{
-		return customApis != null && customApis.Any(api => !string.IsNullOrWhiteSpace(api));
 	}
 }

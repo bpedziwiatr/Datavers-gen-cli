@@ -8,7 +8,7 @@ public class CrmAttributeExtensionsTests
 	[AttributeUsage(AttributeTargets.All)]
 	private sealed class SampleAttribute : Attribute
 	{
-		public string Name { get; set; }
+		public string Name { get; set; } = string.Empty;
 		public bool IsActive { get; set; }
 		public int Priority { get; set; }
 	}
@@ -16,7 +16,7 @@ public class CrmAttributeExtensionsTests
 	[AttributeUsage(AttributeTargets.All)]
 	private sealed class NoSuffixAttr : Attribute
 	{
-		public string Value { get; set; }
+		public string Value { get; set; } = string.Empty;
 	}
 
 	// ── Type name formatting ───────────────────────────────────────────────────

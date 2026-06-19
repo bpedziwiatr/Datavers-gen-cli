@@ -9,14 +9,14 @@ Dataverse early-bound generator for Power Platform, built as a .NET 7 CLI on top
 - The Scriban generator supports both `C#` and `ts` output types.
 - Generation can run in single-file or multi-file mode.
 - TypeScript generation also emits custom API request wrappers under `customapi/`.
+- C# generation also emits custom API request wrappers under `customapi/`.
 - Built-in templates are available through `TemplateName = "Main"`, and project templates can be copied under a `Templates` folder.
 - Release builds are packaged into self-contained and framework-dependent ZIP archives by `build.ps1`.
 
 ## Current Behavior
 
 - The app loads Dataverse metadata for the entities listed in `Entities`.
-- If `CustomApis` is set, TypeScript output is narrowed to the listed custom API unique names.
-- `CustomApis` is only valid when `TemplateEngine.Type` is `ts`.
+- If `CustomApis` is set, the custom API output is narrowed to the listed custom API unique names.
 - It validates the connection string when `EnableConnectionStringValidation` is enabled.
 - It can throw when an entity from `Entities` is missing if `ThrowOnEntityNotFound` is enabled.
 - `TemplateEngine.Name` currently supports `scriban`.
@@ -87,18 +87,18 @@ dotnet run --project DataverseGen.Cli
 }
 ```
 
-## Custom API for TypeScript
+## Custom API
 
-Custom API request wrappers are generated automatically for TypeScript output.
+Custom API request wrappers are generated automatically for both `C#` and `ts` output.
 Configuration is minimal:
 
-- set `TemplateEngine.Type` to `ts`
+- set `TemplateEngine.Type` to `C#` or `ts`
 - keep the normal Dataverse connection string and output directory configuration
 - optionally set `CustomApis` to a list of custom API unique names to generate
 - make sure the environment contains `customapi`, `customapirequestparameter`, and `customapiresponseproperty` metadata
 
 No extra flag is required in `dataversegen.config.json` and there is no separate custom API switch.
-The generator reads the Dataverse metadata and writes TypeScript wrappers into:
+The generator reads the Dataverse metadata and writes custom API wrappers into:
 
 ```text
 <OutDirectory>/customapi/
@@ -130,7 +130,7 @@ Example TypeScript config that enables the feature:
 }
 ```
 
-The generated wrapper follows the Web API request contract and uses:
+The generated wrappers use:
 
 - the custom API unique name as the operation name
 - request parameter names from Dataverse metadata
@@ -138,11 +138,9 @@ The generated wrapper follows the Web API request contract and uses:
 
 If `CustomApis` is omitted or empty, all available custom APIs are generated.
 
-If you only generate `C#`, custom API wrappers are not emitted.
-
 ### Filtering custom APIs
 
-Use `CustomApis` to limit TypeScript generation to specific custom API unique names:
+Use `CustomApis` to limit custom API generation to specific `uniquename` values:
 
 ```json
 {
@@ -158,7 +156,7 @@ The names are matched against the Dataverse `uniquename` field, case-insensitive
 ## Configuration Fields
 
 - `Entities` - Dataverse schema names to generate.
-- `CustomApis` - Custom API unique names to generate. If omitted or empty, all custom APIs are generated for TypeScript output. Requires `TemplateEngine.Type = ts`.
+- `CustomApis` - Custom API unique names to generate. If omitted or empty, all custom APIs are generated for the selected output type.
 - `ConnectionString` - Dataverse connection string. If omitted, the CLI asks for it and stores it in Windows Credential Manager.
 - `Namespace` - Namespace used in generated code.
 - `OutDirectory` - Output folder for generated files.
