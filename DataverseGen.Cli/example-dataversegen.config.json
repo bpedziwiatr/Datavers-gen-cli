@@ -1,5 +1,6 @@
 {
   "Entities": [ "account", "contact" ],
+  "CustomApis": [ "newupdatestatus" ],
   "ConnectionString": "AuthType=ClientSecret;Url={url};ClientId={ClientId};ClientSecret={ClientSecret}",
   "Namespace": "sad.CRM.Test",
   "OutDirectory": "out-crm",

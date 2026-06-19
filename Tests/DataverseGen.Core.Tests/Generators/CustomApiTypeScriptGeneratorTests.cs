@@ -24,7 +24,9 @@ public class CustomApiTypeScriptGeneratorTests
 					{
 						new CustomApiParameterModel
 						{
-							PropertyName = "customerid",
+							PropertyName = "new_customer",
+							RequestPropertyName = "new_customer",
+							ConstructorParameterName = "customerid",
 							TypeScriptType = "string[]",
 							WebApiTypeName = "Collection(Edm.String)",
 							WebApiStructuralProperty = "WebApiRequestStructuralProperty.Collection"
@@ -37,10 +39,13 @@ public class CustomApiTypeScriptGeneratorTests
 			string content = File.ReadAllText(filePath);
 
 			StringAssert.Contains(content, "export default class ProcessStatusRequest implements IWebApiRequest");
-			StringAssert.Contains(content, "private customerid: string[];");
+			StringAssert.Contains(content, "private new_customer: string[];");
+			StringAssert.Contains(content, "constructor(private customerid: string[])");
+			StringAssert.Contains(content, "this.new_customer = customerid;");
 			StringAssert.Contains(content, "operationName = \"newupdatestatus\"");
 			StringAssert.Contains(content, "typeName: \"Collection(Edm.String)\"");
 			StringAssert.Contains(content, "structuralProperty: WebApiRequestStructuralProperty.Collection");
+			StringAssert.Contains(content, "new_customer: this.new_customer");
 		}
 		finally
 		{

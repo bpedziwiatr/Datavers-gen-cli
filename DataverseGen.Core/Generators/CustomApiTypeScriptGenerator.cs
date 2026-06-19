@@ -1,6 +1,5 @@
 using System.Text;
 using DataverseGen.Core.CustomApi;
-using DataverseGen.Core.Extensions;
 
 namespace DataverseGen.Core.Generators;
 
@@ -30,28 +29,41 @@ public static class CustomApiTypeScriptGenerator
 		List<CustomApiParameterModel> constructorParameters = customApi.RequestParameters.ToList();
 		CustomApiParameterModel? boundParameter = GetBoundParameter(customApi);
 
-		if (boundParameter != null)
-		{
-			constructorParameters.Insert(0, boundParameter);
-		}
-
 		sb.AppendLine($"export default class {className} implements IWebApiRequest {{");
 		sb.AppendLine("\tprivate operationName: string;");
 
-		foreach (CustomApiParameterModel parameter in constructorParameters)
+		if (boundParameter != null)
 		{
-			sb.AppendLine($"\tprivate {parameter.PropertyName}: {parameter.TypeScriptType};");
+			sb.AppendLine($"\tprivate {boundParameter.RequestPropertyName}: {boundParameter.TypeScriptType};");
+		}
+
+		foreach (CustomApiParameterModel parameter in customApi.RequestParameters)
+		{
+			sb.AppendLine($"\tprivate {parameter.RequestPropertyName}: {parameter.TypeScriptType};");
 		}
 
 		sb.AppendLine();
 		sb.Append($"\tconstructor(");
-		sb.Append(string.Join(", ", constructorParameters.Select(p => $"private {p.PropertyName}: {p.TypeScriptType}")));
+		sb.Append(string.Join(", ", constructorParameters.Select(p => $"private {p.ConstructorParameterName}: {p.TypeScriptType}")));
+		if (boundParameter != null)
+		{
+			if (constructorParameters.Count > 0)
+			{
+				sb.Append(", ");
+			}
+			sb.Append($"{boundParameter.ConstructorParameterName}: {boundParameter.TypeScriptType}");
+		}
 		sb.AppendLine(") {");
 		sb.AppendLine($"\t\tthis.operationName = \"{EscapeString(customApi.OperationName)}\";");
 
 		foreach (CustomApiParameterModel parameter in customApi.RequestParameters)
 		{
-			sb.AppendLine($"\t\tthis.{parameter.PropertyName} = {parameter.PropertyName};");
+			sb.AppendLine($"\t\tthis.{parameter.RequestPropertyName} = {parameter.ConstructorParameterName};");
+		}
+
+		if (boundParameter != null)
+		{
+			sb.AppendLine($"\t\tthis.{boundParameter.RequestPropertyName} = {boundParameter.ConstructorParameterName};");
 		}
 
 		sb.AppendLine("\t}");
@@ -60,12 +72,12 @@ public static class CustomApiTypeScriptGenerator
 
 		if (boundParameter != null)
 		{
-			sb.AppendLine($"\t\t\t{boundParameter.PropertyName}: this.{boundParameter.PropertyName},");
+			sb.AppendLine($"\t\t\t{boundParameter.RequestPropertyName}: this.{boundParameter.RequestPropertyName},");
 		}
 
 		foreach (CustomApiParameterModel parameter in customApi.RequestParameters)
 		{
-			sb.AppendLine($"\t\t\t{parameter.PropertyName}: this.{parameter.PropertyName},");
+			sb.AppendLine($"\t\t\t{parameter.RequestPropertyName}: this.{parameter.RequestPropertyName},");
 		}
 
 		sb.AppendLine("\t\t\tgetMetadata: () => ({");
@@ -74,7 +86,7 @@ public static class CustomApiTypeScriptGenerator
 
 		if (boundParameter != null)
 		{
-			sb.AppendLine($"\t\t\t\t\t{boundParameter.PropertyName}: {{");
+			sb.AppendLine($"\t\t\t\t\t{boundParameter.RequestPropertyName}: {{");
 			sb.AppendLine($"\t\t\t\t\t\ttypeName: \"{boundParameter.WebApiTypeName}\",");
 			sb.AppendLine($"\t\t\t\t\t\tstructuralProperty: {boundParameter.WebApiStructuralProperty}");
 			sb.AppendLine("\t\t\t\t\t},");
@@ -82,7 +94,7 @@ public static class CustomApiTypeScriptGenerator
 
 		foreach (CustomApiParameterModel parameter in customApi.RequestParameters)
 		{
-			sb.AppendLine($"\t\t\t\t\t{parameter.PropertyName}: {{");
+			sb.AppendLine($"\t\t\t\t\t{parameter.RequestPropertyName}: {{");
 			sb.AppendLine($"\t\t\t\t\t\ttypeName: \"{parameter.WebApiTypeName}\",");
 			sb.AppendLine($"\t\t\t\t\t\tstructuralProperty: {parameter.WebApiStructuralProperty}");
 			sb.AppendLine("\t\t\t\t\t},");
@@ -109,6 +121,8 @@ public static class CustomApiTypeScriptGenerator
 		return new CustomApiParameterModel
 		{
 			PropertyName = "entity",
+			RequestPropertyName = "entity",
+			ConstructorParameterName = "entity",
 			TypeScriptType = "any",
 			WebApiTypeName = $"mscrm.{customApi.BoundEntityLogicalName}",
 			WebApiStructuralProperty = "WebApiRequestStructuralProperty.EntityType"
@@ -119,7 +133,7 @@ public static class CustomApiTypeScriptGenerator
 	{
 		return boundParameter == null
 			? "null"
-			: $"\"{EscapeString(boundParameter.PropertyName)}\"";
+			: $"\"{EscapeString(boundParameter.RequestPropertyName)}\"";
 	}
 
 	private static string GetOperationType(CustomApiModel customApi)

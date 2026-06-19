@@ -2,7 +2,6 @@
 using System.Text;
 using System.Text.RegularExpressions;
 using DataverseGen.Core.Config;
-using DataverseGen.Core.CustomApi;
 using DataverseGen.Core.Generators;
 using DataverseGen.Core.Generators.Scriban.Templates;
 using DataverseGen.Core.Generators.Scriban.Templates.TemplateFileManager;

@@ -38,6 +38,12 @@ public class CustomApiParameterModel
 	public string PropertyName { get; set; }
 
 	[JsonProperty]
+	public string RequestPropertyName { get; set; }
+
+	[JsonProperty]
+	public string ConstructorParameterName { get; set; }
+
+	[JsonProperty]
 	public string TypeScriptType { get; set; }
 
 	[JsonProperty]

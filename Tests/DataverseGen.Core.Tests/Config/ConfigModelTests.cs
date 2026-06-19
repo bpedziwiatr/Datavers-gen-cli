@@ -21,6 +21,7 @@ public class ConfigModelTests
 		{
 			ConnectionString = "AuthType=AD;Url=https://contoso.crm.dynamics.com",
 			Entities = new[] { "account", "contact" },
+			CustomApis = new[] { "newupdatestatus" },
 			Namespace = "MyApp.DataModel",
 			OutDirectory = @"C:\output",
 			TemplateName = "scriban",
@@ -37,6 +38,7 @@ public class ConfigModelTests
 
 		Assert.AreEqual("AuthType=AD;Url=https://contoso.crm.dynamics.com", model.ConnectionString);
 		CollectionAssert.AreEqual(new[] { "account", "contact" }, model.Entities);
+		CollectionAssert.AreEqual(new[] { "newupdatestatus" }, model.CustomApis);
 		Assert.AreEqual("MyApp.DataModel", model.Namespace);
 		Assert.AreEqual(@"C:\output", model.OutDirectory);
 		Assert.AreEqual("scriban", model.TemplateName);
@@ -68,5 +70,35 @@ public class ConfigModelTests
 		Assert.IsFalse(model.IsSingleOutput);
 		Assert.IsNull(model.Name);
 		Assert.IsNull(model.Type);
+	}
+
+	[TestMethod]
+	public void ConfigValidation_ThrowsWhenCustomApisUsedWithNonTsOutput()
+	{
+		var model = new ConfigModel
+		{
+			CustomApis = new[] { "newupdatestatus" },
+			TemplateEngine = new TemplateEngineModel
+			{
+				Type = "C#"
+			}
+		};
+
+		Assert.ThrowsException<InvalidOperationException>(() => ConfigValidation.Validate(model));
+	}
+
+	[TestMethod]
+	public void ConfigValidation_AllowsCustomApisForTsOutput()
+	{
+		var model = new ConfigModel
+		{
+			CustomApis = new[] { "newupdatestatus" },
+			TemplateEngine = new TemplateEngineModel
+			{
+				Type = "ts"
+			}
+		};
+
+		ConfigValidation.Validate(model);
 	}
 }
